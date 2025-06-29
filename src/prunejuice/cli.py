@@ -17,8 +17,9 @@ from .commands.loader import CommandLoader
 from .utils.logging import setup_logging
 from .commands.worktree import worktree_app
 from .commands.session import session_app
-from .integrations.plum import PlumIntegration
 from .integrations.pots import PotsIntegration
+from .worktree_utils import GitWorktreeManager
+from .utils.path_resolver import ProjectPathResolver
 
 # Create Typer app
 app = typer.Typer(
@@ -119,7 +120,6 @@ def init(
     
     # Initialize database
     try:
-        settings = Settings()
         db = Database(prj_dir / "prunejuice.db")
         asyncio.run(db.initialize())
         console.print("Database initialized", style="dim")
@@ -181,7 +181,9 @@ def _list_commands(verbose: bool = False):
 def _list_events(limit: int = 10, status: Optional[str] = None, verbose: bool = False):
     """List recent command events."""
     try:
-        settings = Settings()
+        # Get project root for consistent database access
+        project_root = ProjectPathResolver.get_project_root()
+        settings = Settings(project_path=project_root)
         db = Database(settings.db_path)
         
         # Filter to current project by default
@@ -259,7 +261,9 @@ def run(
         # Import executor here to avoid circular imports
         from .core.executor import Executor
         
-        settings = Settings()
+        # Get project root for consistent database access
+        project_root = ProjectPathResolver.get_project_root()
+        settings = Settings(project_path=project_root)
         executor = Executor(settings)
         
         # Parse arguments
@@ -298,14 +302,57 @@ def run(
         raise typer.Exit(code=1)
 
 
+def _get_project_context():
+    """Get project and worktree context information."""
+    context = {
+        'project_name': Path.cwd().name,  # fallback
+        'project_root': Path.cwd(),
+        'current_worktree': None,
+        'is_git_repo': False
+    }
+    
+    try:
+        # Get Git-aware project root
+        project_root = ProjectPathResolver.get_project_root()
+        context['project_root'] = project_root
+        context['project_name'] = project_root.name
+        
+        # Check if we're in a Git repository
+        manager = GitWorktreeManager(Path.cwd())
+        if manager.is_git_repository():
+            context['is_git_repo'] = True
+            
+            # Check if current location is a worktree
+            current_path = Path.cwd()
+            worktree_info = manager.get_worktree_info(current_path)
+            if worktree_info:
+                # Extract branch name from refs/heads/branch-name format
+                branch = worktree_info.get('branch', '')
+                if branch.startswith('refs/heads/'):
+                    branch = branch[11:]  # Remove 'refs/heads/' prefix
+                context['current_worktree'] = {
+                    'branch': branch,
+                    'path': worktree_info.get('path'),
+                    'is_main': current_path == project_root
+                }
+    except Exception:
+        # Fallback to current directory if Git operations fail
+        pass
+    
+    return context
+
+
 @app.command()
 def status():
     """Show PruneJuice project status."""
     try:
-        settings = Settings()
+        # Get project and worktree context
+        context = _get_project_context()
+        settings = Settings(project_path=context['project_root'])
         
-        # Check if project is initialized
-        prj_dir = Path.cwd() / ".prj"
+        # Check if project is initialized - use project root, not current directory
+        project_root = context['project_root']
+        prj_dir = project_root / ".prj"
         db_exists = settings.db_path.exists()
         
         # Check if database is properly initialized by trying to query it
@@ -322,7 +369,11 @@ def status():
         
         # Show project info
         console.print("📊 PruneJuice Project Status", style="bold")
-        console.print(f"Project: {Path.cwd().name}")
+        console.print(f"Project: {context['project_name']}")
+        
+        # Show current worktree context if applicable
+        if context['current_worktree'] and not context['current_worktree']['is_main']:
+            console.print(f"Current worktree: {context['current_worktree']['branch']}", style="cyan")
         
         if not is_initialized:
             console.print("❌ Project not initialized", style="bold red")
@@ -367,14 +418,18 @@ def status():
         
         # Show worktree information (always show, regardless of init status)
         console.print("\n🌳 Worktree Status", style="bold")
-        plum = PlumIntegration()
-        if plum.is_available():
+        if context['is_git_repo']:
             try:
-                worktrees = plum.list_worktrees(Path.cwd())
+                manager = GitWorktreeManager(project_root)
+                worktrees = manager.list_worktrees()
                 if worktrees:
                     console.print(f"  Active worktrees: {len(worktrees)}")
                     for wt in worktrees[:3]:  # Show first 3
-                        console.print(f"    - {wt.get('branch', 'unknown')} at {wt.get('path', 'unknown')}", style="dim")
+                        # Format branch name (remove refs/heads/ prefix)
+                        branch = wt.get('branch', 'unknown')
+                        if branch.startswith('refs/heads/'):
+                            branch = branch[11:]
+                        console.print(f"    - {branch} at {wt.get('path', 'unknown')}", style="dim")
                     if len(worktrees) > 3:
                         console.print(f"    ... and {len(worktrees) - 3} more", style="dim")
                 else:
@@ -382,7 +437,7 @@ def status():
             except Exception:
                 console.print("  Error retrieving worktree info", style="yellow")
         else:
-            console.print("  Plum integration not available", style="dim")
+            console.print("  Not a Git repository", style="dim")
         
         # Show session information (always show, regardless of init status)
         console.print("\n📺 Session Status", style="bold")
@@ -415,7 +470,9 @@ def cleanup(
 ):
     """Clean up old artifacts and sessions."""
     try:
-        settings = Settings()
+        # Get project root for consistent database access
+        project_root = ProjectPathResolver.get_project_root()
+        settings = Settings(project_path=project_root)
         
         if not confirm:
             response = typer.confirm(f"Clean up artifacts older than {days} days?")
@@ -444,7 +501,9 @@ def history(
 ):
     """Show command execution history with filtering options."""
     try:
-        settings = Settings()
+        # Get project root for consistent database access
+        project_root = ProjectPathResolver.get_project_root()
+        settings = Settings(project_path=project_root)
         db = Database(settings.db_path)
         
         # Get project filter if requested
@@ -497,7 +556,9 @@ def show(
 ):
     """Show detailed information for a specific event."""
     try:
-        settings = Settings()
+        # Get project root for consistent database access
+        project_root = ProjectPathResolver.get_project_root()
+        settings = Settings(project_path=project_root)
         db = Database(settings.db_path)
         event = asyncio.run(db.get_event(event_id))
 

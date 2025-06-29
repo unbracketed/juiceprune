@@ -78,7 +78,7 @@ class GitWorktreeManager:
             result = self.repo.git.worktree("list", "--porcelain")
             
             worktrees = []
-            current_worktree = {}
+            current_worktree: Dict[str, Any] = {}
             
             for line in result.splitlines():
                 if line.startswith("worktree "):
@@ -161,4 +161,12 @@ class GitWorktreeManager:
     
     def get_main_worktree_path(self) -> Path:
         """Get the path to the main worktree (repository root)."""
+        # Get list of all worktrees
+        worktrees = self.list_worktrees()
+        
+        # The main worktree is the first one in the list
+        if worktrees:
+            return Path(worktrees[0]["path"])
+        
+        # Fallback to current working directory
         return Path(self.repo.working_dir)
