@@ -1,0 +1,2262 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Parallel agentic coding workflow orchestrator">
+      
+      
+      
+        <link rel="canonical" href="https://your-username.github.io/prunejuice/concepts/worktrees/">
+      
+      
+        <link rel="prev" href="../../guides/workflows/">
+      
+      
+        <link rel="next" href="../sessions/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Worktrees - Prunejuice Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#git-worktree-integration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Prunejuice Documentation" class="md-header__button md-logo" aria-label="Prunejuice Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Prunejuice Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Worktrees
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/your-username/prunejuice" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/prunejuice
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../quickstart/new-project/" class="md-tabs__link">
+          
+  
+  
+  Quickstart
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/command-definition/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/commands/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../advanced/custom-integrations/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Prunejuice Documentation" class="md-nav__button md-logo" aria-label="Prunejuice Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Prunejuice Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/your-username/prunejuice" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/prunejuice
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Quickstart
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/new-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    New Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/existing-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Existing Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/first-command/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Command
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/command-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Command Definition
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/step-creation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Step Creation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/project-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Workflows
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Worktrees
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Worktrees
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Features
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#native-python-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Native Python Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automatic-worktree-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic Worktree Management
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worktree-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worktree Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Worktree Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-level-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command-Level Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-level-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project-Level Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Structure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Naming Conventions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Technical Implementation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitworktreemanager-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitWorktreeManager Class
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration with Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Template Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#feature-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Feature Development
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hotfix-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hotfix Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Review
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#branch-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      Branch Naming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directory-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Optimization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recovery
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Usage
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-worktree-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Worktree Locations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-worktree-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conditional Worktree Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-external-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with External Tools
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-from-shell-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Migration from Shell Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration from Shell Scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-migration-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Migration Patterns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security Considerations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Monitoring
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sessions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/yaml-schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    YAML Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/custom-integrations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Custom Integrations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/mcp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCP Server
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Features
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#native-python-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Native Python Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automatic-worktree-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic Worktree Management
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worktree-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worktree Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Worktree Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-level-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command-Level Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-level-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project-Level Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Structure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Naming Conventions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Technical Implementation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gitworktreemanager-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      GitWorktreeManager Class
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration with Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Template Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#feature-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Feature Development
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hotfix-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hotfix Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Review
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#branch-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      Branch Naming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#directory-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Optimization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recovery
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Usage
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-worktree-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Worktree Locations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-worktree-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conditional Worktree Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-external-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with External Tools
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-from-shell-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Migration from Shell Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration from Shell Scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-migration-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Migration Patterns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security Considerations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Monitoring
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="git-worktree-integration">Git Worktree Integration</h1>
+<p>Prunejuice provides native Python-based Git worktree management that enables parallel development workflows across multiple working directories. This replaces traditional shell-based approaches with a robust, type-safe implementation built on GitPython.</p>
+<h2 id="overview">Overview</h2>
+<p>Git worktrees allow you to check out multiple branches of the same repository simultaneously, each in its own working directory. Prunejuice automates worktree creation, management, and cleanup as part of command execution workflows.</p>
+<h2 id="core-features">Core Features</h2>
+<h3 id="native-python-implementation">Native Python Implementation</h3>
+<ul>
+<li><strong>Pure Python</strong>: Built with GitPython and asyncio, no shell script dependencies</li>
+<li><strong>Type Safety</strong>: Full type hints throughout the worktree management system</li>
+<li><strong>Better Error Handling</strong>: Structured error handling with detailed logging</li>
+<li><strong>Cross-Platform</strong>: Works on macOS, Linux, and Windows</li>
+</ul>
+<h3 id="automatic-worktree-management">Automatic Worktree Management</h3>
+<ul>
+<li><strong>On-Demand Creation</strong>: Worktrees are created automatically when commands specify worktree requirements</li>
+<li><strong>Smart Naming</strong>: Follows consistent naming patterns: <code>{project}-{branch}</code></li>
+<li><strong>Directory Organization</strong>: Organized in a dedicated worktrees directory structure</li>
+<li><strong>Lifecycle Management</strong>: Automatic cleanup when workflows complete</li>
+</ul>
+<h2 id="worktree-configuration">Worktree Configuration</h2>
+<h3 id="command-level-configuration">Command-Level Configuration</h3>
+<p>Define worktree requirements in your command YAML:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># .prj/commands/feature-dev.yaml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">feature-dev</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Develop a new feature in isolated worktree</span>
+
+<span class="c1"># Worktree specification</span>
+<span class="nt">worktree</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;feature-{{task_id}}&quot;</span>
+<span class="w">  </span><span class="nt">base_branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;main&quot;</span>
+
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">setup-environment</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">run-tests</span>
+</code></pre></div>
+<h3 id="project-level-configuration">Project-Level Configuration</h3>
+<p>Configure global worktree settings in <code>.prj/configs/project.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">project</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-project</span>
+<span class="w">  </span><span class="nt">default_base_branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+
+<span class="nt">worktrees</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">base_directory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;../worktrees&quot;</span>
+<span class="w">  </span><span class="nt">naming_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{project}}-{{branch}}&quot;</span>
+<span class="w">  </span><span class="nt">auto_cleanup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h3 id="global-configuration">Global Configuration</h3>
+<p>Set system-wide defaults in <code>~/.config/prunejuice/config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">git</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">worktree_base</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~/worktrees&quot;</span>
+<span class="w">  </span><span class="nt">auto_cleanup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="nt">defaults</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">base_branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;main&quot;</span>
+</code></pre></div>
+<h2 id="directory-structure">Directory Structure</h2>
+<p>Prunejuice organizes worktrees in a predictable structure:</p>
+<div class="highlight"><pre><span></span><code>project-root/
+├── .git/
+├── main-code/
+└── ../worktrees/
+    ├── project-feature-auth/
+    ├── project-hotfix-bug123/
+    └── project-experiment-perf/
+</code></pre></div>
+<h3 id="naming-conventions">Naming Conventions</h3>
+<ul>
+<li><strong>Pattern</strong>: <code>{project-name}-{branch-name}</code></li>
+<li><strong>Sanitization</strong>: Special characters replaced with hyphens</li>
+<li><strong>Length Limits</strong>: Truncated if too long while preserving readability</li>
+<li><strong>Uniqueness</strong>: Conflicts automatically resolved with suffixes</li>
+</ul>
+<h2 id="technical-implementation">Technical Implementation</h2>
+<h3 id="gitworktreemanager-class">GitWorktreeManager Class</h3>
+<p>The core worktree management is handled by the <code>GitWorktreeManager</code> class:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">prunejuice.worktree_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">GitWorktreeManager</span>
+
+<span class="n">manager</span> <span class="o">=</span> <span class="n">GitWorktreeManager</span><span class="p">(</span><span class="n">project_path</span><span class="p">)</span>
+
+<span class="c1"># Create a new worktree</span>
+<span class="n">worktree_path</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">create_worktree</span><span class="p">(</span>
+    <span class="n">branch_name</span><span class="o">=</span><span class="s2">&quot;feature-auth&quot;</span><span class="p">,</span>
+    <span class="n">base_branch</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
+    <span class="n">parent_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;../worktrees&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># List all worktrees</span>
+<span class="n">worktrees</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">list_worktrees</span><span class="p">()</span>
+
+<span class="c1"># Remove a worktree</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">remove_worktree</span><span class="p">(</span><span class="n">worktree_path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="key-methods">Key Methods</h3>
+<ul>
+<li><strong><code>create_worktree()</code></strong>: Creates new worktree with branch</li>
+<li><strong><code>list_worktrees()</code></strong>: Returns all worktrees with metadata</li>
+<li><strong><code>remove_worktree()</code></strong>: Safely removes worktree and branch</li>
+<li><strong><code>get_worktree_info()</code></strong>: Gets detailed worktree information</li>
+<li><strong><code>is_git_repository()</code></strong>: Validates Git repository status</li>
+</ul>
+<h3 id="error-handling">Error Handling</h3>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">worktree_path</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">create_worktree</span><span class="p">(</span><span class="s2">&quot;new-feature&quot;</span><span class="p">,</span> <span class="s2">&quot;main&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Handle worktree creation failures</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create worktree: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Handle invalid branch names or missing base branches</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid worktree configuration: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="integration-with-commands">Integration with Commands</h2>
+<h3 id="automatic-creation">Automatic Creation</h3>
+<p>When a command specifies worktree requirements, Prunejuice:</p>
+<ol>
+<li><strong>Validates</strong> base branch exists</li>
+<li><strong>Creates</strong> new branch from base</li>
+<li><strong>Sets up</strong> worktree directory</li>
+<li><strong>Configures</strong> working directory for command execution</li>
+<li><strong>Tracks</strong> worktree in project state</li>
+</ol>
+<h3 id="template-variables">Template Variables</h3>
+<p>Worktree configurations support template variables:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">worktree</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{task_type}}-{{issue_number}}&quot;</span>
+<span class="w">  </span><span class="nt">base_branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{base_branch</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">default(&#39;main&#39;)}}&quot;</span>
+</code></pre></div>
+<p>Available variables:
+- <code>{{project}}</code>: Project name
+- <code>{{task_id}}</code>: Task identifier
+- <code>{{timestamp}}</code>: Current timestamp
+- <code>{{user}}</code>: Current user
+- Command arguments as variables</p>
+<h2 id="workflow-examples">Workflow Examples</h2>
+<h3 id="feature-development">Feature Development</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Command with worktree creation</span>
+prj<span class="w"> </span>run<span class="w"> </span>start-feature<span class="w"> </span><span class="nv">task_id</span><span class="o">=</span>user-auth
+
+<span class="c1"># Creates:</span>
+<span class="c1"># - Branch: feature-user-auth</span>
+<span class="c1"># - Worktree: ../worktrees/myproject-feature-user-auth/</span>
+<span class="c1"># - Session: myproject-feature-user-auth-dev</span>
+</code></pre></div>
+<h3 id="hotfix-workflow">Hotfix Workflow</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Emergency hotfix</span>
+prj<span class="w"> </span>run<span class="w"> </span>hotfix<span class="w"> </span><span class="nv">issue</span><span class="o">=</span>critical-bug<span class="w"> </span><span class="nv">base_branch</span><span class="o">=</span>production
+
+<span class="c1"># Creates:</span>
+<span class="c1"># - Branch: hotfix-critical-bug</span>
+<span class="c1"># - Worktree: ../worktrees/myproject-hotfix-critical-bug/</span>
+<span class="c1"># - Based on production branch</span>
+</code></pre></div>
+<h3 id="code-review">Code Review</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Review PR in isolated environment</span>
+prj<span class="w"> </span>run<span class="w"> </span>review-pr<span class="w"> </span><span class="nv">pr_number</span><span class="o">=</span><span class="m">456</span>
+
+<span class="c1"># Creates:</span>
+<span class="c1"># - Branch: review-pr-456</span>
+<span class="c1"># - Worktree: ../worktrees/myproject-review-pr-456/</span>
+<span class="c1"># - Checks out PR branch for review</span>
+</code></pre></div>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="branch-naming">Branch Naming</h3>
+<ul>
+<li>Use descriptive, hierarchical names: <code>feature/user-auth</code>, <code>hotfix/memory-leak</code></li>
+<li>Include issue numbers: <code>feature/gh-123-user-auth</code></li>
+<li>Use consistent prefixes: <code>feature/</code>, <code>hotfix/</code>, <code>experiment/</code></li>
+</ul>
+<h3 id="directory-management">Directory Management</h3>
+<ul>
+<li>Keep worktrees in dedicated parent directory</li>
+<li>Use consistent naming patterns</li>
+<li>Enable auto-cleanup for temporary worktrees</li>
+<li>Regular cleanup of stale worktrees</li>
+</ul>
+<h3 id="performance-optimization">Performance Optimization</h3>
+<ul>
+<li><strong>Shared Objects</strong>: Worktrees share Git objects, saving disk space</li>
+<li><strong>Sparse Checkout</strong>: Use sparse-checkout for large repositories</li>
+<li><strong>Cleanup Strategy</strong>: Remove worktrees promptly after use</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>Worktree Creation Fails</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check if base branch exists</span>
+git<span class="w"> </span>branch<span class="w"> </span>-a<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>main
+
+<span class="c1"># Verify repository state</span>
+prj<span class="w"> </span>status
+
+<span class="c1"># Check available disk space</span>
+df<span class="w"> </span>-h
+</code></pre></div></p>
+<p><strong>Branch Already Exists</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># List existing branches</span>
+git<span class="w"> </span>branch<span class="w"> </span>-a
+
+<span class="c1"># Force cleanup if needed</span>
+prj<span class="w"> </span>run<span class="w"> </span>cleanup-worktree<span class="w"> </span><span class="nv">branch</span><span class="o">=</span>feature-name<span class="w"> </span>--force
+</code></pre></div></p>
+<p><strong>Permission Issues</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check directory permissions</span>
+ls<span class="w"> </span>-la<span class="w"> </span>../worktrees/
+
+<span class="c1"># Fix permissions if needed</span>
+chmod<span class="w"> </span>-R<span class="w"> </span><span class="m">755</span><span class="w"> </span>../worktrees/
+</code></pre></div></p>
+<h3 id="debugging">Debugging</h3>
+<p>Enable debug logging for detailed worktree operations:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Enable debug mode</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PRJ_LOG_LEVEL</span><span class="o">=</span>DEBUG
+prj<span class="w"> </span>run<span class="w"> </span>your-command
+
+<span class="c1"># Check logs</span>
+tail<span class="w"> </span>-f<span class="w"> </span>~/.local/share/prunejuice/logs/debug.log
+</code></pre></div>
+<h3 id="recovery">Recovery</h3>
+<p>Recover from corrupted worktree state:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># List all worktrees</span>
+git<span class="w"> </span>worktree<span class="w"> </span>list
+
+<span class="c1"># Remove corrupted worktree</span>
+git<span class="w"> </span>worktree<span class="w"> </span>remove<span class="w"> </span>--force<span class="w"> </span>path/to/worktree
+
+<span class="c1"># Prune dangling references</span>
+git<span class="w"> </span>worktree<span class="w"> </span>prune
+</code></pre></div>
+<h2 id="advanced-usage">Advanced Usage</h2>
+<h3 id="custom-worktree-locations">Custom Worktree Locations</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Per-command custom location</span>
+<span class="nt">worktree</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;experiment-{{feature}}&quot;</span>
+<span class="w">  </span><span class="nt">base_branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;develop&quot;</span>
+<span class="w">  </span><span class="nt">parent_directory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/experiments&quot;</span>
+</code></pre></div>
+<h3 id="conditional-worktree-creation">Conditional Worktree Creation</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Only create worktree if specific conditions are met</span>
+<span class="nt">worktree</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{branch_name}}&quot;</span>
+<span class="w">  </span><span class="nt">base_branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;main&quot;</span>
+<span class="w">  </span><span class="nt">create_if</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{create_isolated</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">default(false)}}&quot;</span>
+</code></pre></div>
+<h3 id="integration-with-external-tools">Integration with External Tools</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Post-creation hooks</span>
+<span class="nt">worktree</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;feature-{{name}}&quot;</span>
+<span class="w">  </span><span class="nt">post_create_steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">setup-development-environment</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">install-dependencies</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">configure-ide</span>
+</code></pre></div>
+<h2 id="migration-from-shell-scripts">Migration from Shell Scripts</h2>
+<p>If migrating from shell-based worktree management:</p>
+<ol>
+<li><strong>Audit existing scripts</strong> for worktree operations</li>
+<li><strong>Map shell commands</strong> to Prunejuice configurations</li>
+<li><strong>Test workflows</strong> in isolated environment</li>
+<li><strong>Update CI/CD</strong> to use Prunejuice commands</li>
+<li><strong>Train team</strong> on new workflow patterns</li>
+</ol>
+<h3 id="common-migration-patterns">Common Migration Patterns</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Old shell script</span>
+git<span class="w"> </span>worktree<span class="w"> </span>add<span class="w"> </span>../feature-branch<span class="w"> </span>feature-branch
+<span class="nb">cd</span><span class="w"> </span>../feature-branch
+
+<span class="c1"># New Prunejuice command</span>
+prj<span class="w"> </span>run<span class="w"> </span>start-feature<span class="w"> </span><span class="nv">branch</span><span class="o">=</span>feature-branch
+</code></pre></div>
+<h2 id="security-considerations">Security Considerations</h2>
+<ul>
+<li><strong>Path Validation</strong>: All paths are validated and sanitized</li>
+<li><strong>Branch Verification</strong>: Base branches are verified before creation</li>
+<li><strong>Permission Checks</strong>: Directory permissions are validated</li>
+<li><strong>Cleanup Tracking</strong>: All created worktrees are tracked for cleanup</li>
+</ul>
+<h2 id="performance-monitoring">Performance Monitoring</h2>
+<p>Monitor worktree performance through built-in metrics:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># View worktree statistics</span>
+prj<span class="w"> </span>status<span class="w"> </span>--detailed
+
+<span class="c1"># Check recent worktree operations</span>
+prj<span class="w"> </span><span class="nb">history</span><span class="w"> </span>--filter<span class="o">=</span>worktree
+
+<span class="c1"># Analyze disk usage</span>
+prj<span class="w"> </span>analyze-disk-usage
+</code></pre></div>
+<p>The native Python worktree implementation provides a robust foundation for parallel development workflows, enabling teams to work efficiently across multiple branches while maintaining consistency and reliability.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "content.code.copy"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

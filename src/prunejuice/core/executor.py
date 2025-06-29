@@ -12,6 +12,9 @@ import os
 from .database import Database
 from .models import CommandDefinition, ExecutionResult, StepError, CommandStep, StepType
 from .state import StateManager
+from .session import Session, SessionStatus
+from .builtin_steps import BuiltinSteps
+from .commands import create_command
 from ..commands.loader import CommandLoader
 from ..integrations.plum import PlumIntegration
 from ..integrations.pots import PotsIntegration
@@ -218,16 +221,11 @@ class Executor:
         self.plum = PlumIntegration(settings.plum_path)
         self.pots = PotsIntegration(settings.pots_path)
         
-        # Register built-in steps
-        self.step_executor = StepExecutor({
-            "setup-environment": self._setup_environment,
-            "validate-prerequisites": self._validate_prerequisites,
-            "create-worktree": self._create_worktree,
-            "start-session": self._start_session,
-            "gather-context": self._gather_context,
-            "store-artifacts": self._store_artifacts,
-            "cleanup": self._cleanup,
-        })
+        # Initialize built-in steps
+        self.builtin_steps = BuiltinSteps(self.db, self.artifacts, self.plum, self.pots)
+        
+        # Register built-in steps with step executor
+        self.step_executor = StepExecutor(self.builtin_steps.get_step_registry())
     
     async def execute_command(
         self,
@@ -259,24 +257,25 @@ class Executor:
                 error=f"Invalid arguments: {', '.join(validation_errors)}"
             )
         
-        # Create execution context
+        # Create session
         session_id = f"{project_path.name}-{int(datetime.now().timestamp())}"
         artifact_dir = self.artifacts.create_session_dir(
             project_path, session_id, command_name
         )
         
-        context = {
-            'command': command,
-            'project_path': project_path,
-            'session_id': session_id,
-            'artifact_dir': artifact_dir,
-            'args': args,
-            'environment': {**os.environ, **command.environment},
-            'working_directory': command.working_directory or str(project_path)
-        }
+        session = Session(
+            id=session_id,
+            command_name=command_name,
+            project_path=project_path,
+            artifact_dir=artifact_dir
+        )
+        
+        # Store command arguments in session shared data
+        session.set_shared_data('args', args)
+        session.set_shared_data('environment', {**os.environ, **command.environment})
         
         if dry_run:
-            return self._dry_run(command, context)
+            return self._dry_run(command, session)
         
         # Start event tracking
         try:
@@ -286,69 +285,42 @@ class Executor:
                 session_id=session_id,
                 artifacts_path=str(artifact_dir)
             )
-            context['event_id'] = event_id
+            session.set_shared_data('event_id', event_id)
         except Exception as e:
             logger.warning(f"Failed to start event tracking: {e}")
-            context['event_id'] = None
+            session.set_shared_data('event_id', None)
         
-        # Execute command with simple sequential execution
+        # Create appropriate command type and execute
         try:
-            # Get all steps as CommandStep objects
-            all_steps = command.get_all_steps()
+            command_instance = create_command(command, session, self.step_executor, self.builtin_steps)
+            result = await command_instance.execute()
             
-            for i, step in enumerate(all_steps):
-                logger.info(f"Executing step {i+1}/{len(all_steps)}: {step.name}")
-                
-                await self.state.begin_step(session_id, step.name)
-                success, output = await self.step_executor.execute(
-                    step, context, command.timeout
-                )
-                
-                # Store step output as artifact
-                if output:
-                    self.artifacts.store_content(
-                        artifact_dir, output, f"step-{i+1}-{step.name}.log", "logs"
-                    )
-                
-                if success:
-                    await self.state.complete_step(session_id, step.name, output)
-                else:
-                    await self.state.fail_step(session_id, step.name, output)
-                    raise StepError(f"Step '{step.name}' failed: {output}")
-            
-            # Mark success
-            if context.get('event_id'):
+            # Mark success in event tracking
+            event_id = session.get_shared_data('event_id')
+            if event_id:
                 try:
-                    await self.db.end_event(context['event_id'], "completed", 0)
+                    status = "completed" if result.success else "failed"
+                    await self.db.end_event(event_id, status, 0 if result.success else 1)
                 except Exception as e:
-                    logger.warning(f"Failed to mark event as completed: {e}")
+                    logger.warning(f"Failed to mark event as {status}: {e}")
             
-            return ExecutionResult(
-                success=True,
-                artifacts_path=str(artifact_dir)
-            )
+            return result
             
         except Exception as e:
             logger.error(f"Command execution failed: {e}")
             
-            # Run cleanup steps
-            for step in command.cleanup_on_failure:
+            # Mark failure in event tracking
+            event_id = session.get_shared_data('event_id')
+            if event_id:
                 try:
-                    await self.step_executor.execute(step, context, 60)
-                except Exception:
-                    logger.error(f"Cleanup step '{step}' failed")
-            
-            # Mark failure
-            if context.get('event_id'):
-                try:
-                    await self.db.end_event(context['event_id'], "failed", 1, str(e))
+                    await self.db.end_event(event_id, "failed", 1, str(e))
                 except Exception as db_e:
                     logger.warning(f"Failed to mark event as failed: {db_e}")
             
             return ExecutionResult(
                 success=False,
                 error=str(e),
-                artifacts_path=str(artifact_dir)
+                artifacts_path=str(session.artifact_dir)
             )
     
     def _validate_arguments(self, command: CommandDefinition, args: Dict[str, Any]) -> List[str]:
@@ -361,12 +333,12 @@ class Executor:
         
         return errors
     
-    def _dry_run(self, command: CommandDefinition, context: Dict[str, Any]) -> ExecutionResult:
+    def _dry_run(self, command: CommandDefinition, session: Session) -> ExecutionResult:
         """Perform a dry run showing what would be executed."""
         output = f"Dry run for command: {command.name}\n"
         output += f"Description: {command.description}\n"
-        output += f"Project path: {context['project_path']}\n"
-        output += f"Arguments: {context['args']}\n\n"
+        output += f"Project path: {session.project_path}\n"
+        output += f"Arguments: {session.get_shared_data('args')}\n\n"
         
         all_steps = command.get_all_steps()
         output += f"Steps to execute ({len(all_steps)}):\n"
@@ -386,111 +358,3 @@ class Executor:
             success=True,
             output=output
         )
-    
-    # Built-in step implementations
-    async def _setup_environment(self, context: Dict[str, Any]) -> str:
-        """Setup execution environment."""
-        artifact_dir = context['artifact_dir']
-        artifact_dir.mkdir(parents=True, exist_ok=True)
-        (artifact_dir / "logs").mkdir(exist_ok=True)
-        (artifact_dir / "outputs").mkdir(exist_ok=True)
-        return "Environment setup complete"
-    
-    async def _validate_prerequisites(self, context: Dict[str, Any]) -> str:
-        """Validate prerequisites for command execution."""
-        issues = []
-        
-        # Check if we're in a git repository
-        project_path = context['project_path']
-        if not (project_path / ".git").exists():
-            issues.append("Not in a git repository")
-        
-        # Check for required tools
-        if context['command'].name.startswith('worktree-') and not self.plum.is_available():
-            issues.append("Plum worktree manager not available")
-        
-        if issues:
-            raise RuntimeError(f"Prerequisites not met: {', '.join(issues)}")
-        
-        return "Prerequisites validated"
-    
-    async def _create_worktree(self, context: Dict[str, Any]) -> str:
-        """Create worktree via plum integration."""
-        branch_name = context['args'].get(
-            'branch_name',
-            f"pj-{context['command'].name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-        )
-        
-        worktree_path = await self.plum.create_worktree(
-            context['project_path'],
-            branch_name
-        )
-        
-        context['worktree_path'] = worktree_path
-        context['branch_name'] = branch_name
-        return f"Created worktree at {worktree_path}"
-    
-    async def _start_session(self, context: Dict[str, Any]) -> str:
-        """Start tmux session via pots integration."""
-        session_name = await self.pots.create_session(
-            context.get('worktree_path', context['project_path']),
-            context['command'].name
-        )
-        
-        context['tmux_session'] = session_name
-        return f"Started tmux session: {session_name}"
-    
-    async def _gather_context(self, context: Dict[str, Any]) -> str:
-        """Gather context information for the command."""
-        # This could be expanded to gather git status, recent commits, etc.
-        project_path = context['project_path']
-        
-        context_info = {
-            "project_name": project_path.name,
-            "git_branch": "unknown",
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        
-        # Try to get git branch
-        try:
-            result = subprocess.run(
-                ["git", "branch", "--show-current"],
-                cwd=project_path,
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            context_info["git_branch"] = result.stdout.strip()
-        except subprocess.CalledProcessError:
-            pass
-        
-        # Store context as artifact
-        self.artifacts.store_content(
-            context['artifact_dir'],
-            json.dumps(context_info, indent=2),
-            "context.json",
-            "specs"
-        )
-        
-        return f"Context gathered for {context_info['project_name']}"
-    
-    async def _store_artifacts(self, context: Dict[str, Any]) -> str:
-        """Store artifacts for the session."""
-        # Mark artifacts in database
-        if context.get('event_id'):
-            try:
-                await self.db.store_artifact(
-                    context['event_id'],
-                    "session",
-                    str(context['artifact_dir']),
-                    0
-                )
-            except Exception as e:
-                logger.warning(f"Failed to store artifact info: {e}")
-        
-        return f"Artifacts stored in {context['artifact_dir']}"
-    
-    async def _cleanup(self, context: Dict[str, Any]) -> str:
-        """Cleanup session resources."""
-        await self.state.cleanup_session(context['session_id'])
-        return "Cleanup completed"

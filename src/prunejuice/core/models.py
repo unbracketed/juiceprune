@@ -75,6 +75,7 @@ class CommandDefinition(BaseModel):
     """Complete command definition."""
     name: str
     description: str
+    prompt_file: Optional[str] = None
     extends: Optional[str] = None
     category: str = "workflow"
     arguments: List[CommandArgument] = Field(default_factory=list)

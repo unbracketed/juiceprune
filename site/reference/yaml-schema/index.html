@@ -1,0 +1,2626 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Parallel agentic coding workflow orchestrator">
+      
+      
+      
+        <link rel="canonical" href="https://your-username.github.io/prunejuice/reference/yaml-schema/">
+      
+      
+        <link rel="prev" href="../config/">
+      
+      
+        <link rel="next" href="../../advanced/custom-integrations/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>YAML Schema - Prunejuice Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#commandstep-yaml-schemas" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Prunejuice Documentation" class="md-header__button md-logo" aria-label="Prunejuice Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Prunejuice Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              YAML Schema
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/your-username/prunejuice" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/prunejuice
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../quickstart/new-project/" class="md-tabs__link">
+          
+  
+  
+  Quickstart
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/command-definition/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../concepts/worktrees/" class="md-tabs__link">
+          
+  
+  
+  Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../commands/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../advanced/custom-integrations/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Prunejuice Documentation" class="md-nav__button md-logo" aria-label="Prunejuice Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Prunejuice Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/your-username/prunejuice" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/prunejuice
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Quickstart
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/new-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    New Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/existing-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Existing Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/first-command/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Command
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/command-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Command Definition
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/step-creation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Step Creation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/project-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Workflows
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/worktrees/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Worktrees
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sessions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    YAML Schema
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    YAML Schema
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-definition-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Definition Schema
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Definition Schema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-schema-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Schema Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#field-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Field Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Field Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Fields
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      name (required)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      description (required)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category" class="md-nav__link">
+    <span class="md-ellipsis">
+      category
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extends" class="md-nav__link">
+    <span class="md-ellipsis">
+      extends
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      prompt_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      working_directory
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Argument Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#argument-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Schema
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step Schema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-simple-string-format-legacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Simple String Format (Legacy)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-detailed-object-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Detailed Object Format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-mixed-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Mixed Format
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#builtin" class="md-nav__link">
+    <span class="md-ellipsis">
+      builtin
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#script" class="md-nav__link">
+    <span class="md-ellipsis">
+      script
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      shell
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Arguments
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Command
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-with-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command with Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-development-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complex Development Command
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-with-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command with Inheritance
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation Rules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validation Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalid-command-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid Command Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid Steps
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Organization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-from-legacy-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Migration from Legacy Formats
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration from Legacy Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#string-steps-to-object-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      String Steps to Object Steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-type-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Type Information
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Schema Evolution
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/custom-integrations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Custom Integrations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/mcp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCP Server
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-definition-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Definition Schema
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Definition Schema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-schema-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Schema Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#field-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Field Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Field Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Fields
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      name (required)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      description (required)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category" class="md-nav__link">
+    <span class="md-ellipsis">
+      category
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extends" class="md-nav__link">
+    <span class="md-ellipsis">
+      extends
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      prompt_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      working_directory
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Argument Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#argument-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Schema
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step Schema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-simple-string-format-legacy" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Simple String Format (Legacy)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-detailed-object-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Detailed Object Format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-mixed-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Mixed Format
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#builtin" class="md-nav__link">
+    <span class="md-ellipsis">
+      builtin
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#script" class="md-nav__link">
+    <span class="md-ellipsis">
+      script
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      shell
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Arguments
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Command
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-with-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command with Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-development-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complex Development Command
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-with-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command with Inheritance
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation Rules
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validation Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalid-command-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid Command Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid Steps
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argument-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Argument Design
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Organization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-from-legacy-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Migration from Legacy Formats
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration from Legacy Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#string-steps-to-object-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      String Steps to Object Steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-type-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Type Information
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Schema Evolution
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="commandstep-yaml-schemas">Command/Step YAML Schemas</h1>
+<p>This document provides detailed schema documentation for command and step YAML files, including all available fields, types, validation rules, and comprehensive examples.</p>
+<h2 id="overview">Overview</h2>
+<p>PruneJuice uses YAML files to define commands and their execution steps. The schema is based on Pydantic models that provide validation and type checking.</p>
+<h2 id="command-definition-schema">Command Definition Schema</h2>
+<h3 id="complete-schema-structure">Complete Schema Structure</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Required fields</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">                    </span><span class="c1"># Command identifier</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">             </span><span class="c1"># Human-readable description</span>
+
+<span class="c1"># Optional command metadata</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">                </span><span class="c1"># Command category (default: &quot;workflow&quot;)</span>
+<span class="nt">extends</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">                 </span><span class="c1"># Base command to inherit from</span>
+<span class="nt">prompt_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">             </span><span class="c1"># Path to prompt file</span>
+<span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">integer</span><span class="w">                </span><span class="c1"># Command timeout in seconds (default: 1800)</span>
+<span class="nt">working_directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">       </span><span class="c1"># Working directory for execution</span>
+
+<span class="c1"># Command arguments</span>
+<span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">                </span><span class="c1"># Argument name</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">boolean</span><span class="w">           </span><span class="c1"># Whether argument is required (default: true)</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">               </span><span class="c1"># Argument type (default: &quot;string&quot;)</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">any</span><span class="w">               </span><span class="c1"># Default value</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span><span class="w">        </span><span class="c1"># Argument description</span>
+
+<span class="c1"># Environment variables</span>
+<span class="nt">environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">KEY</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;value&quot;</span><span class="w">                 </span><span class="c1"># Environment variable key-value pairs</span>
+
+<span class="c1"># Step definitions</span>
+<span class="nt">pre_steps</span><span class="p">:</span><span class="w">                     </span><span class="c1"># Steps to run before main execution</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">step_definition</span><span class="w">            </span><span class="c1"># Step definition (see Step Schema below)</span>
+<span class="nt">steps</span><span class="p">:</span><span class="w">                         </span><span class="c1"># Main execution steps</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">step_definition</span><span class="w">            </span><span class="c1"># Step definition (see Step Schema below)</span>
+<span class="nt">post_steps</span><span class="p">:</span><span class="w">                    </span><span class="c1"># Steps to run after main execution</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">step_definition</span><span class="w">            </span><span class="c1"># Step definition (see Step Schema below)</span>
+<span class="nt">cleanup_on_failure</span><span class="p">:</span><span class="w">            </span><span class="c1"># Steps to run if execution fails</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">step_definition</span><span class="w">            </span><span class="c1"># Step definition (see Step Schema below)</span>
+</code></pre></div>
+<h2 id="field-definitions">Field Definitions</h2>
+<h3 id="core-fields">Core Fields</h3>
+<h4 id="name-required"><code>name</code> (required)</h4>
+<ul>
+<li><strong>Type</strong>: <code>string</code></li>
+<li><strong>Description</strong>: Unique identifier for the command</li>
+<li><strong>Validation</strong>: Must be a valid string</li>
+<li><strong>Example</strong>: <code>"feature-branch"</code>, <code>"analyze-issue"</code></li>
+</ul>
+<h4 id="description-required"><code>description</code> (required)</h4>
+<ul>
+<li><strong>Type</strong>: <code>string</code></li>
+<li><strong>Description</strong>: Human-readable description of what the command does</li>
+<li><strong>Example</strong>: <code>"Create feature branch with full development environment"</code></li>
+</ul>
+<h4 id="category"><code>category</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>string</code></li>
+<li><strong>Default</strong>: <code>"workflow"</code></li>
+<li><strong>Description</strong>: Categorization for command organization</li>
+<li><strong>Common Values</strong>: <code>"workflow"</code>, <code>"development"</code>, <code>"analysis"</code>, <code>"example"</code></li>
+<li><strong>Example</strong>: <code>"development"</code></li>
+</ul>
+<h4 id="extends"><code>extends</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>string</code> (optional)</li>
+<li><strong>Description</strong>: Name of a base command to inherit configuration from</li>
+<li><strong>Example</strong>: <code>"base-development"</code></li>
+</ul>
+<h4 id="prompt_file"><code>prompt_file</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>string</code> (optional)</li>
+<li><strong>Description</strong>: Path to a prompt file for AI-driven commands</li>
+<li><strong>Example</strong>: <code>"prompts/feature-development.md"</code></li>
+</ul>
+<h4 id="timeout"><code>timeout</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>integer</code></li>
+<li><strong>Default</strong>: <code>1800</code> (30 minutes)</li>
+<li><strong>Description</strong>: Maximum execution time in seconds</li>
+<li><strong>Example</strong>: <code>3600</code> (1 hour)</li>
+</ul>
+<h4 id="working_directory"><code>working_directory</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>string</code> (optional)</li>
+<li><strong>Description</strong>: Working directory for command execution (relative to project root)</li>
+<li><strong>Example</strong>: <code>"src"</code>, <code>"../other-project"</code></li>
+</ul>
+<h3 id="argument-definitions">Argument Definitions</h3>
+<p>Arguments define the parameters that can be passed to a command.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;feature_name&quot;</span><span class="w">        </span><span class="c1"># Required: argument identifier</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">              </span><span class="c1"># Optional: whether argument is mandatory</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;string&quot;</span><span class="w">              </span><span class="c1"># Optional: argument type validation</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">               </span><span class="c1"># Optional: default value if not provided</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Feature</span><span class="nv"> </span><span class="s">name&quot;</span><span class="w"> </span><span class="c1"># Optional: human-readable description</span>
+</code></pre></div>
+<h4 id="argument-types">Argument Types</h4>
+<ul>
+<li><strong><code>string</code></strong>: Text values (default)</li>
+<li><strong><code>integer</code></strong>: Numeric values</li>
+<li><strong><code>boolean</code></strong>: True/false values</li>
+<li><strong><code>path</code></strong>: File system paths</li>
+</ul>
+<h4 id="argument-examples">Argument Examples</h4>
+<div class="highlight"><pre><span></span><code><span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Required string argument</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;issue_number&quot;</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;GitHub</span><span class="nv"> </span><span class="s">issue</span><span class="nv"> </span><span class="s">number</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">analyze&quot;</span>
+
+<span class="w">  </span><span class="c1"># Optional argument with default</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;branch_name&quot;</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;string&quot;</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto-generated&quot;</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Custom</span><span class="nv"> </span><span class="s">branch</span><span class="nv"> </span><span class="s">name&quot;</span>
+
+<span class="w">  </span><span class="c1"># Boolean argument</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;force&quot;</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;boolean&quot;</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Force</span><span class="nv"> </span><span class="s">operation</span><span class="nv"> </span><span class="s">even</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">conflicts</span><span class="nv"> </span><span class="s">exist&quot;</span>
+
+<span class="w">  </span><span class="c1"># Simplified argument (name only)</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;simple_arg&quot;</span>
+</code></pre></div>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>Environment variables are set for the command execution context.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">PRUNEJUICE_TASK</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;feature-development&quot;</span>
+<span class="w">  </span><span class="nt">NODE_ENV</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;development&quot;</span>
+<span class="w">  </span><span class="nt">DEBUG</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+<span class="w">  </span><span class="nt">CUSTOM_PATH</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/custom/path&quot;</span>
+</code></pre></div>
+<h2 id="step-schema">Step Schema</h2>
+<p>Steps can be defined in three formats:</p>
+<h3 id="1-simple-string-format-legacy">1. Simple String Format (Legacy)</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;echo-hello-step&quot;</span><span class="w">           </span><span class="c1"># Simple step name</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;git</span><span class="nv"> </span><span class="s">status&quot;</span><span class="w">                </span><span class="c1"># Shell command</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;scripts/setup.py&quot;</span><span class="w">          </span><span class="c1"># Script path</span>
+</code></pre></div>
+<h3 id="2-detailed-object-format">2. Detailed Object Format</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;setup-environment&quot;</span><span class="w">   </span><span class="c1"># Step name</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span><span class="w">             </span><span class="c1"># Step type (builtin, script, shell)</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;setup-environment&quot;</span><span class="w"> </span><span class="c1"># Action to execute</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w">                       </span><span class="c1"># Step arguments</span>
+<span class="w">      </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;value&quot;</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300</span><span class="w">                </span><span class="c1"># Step timeout in seconds</span>
+<span class="w">    </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                </span><span class="c1"># Script content (for script types)</span>
+</code></pre></div>
+<h3 id="3-mixed-format">3. Mixed Format</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;simple-step&quot;</span><span class="w">               </span><span class="c1"># String format</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;complex-step&quot;</span><span class="w">        </span><span class="c1"># Object format</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;shell&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;npm</span><span class="nv"> </span><span class="s">install</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">npm</span><span class="nv"> </span><span class="s">test&quot;</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">600</span>
+</code></pre></div>
+<h2 id="step-types">Step Types</h2>
+<h3 id="builtin"><code>builtin</code></h3>
+<ul>
+<li><strong>Description</strong>: Built-in PruneJuice operations</li>
+<li><strong>Available Actions</strong>:</li>
+<li><code>setup-environment</code>: Initialize execution environment</li>
+<li><code>validate-prerequisites</code>: Check system requirements</li>
+<li><code>create-worktree</code>: Create git worktree via plum</li>
+<li><code>start-session</code>: Start tmux session via pots</li>
+<li><code>gather-context</code>: Collect project context information</li>
+<li><code>store-artifacts</code>: Store execution artifacts</li>
+<li><code>cleanup</code>: Clean up resources</li>
+</ul>
+<h3 id="script"><code>script</code></h3>
+<ul>
+<li><strong>Description</strong>: Execute a script file</li>
+<li><strong>Action</strong>: Path to script file (relative to project or absolute)</li>
+<li><strong>Supported</strong>: <code>.sh</code>, <code>.py</code>, <code>.js</code>, and other executable files</li>
+</ul>
+<h3 id="shell"><code>shell</code></h3>
+<ul>
+<li><strong>Description</strong>: Execute shell commands directly</li>
+<li><strong>Action</strong>: Shell command string</li>
+<li><strong>Features</strong>: Supports pipes, redirects, and shell operators</li>
+</ul>
+<h2 id="step-arguments">Step Arguments</h2>
+<p>Step arguments are passed to the step execution context:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;custom-step&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;script&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;scripts/deploy.py&quot;</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">environment</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;staging&quot;</span>
+<span class="w">      </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;us-west-2&quot;</span>
+<span class="w">      </span><span class="nt">force</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">900</span>
+</code></pre></div>
+<h2 id="complete-examples">Complete Examples</h2>
+<h3 id="basic-command">Basic Command</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-hello</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Simple echo command example</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-hello-step</span>
+<span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300</span>
+</code></pre></div>
+<h3 id="command-with-arguments">Command with Arguments</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-arg</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Echo command with argument example</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example</span>
+<span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">message</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Message to echo back</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-arg-step</span>
+<span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300</span>
+</code></pre></div>
+<h3 id="complex-development-command">Complex Development Command</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">feature-branch</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create feature branch with full development environment</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">development</span>
+<span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">feature_name</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Name of the feature to implement</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">issue_number</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Related GitHub issue number</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">force</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">boolean</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Force creation even if branch exists</span>
+<span class="nt">environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">PRUNEJUICE_TASK</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;feature-development&quot;</span>
+<span class="w">  </span><span class="nt">NODE_ENV</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;development&quot;</span>
+<span class="w">  </span><span class="nt">FEATURE_NAME</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">feature_name</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="nt">pre_steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;validate-environment&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;validate-prerequisites&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;check-git-status&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;shell&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;git</span><span class="nv"> </span><span class="s">status</span><span class="nv"> </span><span class="s">--porcelain&quot;</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;gather-project-context&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;gather-context&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;create-feature-worktree&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;create-worktree&quot;</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">branch_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">feature_name</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;setup-development-environment&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;script&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;scripts/setup-dev-env.sh&quot;</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">feature</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">feature_name</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">issue</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">issue_number</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">600</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start-development-session&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start-session&quot;</span>
+<span class="nt">post_steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;store-session-artifacts&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;store-artifacts&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notify-completion&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;shell&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;echo</span><span class="nv"> </span><span class="s">&#39;Feature</span><span class="nv"> </span><span class="s">branch</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">feature_name</span><span class="nv"> </span><span class="s">}}</span><span class="nv"> </span><span class="s">ready</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">development&#39;&quot;</span>
+<span class="nt">cleanup_on_failure</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cleanup-failed-setup&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cleanup&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;remove-partial-worktree&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;shell&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;git</span><span class="nv"> </span><span class="s">worktree</span><span class="nv"> </span><span class="s">remove</span><span class="nv"> </span><span class="s">--force</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">feature_name</span><span class="nv"> </span><span class="s">}}</span><span class="nv"> </span><span class="s">||</span><span class="nv"> </span><span class="s">true&quot;</span>
+<span class="nt">working_directory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;.&quot;</span>
+<span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1800</span>
+</code></pre></div>
+<h3 id="command-with-inheritance">Command with Inheritance</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># base-command.yaml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base-development</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Base development command</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base</span>
+<span class="nt">environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">NODE_ENV</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;development&quot;</span>
+<span class="w">  </span><span class="nt">DEBUG</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+<span class="nt">pre_steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">setup-environment</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">validate-prerequisites</span>
+<span class="nt">post_steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">store-artifacts</span>
+<span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1800</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># derived-command.yaml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom-feature</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Custom feature development</span>
+<span class="nt">extends</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base-development</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">development</span>
+<span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">feature_type</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Type of feature to create</span>
+<span class="nt">environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">FEATURE_TYPE</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">feature_type</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gather-context</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create-worktree</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">start-session</span>
+</code></pre></div>
+<h2 id="validation-rules">Validation Rules</h2>
+<h3 id="command-validation">Command Validation</h3>
+<ol>
+<li><strong>Required Fields</strong>: <code>name</code> and <code>description</code> must be present</li>
+<li><strong>Name Format</strong>: Command names should use lowercase with hyphens</li>
+<li><strong>Timeout Values</strong>: Must be positive integers</li>
+<li><strong>Step Arrays</strong>: All step arrays must contain valid step definitions</li>
+</ol>
+<h3 id="argument-validation">Argument Validation</h3>
+<ol>
+<li><strong>Name Uniqueness</strong>: Argument names must be unique within a command</li>
+<li><strong>Type Validation</strong>: Type must be one of: <code>string</code>, <code>integer</code>, <code>boolean</code>, <code>path</code></li>
+<li><strong>Required Logic</strong>: Required arguments cannot have default values</li>
+<li><strong>Default Types</strong>: Default values must match the specified type</li>
+</ol>
+<h3 id="step-validation">Step Validation</h3>
+<ol>
+<li><strong>Type Validation</strong>: Step type must be <code>builtin</code>, <code>script</code>, or <code>shell</code></li>
+<li><strong>Action Required</strong>: All steps must have a valid action</li>
+<li><strong>Timeout Limits</strong>: Step timeouts must be positive and reasonable</li>
+<li><strong>Script Paths</strong>: Script actions must reference accessible files</li>
+</ol>
+<h2 id="error-examples">Error Examples</h2>
+<h3 id="invalid-command-structure">Invalid Command Structure</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># ❌ Missing required fields</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">incomplete-command</span>
+<span class="c1"># Missing description</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">invalid-step</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># ❌ Invalid timeout</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bad-timeout</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Command with invalid timeout</span>
+<span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-100</span><span class="w">  </span><span class="c1"># Negative timeout invalid</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-hello</span>
+</code></pre></div>
+<h3 id="invalid-arguments">Invalid Arguments</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># ❌ Duplicate argument names</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">duplicate-args</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Command with duplicate argument names</span>
+<span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">duplicate</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">duplicate</span><span class="w">  </span><span class="c1"># Duplicate name</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">integer</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-hello</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># ❌ Required argument with default value</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">invalid-required</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Command with invalid required argument</span>
+<span class="nt">arguments</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bad_arg</span>
+<span class="w">    </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;should</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">have</span><span class="nv"> </span><span class="s">default&quot;</span><span class="w">  </span><span class="c1"># Invalid combination</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo-hello</span>
+</code></pre></div>
+<h3 id="invalid-steps">Invalid Steps</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># ❌ Invalid step type</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bad-step-type</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Command with invalid step type</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">invalid-step</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unknown-type&quot;</span><span class="w">  </span><span class="c1"># Invalid step type</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;some-action&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># ❌ Missing action</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">missing-action</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Command with missing step action</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">incomplete-step</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="c1"># Missing action field</span>
+</code></pre></div>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="command-design">Command Design</h3>
+<ol>
+<li><strong>Descriptive Names</strong>: Use clear, hyphenated command names</li>
+<li><strong>Meaningful Descriptions</strong>: Provide comprehensive descriptions</li>
+<li><strong>Appropriate Categories</strong>: Use consistent categorization</li>
+<li><strong>Reasonable Timeouts</strong>: Set appropriate timeout values</li>
+</ol>
+<h3 id="argument-design">Argument Design</h3>
+<ol>
+<li><strong>Clear Names</strong>: Use descriptive argument names</li>
+<li><strong>Helpful Descriptions</strong>: Provide clear argument descriptions</li>
+<li><strong>Sensible Defaults</strong>: Use reasonable default values</li>
+<li><strong>Type Safety</strong>: Specify appropriate argument types</li>
+</ol>
+<h3 id="step-organization">Step Organization</h3>
+<ol>
+<li><strong>Logical Grouping</strong>: Group related steps together</li>
+<li><strong>Error Handling</strong>: Include cleanup steps for failure scenarios</li>
+<li><strong>Clear Naming</strong>: Use descriptive step names</li>
+<li><strong>Appropriate Timeouts</strong>: Set step-specific timeouts when needed</li>
+</ol>
+<h3 id="environment-variables_1">Environment Variables</h3>
+<ol>
+<li><strong>Consistent Naming</strong>: Use consistent environment variable naming</li>
+<li><strong>Documentation</strong>: Document custom environment variables</li>
+<li><strong>Security</strong>: Avoid sensitive data in YAML files</li>
+<li><strong>Template Variables</strong>: Use <code>{{ variable }}</code> syntax for argument substitution</li>
+</ol>
+<h2 id="migration-from-legacy-formats">Migration from Legacy Formats</h2>
+<h3 id="string-steps-to-object-steps">String Steps to Object Steps</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Old format</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;simple-command&quot;</span>
+
+<span class="c1"># New format (recommended)</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;simple-command&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;builtin&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;simple-command&quot;</span>
+</code></pre></div>
+<h3 id="adding-type-information">Adding Type Information</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Minimal</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;git</span><span class="nv"> </span><span class="s">status&quot;</span>
+
+<span class="c1"># Enhanced</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;check-git-status&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;shell&quot;</span>
+<span class="w">    </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;git</span><span class="nv"> </span><span class="s">status&quot;</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+</code></pre></div>
+<h2 id="schema-evolution">Schema Evolution</h2>
+<p>The YAML schema continues to evolve. Future versions may include:</p>
+<ul>
+<li><strong>Conditional Steps</strong>: Steps that execute based on conditions</li>
+<li><strong>Parallel Execution</strong>: Support for parallel step execution</li>
+<li><strong>Step Dependencies</strong>: Explicit step dependency management</li>
+<li><strong>Dynamic Arguments</strong>: Runtime argument resolution</li>
+<li><strong>Enhanced Validation</strong>: More sophisticated validation rules</li>
+</ul>
+<p>For the latest schema updates, check the release notes and migration guides.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "content.code.copy"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

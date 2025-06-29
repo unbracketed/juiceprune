@@ -1,7 +1,7 @@
 # Prunejuice Project Makefile
 # Unified Python project for parallel agentic coding workflow orchestration
 
-.PHONY: help install test lint typecheck format clean dev run status init build
+.PHONY: help install test lint typecheck format clean dev run status init build docs-install docs-serve docs-build docs-clean docs-deploy
 
 # Default target
 help: ## Show this help message
@@ -92,11 +92,23 @@ session-list: ## List all tmux sessions
 	uv run python -c "import asyncio; from prunejuice.session_utils import TmuxManager; print('\n'.join([s['name'] for s in asyncio.run(TmuxManager().list_sessions())]))"
 
 # Documentation
-docs-serve: ## Serve documentation (if available)
-	@echo "Documentation serving not yet implemented"
+docs-install: ## Install documentation dependencies
+	uv sync --group docs
+
+docs-serve: ## Serve documentation locally (use PORT=<number> to specify port)
+	uv run mkdocs serve --dev-addr 127.0.0.1:$${PORT:-8000}
+
+docs-build: ## Build static documentation
+	uv run mkdocs build
+
+docs-clean: ## Clean documentation build artifacts
+	rm -rf site/
+
+docs-deploy: ## Deploy documentation to GitHub Pages
+	uv run mkdocs gh-deploy
 
 # Complete development workflow
-dev-setup: dev-install check test ## Complete development environment setup
+dev-setup: dev-install docs-install check test ## Complete development environment setup
 
 # CI/CD workflow
 ci: check test ## Run CI checks (linting, type checking, tests)

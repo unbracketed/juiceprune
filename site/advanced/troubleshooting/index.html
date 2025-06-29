@@ -1,0 +1,2468 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Parallel agentic coding workflow orchestrator">
+      
+      
+      
+        <link rel="canonical" href="https://your-username.github.io/prunejuice/advanced/troubleshooting/">
+      
+      
+        <link rel="prev" href="../mcp-server/">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Troubleshooting - Prunejuice Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#troubleshooting-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Prunejuice Documentation" class="md-header__button md-logo" aria-label="Prunejuice Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Prunejuice Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Troubleshooting
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/your-username/prunejuice" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/prunejuice
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../quickstart/new-project/" class="md-tabs__link">
+          
+  
+  
+  Quickstart
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/command-definition/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../concepts/worktrees/" class="md-tabs__link">
+          
+  
+  
+  Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/commands/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../custom-integrations/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Prunejuice Documentation" class="md-nav__button md-logo" aria-label="Prunejuice Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Prunejuice Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/your-username/prunejuice" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    your-username/prunejuice
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Quickstart
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/new-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    New Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/existing-project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Existing Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/first-command/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Command
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/command-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Command Definition
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/step-creation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Step Creation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/project-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Workflows
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/worktrees/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Worktrees
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sessions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/yaml-schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    YAML Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-integrations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Custom Integrations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCP Server
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-version-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      Python Version Compatibility
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#missing-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Missing Dependencies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-initialization-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Initialization Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Initialization Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#not-a-git-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Not a Git Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-denied" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permission Denied
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-execution-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Execution Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Execution Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Not Found
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-yaml-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid YAML Syntax
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-execution-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Execution Failures
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-worktree-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Worktree Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Worktree Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#worktree-creation-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worktree Creation Fails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worktree-directory-conflicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worktree Directory Conflicts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-branch-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Branch Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tmux-session-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tmux Session Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tmux Session Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tmux-not-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tmux Not Available
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-name-conflicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Name Conflicts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-attachment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Attachment Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#slow-command-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Slow Command Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      High Memory Usage
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#corrupted-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corrupted Database
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-lock-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database Lock Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-and-configuration-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment and Configuration Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment and Configuration Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variable-problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variable Problems
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-override-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Override Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-message-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Message Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Message Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Error Codes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Error Messages
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debug Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enabling-debug-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enabling Debug Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-information-includes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Information Includes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      Getting Help
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Help">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log Files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#system-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      System Information
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#community-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Community Resources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prevention-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prevention Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prevention Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regular-maintenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Regular Maintenance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-version-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      Python Version Compatibility
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#missing-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Missing Dependencies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-initialization-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Initialization Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Initialization Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#not-a-git-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Not a Git Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-denied" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permission Denied
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-execution-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Execution Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Execution Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Not Found
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-yaml-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid YAML Syntax
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-execution-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step Execution Failures
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-worktree-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Worktree Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Worktree Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#worktree-creation-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worktree Creation Fails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worktree-directory-conflicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worktree Directory Conflicts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-branch-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Git Branch Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tmux-session-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tmux Session Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tmux Session Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tmux-not-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tmux Not Available
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-name-conflicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Name Conflicts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-attachment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Session Attachment Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#slow-command-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Slow Command Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      High Memory Usage
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#corrupted-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corrupted Database
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-lock-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database Lock Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-and-configuration-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment and Configuration Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment and Configuration Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variable-problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variable Problems
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-override-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Override Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-message-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Message Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Message Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Error Codes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Error Messages
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debug Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enabling-debug-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enabling Debug Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-information-includes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Information Includes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      Getting Help
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Help">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#log-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log Files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#system-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      System Information
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#community-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Community Resources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prevention-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prevention Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prevention Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regular-maintenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Regular Maintenance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="troubleshooting-guide">Troubleshooting Guide</h1>
+<p>This guide helps you diagnose and resolve common issues when using Prunejuice.</p>
+<h2 id="installation-issues">Installation Issues</h2>
+<h3 id="python-version-compatibility">Python Version Compatibility</h3>
+<p><strong>Problem</strong>: Installation fails with Python version errors.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check Python version (requires 3.11+)</span>
+python<span class="w"> </span>--version
+
+<span class="c1"># Using uv (recommended)</span>
+uv<span class="w"> </span>python<span class="w"> </span>install<span class="w"> </span><span class="m">3</span>.11
+uv<span class="w"> </span>add<span class="w"> </span>prunejuice
+
+<span class="c1"># Or upgrade Python via your system package manager</span>
+</code></pre></div></p>
+<h3 id="missing-dependencies">Missing Dependencies</h3>
+<p><strong>Problem</strong>: <code>uv</code> or <code>git</code> not found.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Install uv</span>
+curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+
+<span class="c1"># Verify git is available</span>
+git<span class="w"> </span>--version
+</code></pre></div></p>
+<h2 id="project-initialization-issues">Project Initialization Issues</h2>
+<h3 id="not-a-git-repository">Not a Git Repository</h3>
+<p><strong>Problem</strong>: <code>prj init</code> fails with "not a git repository" error.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Initialize git repository first</span>
+git<span class="w"> </span>init
+
+<span class="c1"># Then initialize prunejuice</span>
+prj<span class="w"> </span>init
+</code></pre></div></p>
+<h3 id="permission-denied">Permission Denied</h3>
+<p><strong>Problem</strong>: Cannot create <code>.prj</code> directory.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check directory permissions</span>
+ls<span class="w"> </span>-la
+
+<span class="c1"># Ensure write permissions</span>
+chmod<span class="w"> </span>u+w<span class="w"> </span>.
+
+<span class="c1"># Or run as appropriate user</span>
+sudo<span class="w"> </span>chown<span class="w"> </span><span class="nv">$USER</span>:<span class="nv">$USER</span><span class="w"> </span>.
+</code></pre></div></p>
+<h2 id="command-execution-issues">Command Execution Issues</h2>
+<h3 id="command-not-found">Command Not Found</h3>
+<p><strong>Problem</strong>: <code>prj run &lt;command&gt;</code> fails with "command not found".</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># List available commands</span>
+prj<span class="w"> </span>list-commands
+
+<span class="c1"># Check command file exists</span>
+ls<span class="w"> </span>.prj/commands/
+
+<span class="c1"># Verify YAML syntax</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--dry-run
+</code></pre></div></p>
+<h3 id="invalid-yaml-syntax">Invalid YAML Syntax</h3>
+<p><strong>Problem</strong>: YAML parsing errors when loading commands.</p>
+<p><strong>Symptoms</strong>:
+<div class="highlight"><pre><span></span><code>Error: Invalid YAML syntax in command file
+</code></pre></div></p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Validate YAML syntax</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import yaml; yaml.safe_load(open(&#39;.prj/commands/my-command.yaml&#39;))&quot;</span>
+
+<span class="c1"># Common YAML issues:</span>
+<span class="c1"># - Incorrect indentation (use spaces, not tabs)</span>
+<span class="c1"># - Missing quotes around strings with special characters</span>
+<span class="c1"># - Incorrect list syntax</span>
+</code></pre></div></p>
+<h3 id="step-execution-failures">Step Execution Failures</h3>
+<p><strong>Problem</strong>: Individual steps fail during command execution.</p>
+<p><strong>Debugging</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Run with verbose output</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--verbose
+
+<span class="c1"># Use dry run to see what will execute</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--dry-run
+
+<span class="c1"># Check step scripts exist</span>
+ls<span class="w"> </span>.prj/steps/
+</code></pre></div></p>
+<h2 id="git-worktree-issues">Git Worktree Issues</h2>
+<h3 id="worktree-creation-fails">Worktree Creation Fails</h3>
+<p><strong>Problem</strong>: Cannot create worktree for command.</p>
+<p><strong>Common Causes</strong>:
+- Branch already exists
+- Insufficient disk space
+- Git repository corruption</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check existing worktrees</span>
+git<span class="w"> </span>worktree<span class="w"> </span>list
+
+<span class="c1"># Remove stale worktrees</span>
+git<span class="w"> </span>worktree<span class="w"> </span>prune
+
+<span class="c1"># Check available disk space</span>
+df<span class="w"> </span>-h
+
+<span class="c1"># Verify git repository health</span>
+git<span class="w"> </span>fsck
+</code></pre></div></p>
+<h3 id="worktree-directory-conflicts">Worktree Directory Conflicts</h3>
+<p><strong>Problem</strong>: Worktree path already exists.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># List active worktrees</span>
+prj<span class="w"> </span>worktree<span class="w"> </span>list
+
+<span class="c1"># Remove specific worktree</span>
+prj<span class="w"> </span>worktree<span class="w"> </span>remove<span class="w"> </span>&lt;path&gt;
+
+<span class="c1"># Clean up all inactive worktrees</span>
+git<span class="w"> </span>worktree<span class="w"> </span>prune
+</code></pre></div></p>
+<h3 id="git-branch-issues">Git Branch Issues</h3>
+<p><strong>Problem</strong>: Cannot switch to specified branch.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check if branch exists locally</span>
+git<span class="w"> </span>branch<span class="w"> </span>-a
+
+<span class="c1"># Fetch from remote</span>
+git<span class="w"> </span>fetch<span class="w"> </span>origin
+
+<span class="c1"># Create branch if it doesn&#39;t exist</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>&lt;branch-name&gt;
+</code></pre></div></p>
+<h2 id="tmux-session-issues">Tmux Session Issues</h2>
+<h3 id="tmux-not-available">Tmux Not Available</h3>
+<p><strong>Problem</strong>: Session creation fails because tmux is not installed.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Install tmux (macOS)</span>
+brew<span class="w"> </span>install<span class="w"> </span>tmux
+
+<span class="c1"># Install tmux (Ubuntu/Debian)</span>
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>tmux
+
+<span class="c1"># Install tmux (CentOS/RHEL)</span>
+sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>tmux
+
+<span class="c1"># Verify installation</span>
+tmux<span class="w"> </span>-V
+</code></pre></div></p>
+<h3 id="session-name-conflicts">Session Name Conflicts</h3>
+<p><strong>Problem</strong>: Cannot create session because name already exists.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># List existing sessions</span>
+prj<span class="w"> </span>session<span class="w"> </span>list
+
+<span class="c1"># Kill specific session</span>
+prj<span class="w"> </span>session<span class="w"> </span><span class="nb">kill</span><span class="w"> </span>&lt;session-name&gt;
+
+<span class="c1"># Kill all prunejuice sessions</span>
+tmux<span class="w"> </span>list-sessions<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>prunejuice<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d:<span class="w"> </span>-f1<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>-I<span class="w"> </span><span class="o">{}</span><span class="w"> </span>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span><span class="o">{}</span>
+</code></pre></div></p>
+<h3 id="session-attachment-issues">Session Attachment Issues</h3>
+<p><strong>Problem</strong>: Cannot attach to session.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check if session exists</span>
+tmux<span class="w"> </span>list-sessions
+
+<span class="c1"># Force attach (detach other clients)</span>
+tmux<span class="w"> </span>attach-session<span class="w"> </span>-t<span class="w"> </span>&lt;session-name&gt;<span class="w"> </span>-d
+
+<span class="c1"># Create new session if needed</span>
+prj<span class="w"> </span>session<span class="w"> </span>create<span class="w"> </span>&lt;task-name&gt;
+</code></pre></div></p>
+<h2 id="performance-issues">Performance Issues</h2>
+<h3 id="slow-command-execution">Slow Command Execution</h3>
+<p><strong>Problem</strong>: Commands take too long to execute.</p>
+<p><strong>Debugging Steps</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Enable timing information</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--verbose
+
+<span class="c1"># Check system resources</span>
+top
+htop
+
+<span class="c1"># Monitor disk I/O</span>
+iostat<span class="w"> </span><span class="m">1</span>
+
+<span class="c1"># Check network if using remote resources</span>
+ping<span class="w"> </span>&lt;remote-host&gt;
+</code></pre></div></p>
+<p><strong>Optimization</strong>:
+- Reduce command complexity
+- Use parallel execution where possible
+- Optimize step scripts
+- Consider faster storage (SSD)</p>
+<h3 id="high-memory-usage">High Memory Usage</h3>
+<p><strong>Problem</strong>: Prunejuice consumes excessive memory.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Monitor memory usage</span>
+prj<span class="w"> </span>status<span class="w"> </span>--verbose
+
+<span class="c1"># Reduce parallel execution</span>
+<span class="c1"># In .prj/config/project.yaml:</span>
+<span class="c1"># execution:</span>
+<span class="c1">#   max_parallel_steps: 2</span>
+
+<span class="c1"># Clean up old artifacts</span>
+prj<span class="w"> </span>cleanup<span class="w"> </span>--artifacts
+</code></pre></div></p>
+<h2 id="database-issues">Database Issues</h2>
+<h3 id="corrupted-database">Corrupted Database</h3>
+<p><strong>Problem</strong>: SQLite database corruption errors.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Backup current database</span>
+cp<span class="w"> </span>.prj/database.db<span class="w"> </span>.prj/database.db.backup
+
+<span class="c1"># Check database integrity</span>
+sqlite3<span class="w"> </span>.prj/database.db<span class="w"> </span><span class="s2">&quot;PRAGMA integrity_check;&quot;</span>
+
+<span class="c1"># Rebuild from backup if corrupted</span>
+rm<span class="w"> </span>.prj/database.db
+prj<span class="w"> </span>init
+</code></pre></div></p>
+<h3 id="database-lock-issues">Database Lock Issues</h3>
+<p><strong>Problem</strong>: "Database is locked" errors.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check for zombie processes</span>
+ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>prunejuice
+
+<span class="c1"># Kill any hanging processes</span>
+killall<span class="w"> </span>prunejuice
+
+<span class="c1"># Remove lock file if it exists</span>
+rm<span class="w"> </span>.prj/database.db-wal<span class="w"> </span>.prj/database.db-shm
+</code></pre></div></p>
+<h2 id="environment-and-configuration-issues">Environment and Configuration Issues</h2>
+<h3 id="environment-variable-problems">Environment Variable Problems</h3>
+<p><strong>Problem</strong>: Environment variables not being recognized.</p>
+<p><strong>Debugging</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check current environment</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--env-debug
+
+<span class="c1"># Verify .env file syntax</span>
+cat<span class="w"> </span>.prj/.env
+
+<span class="c1"># Test environment loading</span>
+env<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>PRUNEJUICE
+</code></pre></div></p>
+<h3 id="configuration-override-issues">Configuration Override Issues</h3>
+<p><strong>Problem</strong>: Configuration not being applied correctly.</p>
+<p><strong>Solution</strong>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Check configuration hierarchy</span>
+prj<span class="w"> </span>config<span class="w"> </span>show
+
+<span class="c1"># Verify file syntax</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import yaml; print(yaml.safe_load(open(&#39;.prj/config/project.yaml&#39;)))&quot;</span>
+
+<span class="c1"># Check global config</span>
+cat<span class="w"> </span>~/.config/prunejuice/config.yaml
+</code></pre></div></p>
+<h2 id="error-message-reference">Error Message Reference</h2>
+<h3 id="common-error-codes">Common Error Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Exit Code</th>
+<th>Meaning</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>General error</td>
+<td>Check command syntax and logs</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Command not found</td>
+<td>Verify command exists in <code>.prj/commands/</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Invalid configuration</td>
+<td>Check YAML syntax and required fields</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Git operation failed</td>
+<td>Check git repository status</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Session operation failed</td>
+<td>Verify tmux availability</td>
+</tr>
+<tr>
+<td>6</td>
+<td>File system error</td>
+<td>Check permissions and disk space</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common-error-messages">Common Error Messages</h3>
+<p><strong>"Command execution failed"</strong>
+- Check step scripts exist and are executable
+- Verify all required arguments are provided
+- Check environment variables and paths</p>
+<p><strong>"Worktree already exists"</strong>
+- Use <code>git worktree list</code> to see existing worktrees
+- Remove unused worktrees with <code>git worktree remove</code></p>
+<p><strong>"Session creation failed"</strong>
+- Verify tmux is installed and working
+- Check for session name conflicts
+- Ensure sufficient system resources</p>
+<h2 id="debug-mode">Debug Mode</h2>
+<h3 id="enabling-debug-output">Enabling Debug Output</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Environment variable</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PRUNEJUICE_LOG_LEVEL</span><span class="o">=</span>DEBUG
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;
+
+<span class="c1"># Command-line flag</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--debug
+
+<span class="c1"># Configuration file</span>
+<span class="c1"># In .prj/config/project.yaml:</span>
+<span class="c1"># logging:</span>
+<span class="c1">#   level: DEBUG</span>
+</code></pre></div>
+<h3 id="debug-information-includes">Debug Information Includes</h3>
+<ul>
+<li>Step execution timing</li>
+<li>Environment variable resolution</li>
+<li>File system operations</li>
+<li>Git and tmux command execution</li>
+<li>Database queries</li>
+<li>Configuration loading</li>
+</ul>
+<h2 id="getting-help">Getting Help</h2>
+<h3 id="log-files">Log Files</h3>
+<p>Check these locations for detailed logs:
+- <code>.prj/logs/prunejuice.log</code>
+- Session logs in <code>.prj/artifacts/&lt;command&gt;/session.log</code>
+- Step output in <code>.prj/artifacts/&lt;command&gt;/steps/</code></p>
+<h3 id="system-information">System Information</h3>
+<p>When reporting issues, include:
+<div class="highlight"><pre><span></span><code><span class="c1"># Prunejuice version</span>
+prj<span class="w"> </span>--version
+
+<span class="c1"># System information</span>
+uname<span class="w"> </span>-a
+python<span class="w"> </span>--version
+git<span class="w"> </span>--version
+tmux<span class="w"> </span>-V
+
+<span class="c1"># Configuration</span>
+prj<span class="w"> </span>config<span class="w"> </span>show
+
+<span class="c1"># Recent events</span>
+prj<span class="w"> </span><span class="nb">history</span><span class="w"> </span>--recent<span class="w"> </span><span class="m">10</span>
+</code></pre></div></p>
+<h3 id="community-resources">Community Resources</h3>
+<ul>
+<li>GitHub Issues: Report bugs and feature requests</li>
+<li>Documentation: Check for updated troubleshooting guides</li>
+<li>Examples: Review template commands for patterns</li>
+</ul>
+<h2 id="prevention-best-practices">Prevention Best Practices</h2>
+<h3 id="regular-maintenance">Regular Maintenance</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clean up old artifacts</span>
+prj<span class="w"> </span>cleanup<span class="w"> </span>--artifacts<span class="w"> </span>--older-than<span class="w"> </span>30d
+
+<span class="c1"># Prune unused worktrees</span>
+git<span class="w"> </span>worktree<span class="w"> </span>prune
+
+<span class="c1"># Kill old sessions</span>
+prj<span class="w"> </span>session<span class="w"> </span>cleanup
+
+<span class="c1"># Update dependencies</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--upgrade
+</code></pre></div>
+<h3 id="configuration-validation">Configuration Validation</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Validate configuration files</span>
+prj<span class="w"> </span>config<span class="w"> </span>validate
+
+<span class="c1"># Test commands without execution</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--dry-run
+
+<span class="c1"># Regular health checks</span>
+prj<span class="w"> </span>status<span class="w"> </span>--health-check
+</code></pre></div>
+<h3 id="monitoring">Monitoring</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check system resources before major operations</span>
+df<span class="w"> </span>-h<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>free<span class="w"> </span>-h
+
+<span class="c1"># Monitor long-running commands</span>
+prj<span class="w"> </span>run<span class="w"> </span>&lt;command&gt;<span class="w"> </span>--monitor
+
+<span class="c1"># Set up alerts for failures</span>
+prj<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>alerts.on_failure<span class="w"> </span>email
+</code></pre></div>
+<p>This troubleshooting guide should help you quickly identify and resolve common issues. For persistent problems, enable debug mode and review the log files for detailed error information.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "content.code.copy"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
