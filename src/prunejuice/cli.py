@@ -343,7 +343,9 @@ def _get_project_context():
 
 
 @app.command()
-def status():
+def status(
+    all_worktrees: bool = typer.Option(False, "-a", "--all", help="Show events from all worktrees (default: current worktree only when in worktree)")
+):
     """Show PruneJuice project status."""
     try:
         # Get project and worktree context
@@ -386,23 +388,39 @@ def status():
             
             # Show recent events only if initialized
             db = Database(settings.db_path)
-            events = asyncio.run(db.get_recent_events(limit=5))
+            
+            # Determine filtering based on worktree context
+            worktree_filter = None
+            if not all_worktrees and context['current_worktree'] and not context['current_worktree']['is_main']:
+                # Filter to current worktree only
+                worktree_filter = context['current_worktree']['branch']
+            
+            events = asyncio.run(db.get_events(
+                limit=5,
+                worktree=worktree_filter
+            ))
+            
             if events:
                 table = Table(title="Recent Events")
                 table.add_column("Command", style="cyan")
                 table.add_column("Status", style="yellow")
                 table.add_column("Start Time", style="green")
                 table.add_column("Duration", style="blue")
+                table.add_column("Worktree", style="dim")
                 
                 for event in events:
                     duration_str = _format_duration(event.start_time, event.end_time)
                     status_style = _get_status_style(event.status)
                     
+                    # Display worktree name or "main" for main branch
+                    worktree_display = event.worktree_name or "main"
+                    
                     table.add_row(
                         event.command,
                         f"[{status_style}]{event.status}[/{status_style}]",
                         event.start_time.strftime("%Y-%m-%d %H:%M:%S"),
-                        duration_str
+                        duration_str,
+                        worktree_display
                     )
                 
                 console.print(table)
@@ -497,23 +515,30 @@ def history(
     status: Optional[str] = typer.Option(None, "--status", help="Filter by status (completed, failed, running)"),
     command: Optional[str] = typer.Option(None, "--command", help="Filter by command name"),
     worktree: Optional[str] = typer.Option(None, "--worktree", help="Filter by worktree name"),
-    project: bool = typer.Option(False, "--project", help="Filter to current project only")
+    project: bool = typer.Option(False, "--project", help="Filter to current project only"),
+    all_worktrees: bool = typer.Option(False, "-a", "--all", help="Show events from all worktrees (default: current worktree only when in worktree)")
 ):
     """Show command execution history with filtering options."""
     try:
-        # Get project root for consistent database access
-        project_root = ProjectPathResolver.get_project_root()
-        settings = Settings(project_path=project_root)
+        # Get project and worktree context
+        context = _get_project_context()
+        settings = Settings(project_path=context['project_root'])
         db = Database(settings.db_path)
         
         # Get project filter if requested
         project_filter = str(Path.cwd()) if project else None
         
+        # Determine worktree filtering
+        worktree_filter = worktree  # Start with explicit --worktree flag
+        if worktree_filter is None and not all_worktrees and context['current_worktree'] and not context['current_worktree']['is_main']:
+            # Auto-filter to current worktree only when not explicitly overridden
+            worktree_filter = context['current_worktree']['branch']
+        
         events = asyncio.run(db.get_events(
             limit=limit, 
             status=status, 
             command=command, 
-            worktree=worktree,
+            worktree=worktree_filter,
             project_path=project_filter
         ))
         
@@ -532,7 +557,13 @@ def history(
         for event in events:
             duration_str = _format_duration(event.start_time, event.end_time)
             status_style = _get_status_style(event.status)
+            
+            # Display project-worktree combination if worktree exists
             project_name = Path(event.project_path).name
+            if event.worktree_name:
+                project_display = f"{project_name}-{event.worktree_name}"
+            else:
+                project_display = project_name
 
             table.add_row(
                 str(event.id),
@@ -540,7 +571,7 @@ def history(
                 f"[{status_style}]{event.status}[/{status_style}]",
                 event.start_time.strftime("%m/%d %H:%M"),
                 duration_str,
-                project_name
+                project_display
             )
         
         console.print(table)

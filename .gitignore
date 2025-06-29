@@ -102,3 +102,6 @@ htmlcov/
 # uv
 .venv/
 uv.lock
+
+# Test projects
+tmp/

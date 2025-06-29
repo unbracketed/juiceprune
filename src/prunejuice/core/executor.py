@@ -19,6 +19,7 @@ from ..commands.loader import CommandLoader
 from ..integrations.plum import PlumIntegration
 from ..integrations.pots import PotsIntegration
 from ..utils.artifacts import ArtifactStore
+from ..worktree_utils import GitWorktreeManager
 
 logger = logging.getLogger(__name__)
 
@@ -277,13 +278,32 @@ class Executor:
         if dry_run:
             return self._dry_run(command, session)
         
+        # Detect current worktree context
+        worktree_name = None
+        try:
+            manager = GitWorktreeManager(project_path)
+            if manager.is_git_repository():
+                current_path = Path.cwd()
+                worktree_info = manager.get_worktree_info(current_path)
+                if worktree_info:
+                    # Extract branch name from refs/heads/branch-name format
+                    branch = worktree_info.get('branch', '')
+                    if branch.startswith('refs/heads/'):
+                        branch = branch[11:]  # Remove 'refs/heads/' prefix
+                    # Only set worktree_name if not in main worktree
+                    if current_path != manager.get_main_worktree_path():
+                        worktree_name = branch
+        except Exception as e:
+            logger.debug(f"Failed to detect worktree context: {e}")
+        
         # Start event tracking
         try:
             event_id = await self.db.start_event(
                 command=command_name,
                 project_path=str(project_path),
                 session_id=session_id,
-                artifacts_path=str(artifact_dir)
+                artifacts_path=str(artifact_dir),
+                worktree_name=worktree_name
             )
             session.set_shared_data('event_id', event_id)
         except Exception as e:

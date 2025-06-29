@@ -113,6 +113,26 @@ dev-setup: dev-install docs-install check test ## Complete development environme
 # CI/CD workflow
 ci: check test ## Run CI checks (linting, type checking, tests)
 
+# Test project management
+create-test-project: ## Create a new test project directory with git repo
+	@PROJECT_NAME="test-project-$(shell date +%Y%m%d-%H%M%S)"; \
+	mkdir -p tmp/$$PROJECT_NAME; \
+	cd tmp/$$PROJECT_NAME; \
+	git init; \
+	echo "# Test Project: $$PROJECT_NAME" > README.md; \
+	echo "Created: $(shell date)" >> README.md; \
+	git add README.md; \
+	git commit -m "Initial commit for test project"; \
+	echo "Created test project: tmp/$$PROJECT_NAME"
+
+list-test-projects: ## List all test projects
+	@echo "Test projects in tmp/:"
+	@ls -la tmp/ 2>/dev/null || echo "No test projects found"
+
+clean-test-projects: ## Remove all test projects
+	@rm -rf tmp/*
+	@echo "All test projects removed"
+
 # Example commands for development
 example-init: ## Example: Initialize project in current directory
 	uv run prj init
