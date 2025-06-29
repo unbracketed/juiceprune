@@ -582,25 +582,32 @@ def resume():
             # Show worktree options
             console.print(f"\nSelected worktree: {selected_item['branch']}", style="cyan")
             console.print("Options:")
-            console.print("  1. Change directory (cd)")
+            console.print("  1. Show worktree path (for copying)")
             console.print("  2. Open in new tmux session")
             
             try:
                 action = typer.prompt("Choose action (1-2)")
                 
                 if action == "1":
-                    # Output cd command for shell to execute
-                    console.print(f"cd \"{selected_item['path']}\"", style="green")
-                    console.print(f"Changed to worktree: {selected_item['branch']}", style="dim")
+                    # Display path for easy copying
+                    console.print("\nWorktree path:", style="bold")
+                    console.print(f"{selected_item['path']}", style="green")
+                    console.print(f"Copy the path above to navigate to worktree: {selected_item['branch']}", style="dim")
                     
                 elif action == "2":
-                    # Create new tmux session
+                    # Create new tmux session and attach to it
                     try:
-                        session_name = f"{context['project_name']}-{selected_item['branch']}"
                         pots = PotsIntegration()
-                        pots.create_session(Path(selected_item['path']), selected_item['branch'])
+                        session_name = pots.create_session(Path(selected_item['path']), selected_item['branch'])
                         console.print(f"Created tmux session: {session_name}", style="green")
-                        console.print(f"Run: tmux attach -t {session_name}", style="dim")
+                        
+                        # Immediately attach to the new session
+                        console.print("Attaching to session...", style="dim")
+                        success = pots.attach_session(session_name)
+                        if success:
+                            console.print(f"Attached to session: {session_name}", style="green")
+                        else:
+                            console.print(f"Created session but failed to attach. Run: tmux attach -t {session_name}", style="yellow")
                     except Exception as e:
                         console.print(f"Failed to create session: {e}", style="red")
                 else:
@@ -616,7 +623,7 @@ def resume():
             console.print("Options:")
             console.print("  1. Attach to session")
             if selected_item['path']:
-                console.print("  2. Change directory to session path (cd)")
+                console.print("  2. Show session path (for copying)")
             
             try:
                 max_option = 2 if selected_item['path'] else 1
@@ -635,9 +642,10 @@ def resume():
                         console.print(f"Failed to attach: {e}", style="red")
                 
                 elif action == "2" and selected_item['path']:
-                    # Output cd command for shell to execute
-                    console.print(f"cd \"{selected_item['path']}\"", style="green")
-                    console.print(f"Changed to session path: {selected_item['path']}", style="dim")
+                    # Display path for easy copying
+                    console.print("\nSession path:", style="bold")
+                    console.print(f"{selected_item['path']}", style="green")
+                    console.print("Copy the path above to navigate to session directory", style="dim")
                     
                 else:
                     console.print("Invalid action", style="red")
