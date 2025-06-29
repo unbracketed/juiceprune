@@ -2,7 +2,6 @@
 
 from typing import Dict, Any, Optional
 import logging
-import json
 from datetime import datetime, timezone
 
 from .database import Database

@@ -1,7 +1,6 @@
 """File operations for worktree management."""
 
 import shutil
-import json
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 import logging
@@ -16,7 +15,7 @@ class FileManager:
         """Initialize with source root directory."""
         self.source_root = source_root
     
-    async def copy_files(
+    def copy_files(
         self,
         target_root: Path,
         files_to_copy: List[str],
@@ -82,7 +81,7 @@ class FileManager:
         
         return results
     
-    async def copy_files_with_patterns(
+    def copy_files_with_patterns(
         self,
         target_root: Path,
         patterns: List[str]
@@ -137,7 +136,7 @@ class FileManager:
         
         return results
     
-    async def handle_mcp_templates(
+    def handle_mcp_templates(
         self,
         target_root: Path,
         template_dir: str = "mcp-json-templates",

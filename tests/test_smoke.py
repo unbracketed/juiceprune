@@ -1,6 +1,5 @@
 """Smoke tests for basic PruneJuice functionality."""
 
-import pytest
 from typer.testing import CliRunner
 from pathlib import Path
 

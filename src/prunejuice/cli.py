@@ -3,10 +3,13 @@
 import typer
 from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
+from rich.text import Text
 from pathlib import Path
 from typing import Optional, List
+from datetime import datetime
 import asyncio
-import sys
+import json
 
 from .core.config import Settings
 from .core.database import Database
@@ -25,6 +28,23 @@ app = typer.Typer(
 )
 
 console = Console()
+
+# Formatting helper functions
+def _format_duration(start_time: datetime, end_time: Optional[datetime]) -> str:
+    """Format the duration between two datetimes."""
+    if not end_time:
+        return "running"
+    duration = end_time - start_time
+    return f"{duration.total_seconds():.1f}s"
+
+def _get_status_style(status: str) -> str:
+    """Return the rich style for a given status."""
+    return {
+        "completed": "green",
+        "failed": "red", 
+        "running": "yellow",
+        "cancelled": "dim"
+    }.get(status, "white")
 
 # Add subcommand groups
 app.add_typer(worktree_app, name="worktree")
@@ -106,13 +126,27 @@ def init(
 
 
 @app.command()
-def list_commands(
+def list(
+    what: Optional[str] = typer.Argument("events", help="What to list: 'events' (default) or 'commands'"),
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of events to show (events only)"),
+    status: Optional[str] = typer.Option(None, "--status", help="Filter by status (events only)"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed info")
 ):
+    """List recent events (default) or available commands."""
+    if what == "commands":
+        _list_commands(verbose)
+    elif what == "events":
+        _list_events(limit, status, verbose)
+    else:
+        console.print(f"❌ Unknown list type: {what}. Use 'events' or 'commands'.", style="bold red")
+        raise typer.Exit(code=1)
+
+
+def _list_commands(verbose: bool = False):
     """List available SDLC commands."""
     try:
         loader = CommandLoader()
-        commands = asyncio.run(loader.discover_commands(Path.cwd()))
+        commands = loader.discover_commands(Path.cwd())
         
         if not commands:
             console.print("No commands found. Run 'prj init' first.", style="yellow")
@@ -138,6 +172,69 @@ def list_commands(
     except Exception as e:
         console.print(f"❌ Error listing commands: {e}", style="bold red")
         raise typer.Exit(code=1)
+
+
+def _list_events(limit: int = 10, status: Optional[str] = None, verbose: bool = False):
+    """List recent command events."""
+    try:
+        settings = Settings()
+        db = Database(settings.db_path)
+        
+        # Filter to current project by default
+        project_filter = str(Path.cwd())
+        
+        events = asyncio.run(db.get_events(
+            limit=limit, 
+            status=status,
+            project_path=project_filter
+        ))
+        
+        if not events:
+            console.print("No recent events found.", style="yellow")
+            return
+
+        table = Table(title="Recent Events")
+        table.add_column("ID", style="dim", width=4)
+        table.add_column("Command", style="cyan")
+        table.add_column("Status", style="yellow")
+        table.add_column("Started", style="green")
+        table.add_column("Duration", style="blue")
+        
+        if verbose:
+            table.add_column("Session", style="dim")
+
+        for event in events:
+            duration_str = _format_duration(event.start_time, event.end_time)
+            status_style = _get_status_style(event.status)
+
+            row = [
+                str(event.id),
+                event.command,
+                f"[{status_style}]{event.status}[/{status_style}]",
+                event.start_time.strftime("%m/%d %H:%M"),
+                duration_str
+            ]
+            
+            if verbose:
+                row.append(event.session_id)
+                
+            table.add_row(*row)
+        
+        console.print(table)
+
+    except Exception as e:
+        console.print(f"❌ Error listing events: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+# Keep backwards compatibility
+@app.command()
+def list_commands(
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed info")
+):
+    """List available SDLC commands (deprecated: use 'list commands')."""
+    console.print("Note: 'list-commands' is deprecated. Use 'list commands' instead.", style="dim")
+    _list_commands(verbose)
 
 
 @app.command()
@@ -238,19 +335,8 @@ def status():
                 table.add_column("Duration", style="blue")
                 
                 for event in events:
-                    # Calculate duration
-                    if event.end_time:
-                        duration = event.end_time - event.start_time
-                        duration_str = f"{duration.total_seconds():.1f}s"
-                    else:
-                        duration_str = "running"
-                    
-                    # Format status with color
-                    status_style = {
-                        "completed": "green",
-                        "failed": "red",
-                        "running": "yellow"
-                    }.get(event.status, "white")
+                    duration_str = _format_duration(event.start_time, event.end_time)
+                    status_style = _get_status_style(event.status)
                     
                     table.add_row(
                         event.command,
@@ -275,7 +361,7 @@ def status():
         plum = PlumIntegration()
         if plum.is_available():
             try:
-                worktrees = asyncio.run(plum.list_worktrees(Path.cwd()))
+                worktrees = plum.list_worktrees(Path.cwd())
                 if worktrees:
                     console.print(f"  Active worktrees: {len(worktrees)}")
                     for wt in worktrees[:3]:  # Show first 3
@@ -294,7 +380,7 @@ def status():
         pots = PotsIntegration()
         if pots.is_available():
             try:
-                sessions = asyncio.run(pots.list_sessions())
+                sessions = pots.list_sessions()
                 if sessions:
                     console.print(f"  Active sessions: {len(sessions)}")
                     for session in sessions[:3]:  # Show first 3
@@ -336,6 +422,122 @@ def cleanup(
         
     except Exception as e:
         console.print(f"❌ Error during cleanup: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def history(
+    limit: int = typer.Option(20, "--limit", "-n", help="Number of events to show"),
+    status: Optional[str] = typer.Option(None, "--status", help="Filter by status (completed, failed, running)"),
+    command: Optional[str] = typer.Option(None, "--command", help="Filter by command name"),
+    worktree: Optional[str] = typer.Option(None, "--worktree", help="Filter by worktree name"),
+    project: bool = typer.Option(False, "--project", help="Filter to current project only")
+):
+    """Show command execution history with filtering options."""
+    try:
+        settings = Settings()
+        db = Database(settings.db_path)
+        
+        # Get project filter if requested
+        project_filter = str(Path.cwd()) if project else None
+        
+        events = asyncio.run(db.get_events(
+            limit=limit, 
+            status=status, 
+            command=command, 
+            worktree=worktree,
+            project_path=project_filter
+        ))
+        
+        if not events:
+            console.print("No history found matching criteria.", style="yellow")
+            return
+
+        table = Table(title="Command History")
+        table.add_column("ID", style="dim", width=4)
+        table.add_column("Command", style="cyan")
+        table.add_column("Status", style="yellow")
+        table.add_column("Start Time", style="green")
+        table.add_column("Duration", style="blue")
+        table.add_column("Project", style="dim")
+
+        for event in events:
+            duration_str = _format_duration(event.start_time, event.end_time)
+            status_style = _get_status_style(event.status)
+            project_name = Path(event.project_path).name
+
+            table.add_row(
+                str(event.id),
+                event.command,
+                f"[{status_style}]{event.status}[/{status_style}]",
+                event.start_time.strftime("%m/%d %H:%M"),
+                duration_str,
+                project_name
+            )
+        
+        console.print(table)
+
+    except Exception as e:
+        console.print(f"❌ Error fetching history: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def show(
+    event_id: int = typer.Argument(..., help="The ID of the event to show")
+):
+    """Show detailed information for a specific event."""
+    try:
+        settings = Settings()
+        db = Database(settings.db_path)
+        event = asyncio.run(db.get_event(event_id))
+
+        if not event:
+            console.print(f"❌ Event with ID {event_id} not found.", style="bold red")
+            raise typer.Exit(code=1)
+
+        # Create a formatted panel
+        text = Text()
+        text.append("Command: ", style="bold yellow")
+        text.append(f"{event.command}\n")
+        text.append("Status: ", style="bold yellow")
+        status_style = _get_status_style(event.status)
+        text.append(f"{event.status}\n", style=status_style)
+        text.append("Project: ", style="bold yellow")
+        text.append(f"{Path(event.project_path).name}\n")
+        text.append("Full Path: ", style="bold yellow")
+        text.append(f"{event.project_path}\n")
+        if event.worktree_name:
+            text.append("Worktree: ", style="bold yellow")
+            text.append(f"{event.worktree_name}\n")
+        text.append("Session ID: ", style="bold yellow")
+        text.append(f"{event.session_id}\n")
+        text.append("Start Time: ", style="bold yellow")
+        text.append(f"{event.start_time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        if event.end_time:
+            text.append("End Time: ", style="bold yellow")
+            text.append(f"{event.end_time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            duration = event.end_time - event.start_time
+            text.append("Duration: ", style="bold yellow")
+            text.append(f"{duration.total_seconds():.2f}s\n")
+        if event.exit_code is not None:
+            text.append("Exit Code: ", style="bold yellow")
+            text.append(f"{event.exit_code}\n")
+        if event.artifacts_path:
+            text.append("Artifacts: ", style="bold yellow")
+            text.append(f"{event.artifacts_path}\n")
+        if event.error_message:
+            text.append("Error: ", style="bold red")
+            text.append(f"{event.error_message}\n")
+        if event.metadata:
+            text.append("Metadata: ", style="bold yellow")
+            text.append(f"{json.dumps(event.metadata, indent=2)}")
+
+        panel = Panel(text, title=f"Event Details (ID: {event.id})", border_style="blue")
+        console.print(panel)
+
+    except Exception as e:
+        console.print(f"❌ Error showing event: {e}", style="bold red")
         raise typer.Exit(code=1)
 
 

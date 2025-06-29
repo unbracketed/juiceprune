@@ -198,3 +198,110 @@ class Database:
                 (name, description, yaml_path, yaml_hash)
             )
             await db.commit()
+    
+    async def get_events(
+        self,
+        limit: int = 20,
+        status: Optional[str] = None,
+        command: Optional[str] = None,
+        worktree: Optional[str] = None,
+        project_path: Optional[str] = None
+    ) -> List[ExecutionEvent]:
+        """Get events with optional filters and secure parameter binding."""
+        query_parts = [
+            "SELECT id, command, project_path, worktree_name, session_id,",
+            "start_time, end_time, status, artifacts_path, exit_code,",
+            "error_message, metadata FROM events"
+        ]
+        conditions = []
+        params = []
+
+        if status:
+            conditions.append("status = ?")
+            params.append(status)
+        if command:
+            conditions.append("command LIKE ?")
+            params.append(f"%{command}%")
+        if worktree:
+            conditions.append("worktree_name LIKE ?")
+            params.append(f"%{worktree}%")
+        if project_path:
+            conditions.append("project_path = ?")
+            params.append(project_path)
+
+        if conditions:
+            query_parts.append("WHERE " + " AND ".join(conditions))
+
+        query_parts.append("ORDER BY start_time DESC LIMIT ?")
+        params.append(limit)
+        
+        query = " ".join(query_parts)
+
+        async with self.connection() as db:
+            cursor = await db.execute(query, params)
+            rows = await cursor.fetchall()
+            
+            events = []
+            for row in rows:
+                # Parse metadata safely
+                try:
+                    metadata = json.loads(row[11]) if row[11] else {}
+                except json.JSONDecodeError:
+                    metadata = {}
+                
+                event = ExecutionEvent(
+                    id=row[0],
+                    command=row[1],
+                    project_path=row[2],
+                    worktree_name=row[3],
+                    session_id=row[4],
+                    start_time=datetime.fromisoformat(row[5]) if row[5] else datetime.utcnow(),
+                    end_time=datetime.fromisoformat(row[6]) if row[6] else None,
+                    status=row[7],
+                    artifacts_path=row[8],
+                    exit_code=row[9],
+                    error_message=row[10],
+                    metadata=metadata
+                )
+                events.append(event)
+            
+            return events
+    
+    async def get_event(self, event_id: int) -> Optional[ExecutionEvent]:
+        """Get a single event by its ID with secure parameter binding."""
+        async with self.connection() as db:
+            cursor = await db.execute(
+                """
+                SELECT id, command, project_path, worktree_name, session_id,
+                       start_time, end_time, status, artifacts_path, exit_code,
+                       error_message, metadata
+                FROM events 
+                WHERE id = ?
+                """,
+                (event_id,)
+            )
+            row = await cursor.fetchone()
+            
+            if not row:
+                return None
+            
+            # Parse metadata safely
+            try:
+                metadata = json.loads(row[11]) if row[11] else {}
+            except json.JSONDecodeError:
+                metadata = {}
+            
+            return ExecutionEvent(
+                id=row[0],
+                command=row[1],
+                project_path=row[2],
+                worktree_name=row[3],
+                session_id=row[4],
+                start_time=datetime.fromisoformat(row[5]) if row[5] else datetime.utcnow(),
+                end_time=datetime.fromisoformat(row[6]) if row[6] else None,
+                status=row[7],
+                artifacts_path=row[8],
+                exit_code=row[9],
+                error_message=row[10],
+                metadata=metadata
+            )

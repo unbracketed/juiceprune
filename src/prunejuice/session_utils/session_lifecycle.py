@@ -21,7 +21,7 @@ class SessionLifecycleManager:
         self.tmux = tmux_manager or TmuxManager()
         self.default_task = "dev"
     
-    async def create_session_for_worktree(
+    def create_session_for_worktree(
         self,
         worktree_path: Path,
         task_name: Optional[str] = None,
@@ -51,12 +51,12 @@ class SessionLifecycleManager:
             session_name = self.tmux.format_session_name(project_name, worktree_name, task)
             
             # Check if session already exists
-            if await self.tmux.session_exists(session_name):
+            if self.tmux.session_exists(session_name):
                 logger.info(f"Session '{session_name}' already exists")
                 return session_name
             
             # Create the session
-            success = await self.tmux.create_session(
+            success = self.tmux.create_session(
                 session_name, 
                 worktree_path, 
                 auto_attach
@@ -73,7 +73,7 @@ class SessionLifecycleManager:
             logger.error(f"Error creating session for worktree {worktree_path}: {e}")
             return None
     
-    async def cleanup_orphaned_sessions(
+    def cleanup_orphaned_sessions(
         self,
         project_filter: Optional[str] = None,
         dry_run: bool = False
@@ -98,7 +98,7 @@ class SessionLifecycleManager:
         }
         
         try:
-            sessions = await self.tmux.list_sessions()
+            sessions = self.tmux.list_sessions()
             
             for session in sessions:
                 session_name = session["name"]
@@ -122,7 +122,7 @@ class SessionLifecycleManager:
                     
                     if not dry_run:
                         # Kill the orphaned session
-                        if await self.tmux.kill_session(session_name):
+                        if self.tmux.kill_session(session_name):
                             results["cleaned"].append(session_name)
                             results["total_cleaned"] += 1
                             logger.info(f"Cleaned orphaned session: {session_name}")
@@ -146,7 +146,7 @@ class SessionLifecycleManager:
             results["failed"].append({"error": str(e)})
             return results
     
-    async def list_project_sessions(
+    def list_project_sessions(
         self,
         project_name: Optional[str] = None
     ) -> List[Dict[str, Any]]:
@@ -159,7 +159,7 @@ class SessionLifecycleManager:
             List of session information with parsed metadata
         """
         try:
-            sessions = await self.tmux.list_sessions()
+            sessions = self.tmux.list_sessions()
             project_sessions = []
             
             for session in sessions:
@@ -187,7 +187,7 @@ class SessionLifecycleManager:
             logger.error(f"Error listing project sessions: {e}")
             return []
     
-    async def attach_to_session(self, session_name: str) -> bool:
+    def attach_to_session(self, session_name: str) -> bool:
         """Attach to a session with validation.
         
         Args:
@@ -196,9 +196,9 @@ class SessionLifecycleManager:
         Returns:
             True if successful, False otherwise
         """
-        return await self.tmux.attach_session(session_name)
+        return self.tmux.attach_session(session_name)
     
-    async def kill_session(self, session_name: str) -> bool:
+    def kill_session(self, session_name: str) -> bool:
         """Kill a session with validation.
         
         Args:
@@ -207,7 +207,7 @@ class SessionLifecycleManager:
         Returns:
             True if successful, False otherwise
         """
-        return await self.tmux.kill_session(session_name)
+        return self.tmux.kill_session(session_name)
     
     def _extract_project_name(self, worktree_path: Path) -> str:
         """Extract project name from worktree path.

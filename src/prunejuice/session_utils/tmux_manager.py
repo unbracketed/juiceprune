@@ -1,6 +1,5 @@
 """Tmux session management operations."""
 
-import asyncio
 import subprocess
 import re
 from pathlib import Path
@@ -17,37 +16,38 @@ class TmuxManager:
         """Initialize the tmux manager."""
         pass
     
-    async def check_tmux_available(self) -> bool:
+    def check_tmux_available(self) -> bool:
         """Check if tmux is available and working.
         
         Returns:
             True if tmux is available, False otherwise
         """
         try:
-            result = await asyncio.create_subprocess_exec(
-                "tmux", "-V",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+            result = subprocess.run(
+                ["tmux", "-V"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False
             )
-            await result.communicate()
             return result.returncode == 0
         except FileNotFoundError:
             return False
     
-    async def list_sessions(self) -> List[Dict[str, Any]]:
+    def list_sessions(self) -> List[Dict[str, Any]]:
         """List all tmux sessions.
         
         Returns:
             List of session information dictionaries
         """
         try:
-            result = await asyncio.create_subprocess_exec(
-                "tmux", "list-sessions", "-F", 
-                "#{session_name}|#{session_path}|#{session_created}|#{session_attached}",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+            result = subprocess.run(
+                ["tmux", "list-sessions", "-F", 
+                 "#{session_name}|#{session_path}|#{session_created}|#{session_attached}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False
             )
-            stdout, stderr = await result.communicate()
+            stdout, stderr = result.stdout, result.stderr
             
             if result.returncode != 0:
                 if "no server running" in stderr.decode().lower():
@@ -74,7 +74,7 @@ class TmuxManager:
             logger.error(f"Failed to list tmux sessions: {e}")
             return []
     
-    async def session_exists(self, session_name: str) -> bool:
+    def session_exists(self, session_name: str) -> bool:
         """Check if a tmux session exists.
         
         Args:
@@ -84,17 +84,17 @@ class TmuxManager:
             True if session exists, False otherwise
         """
         try:
-            result = await asyncio.create_subprocess_exec(
-                "tmux", "has-session", "-t", session_name,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+            result = subprocess.run(
+                ["tmux", "has-session", "-t", session_name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False
             )
-            await result.communicate()
             return result.returncode == 0
         except Exception:
             return False
     
-    async def create_session(
+    def create_session(
         self,
         session_name: str,
         working_dir: Path,
@@ -112,7 +112,7 @@ class TmuxManager:
         """
         try:
             # Check if session already exists
-            if await self.session_exists(session_name):
+            if self.session_exists(session_name):
                 logger.warning(f"Session '{session_name}' already exists")
                 return False
             
@@ -122,12 +122,13 @@ class TmuxManager:
                 args.append("-d")  # Detached
             args.extend(["-s", session_name, "-c", str(working_dir)])
             
-            result = await asyncio.create_subprocess_exec(
-                *args,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+            result = subprocess.run(
+                args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False
             )
-            stdout, stderr = await result.communicate()
+            stdout, stderr = result.stdout, result.stderr
             
             if result.returncode != 0:
                 raise RuntimeError(f"Failed to create session: {stderr.decode()}")
@@ -139,7 +140,7 @@ class TmuxManager:
             logger.error(f"Failed to create session '{session_name}': {e}")
             return False
     
-    async def attach_session(self, session_name: str) -> bool:
+    def attach_session(self, session_name: str) -> bool:
         """Attach to an existing tmux session.
         
         Args:
@@ -149,7 +150,7 @@ class TmuxManager:
             True if successful, False otherwise
         """
         try:
-            if not await self.session_exists(session_name):
+            if not self.session_exists(session_name):
                 logger.error(f"Session '{session_name}' does not exist")
                 return False
             
@@ -165,7 +166,7 @@ class TmuxManager:
             logger.error(f"Failed to attach to session '{session_name}': {e}")
             return False
     
-    async def kill_session(self, session_name: str) -> bool:
+    def kill_session(self, session_name: str) -> bool:
         """Kill a tmux session.
         
         Args:
@@ -175,12 +176,13 @@ class TmuxManager:
             True if successful, False otherwise
         """
         try:
-            result = await asyncio.create_subprocess_exec(
-                "tmux", "kill-session", "-t", session_name,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+            result = subprocess.run(
+                ["tmux", "kill-session", "-t", session_name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False
             )
-            stdout, stderr = await result.communicate()
+            stdout, stderr = result.stdout, result.stderr
             
             if result.returncode != 0:
                 raise RuntimeError(f"Failed to kill session: {stderr.decode()}")
@@ -253,7 +255,7 @@ class TmuxManager:
         
         return session_name
     
-    async def get_session_info(self, session_name: str) -> Optional[Dict[str, Any]]:
+    def get_session_info(self, session_name: str) -> Optional[Dict[str, Any]]:
         """Get detailed information about a session.
         
         Args:
@@ -262,7 +264,7 @@ class TmuxManager:
         Returns:
             Session information dictionary or None if not found
         """
-        sessions = await self.list_sessions()
+        sessions = self.list_sessions()
         
         for session in sessions:
             if session["name"] == session_name:

@@ -1,7 +1,5 @@
 """Git operations for worktree management."""
 
-import asyncio
-import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import logging
@@ -30,7 +28,7 @@ class GitWorktreeManager:
                 raise RuntimeError(f"Not a git repository: {self.project_path}")
         return self._repo
     
-    async def create_worktree(
+    def create_worktree(
         self,
         branch_name: str,
         base_branch: str = "main",
@@ -69,7 +67,7 @@ class GitWorktreeManager:
         except GitCommandError as e:
             raise RuntimeError(f"Failed to create worktree: {e}")
     
-    async def list_worktrees(self) -> List[Dict[str, Any]]:
+    def list_worktrees(self) -> List[Dict[str, Any]]:
         """List all worktrees for the repository.
         
         Returns:
@@ -106,7 +104,7 @@ class GitWorktreeManager:
             logger.error(f"Failed to list worktrees: {e}")
             return []
     
-    async def remove_worktree(self, worktree_path: Path, force: bool = False) -> bool:
+    def remove_worktree(self, worktree_path: Path, force: bool = False) -> bool:
         """Remove a Git worktree.
         
         Args:
@@ -129,7 +127,7 @@ class GitWorktreeManager:
             logger.error(f"Failed to remove worktree {worktree_path}: {e}")
             return False
     
-    async def get_worktree_info(self, worktree_path: Path) -> Optional[Dict[str, Any]]:
+    def get_worktree_info(self, worktree_path: Path) -> Optional[Dict[str, Any]]:
         """Get information about a specific worktree.
         
         Args:
@@ -138,7 +136,7 @@ class GitWorktreeManager:
         Returns:
             Worktree information dictionary or None if not found
         """
-        worktrees = await self.list_worktrees()
+        worktrees = self.list_worktrees()
         
         for worktree in worktrees:
             if Path(worktree["path"]) == worktree_path:

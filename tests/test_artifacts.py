@@ -1,8 +1,6 @@
 """Tests for artifact storage and file operations."""
 
 import pytest
-from pathlib import Path
-import os
 
 from prunejuice.utils.artifacts import ArtifactStore
 

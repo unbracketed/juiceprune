@@ -1,6 +1,5 @@
 """Integration with tmux session management - Native Python implementation."""
 
-import subprocess
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 import logging
@@ -23,7 +22,7 @@ class PotsIntegration:
         self.tmux_manager = TmuxManager()
         self.session_manager = SessionLifecycleManager(self.tmux_manager)
     
-    async def create_session(
+    def create_session(
         self,
         working_dir: Path,
         task_name: str
@@ -31,7 +30,7 @@ class PotsIntegration:
         """Create a new tmux session using native Python implementation."""
         try:
             # Use native session lifecycle manager
-            session_name = await self.session_manager.create_session_for_worktree(
+            session_name = self.session_manager.create_session_for_worktree(
                 working_dir,
                 task_name,
                 auto_attach=False
@@ -51,10 +50,10 @@ class PotsIntegration:
             # Don't fail the whole operation if tmux isn't available
             return f"prunejuice-{task_name}"
     
-    async def list_sessions(self) -> List[Dict[str, Any]]:
+    def list_sessions(self) -> List[Dict[str, Any]]:
         """List all tmux sessions using native Python implementation."""
         try:
-            sessions = await self.tmux_manager.list_sessions()
+            sessions = self.tmux_manager.list_sessions()
             
             logger.debug(f"Listed {len(sessions)} sessions using native Python")
             return sessions
@@ -63,10 +62,10 @@ class PotsIntegration:
             logger.error(f"Failed to list sessions: {e}")
             return []
     
-    async def attach_session(self, session_name: str) -> bool:
+    def attach_session(self, session_name: str) -> bool:
         """Attach to an existing session using native Python implementation."""
         try:
-            success = await self.session_manager.attach_to_session(session_name)
+            success = self.session_manager.attach_to_session(session_name)
             
             if success:
                 logger.info(f"Attached to session with native Python: {session_name}")
@@ -77,10 +76,10 @@ class PotsIntegration:
             logger.error(f"Failed to attach to session: {e}")
             return False
     
-    async def kill_session(self, session_name: str) -> bool:
+    def kill_session(self, session_name: str) -> bool:
         """Kill a session using native Python implementation."""
         try:
-            success = await self.session_manager.kill_session(session_name)
+            success = self.session_manager.kill_session(session_name)
             
             if success:
                 logger.info(f"Killed session with native Python: {session_name}")
@@ -103,7 +102,7 @@ class PotsIntegration:
                 # Return True and let the actual operations handle tmux availability
                 return True
             else:
-                return asyncio.run(self.tmux_manager.check_tmux_available())
+                return self.tmux_manager.check_tmux_available()
         except RuntimeError:
             # No event loop, create one
-            return asyncio.run(self.tmux_manager.check_tmux_available())
+            return self.tmux_manager.check_tmux_available()

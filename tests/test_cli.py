@@ -1,6 +1,5 @@
 """Tests for CLI interface."""
 
-import pytest
 from typer.testing import CliRunner
 from pathlib import Path
 import yaml

@@ -2,7 +2,7 @@
 
 import asyncio
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, List, Tuple
 from datetime import datetime, timezone
 import subprocess
 import json
@@ -10,7 +10,7 @@ import logging
 import os
 
 from .database import Database
-from .models import CommandDefinition, ExecutionEvent, StepStatus, ExecutionResult, StepError
+from .models import CommandDefinition, ExecutionResult, StepError
 from .state import StateManager
 from ..commands.loader import CommandLoader
 from ..integrations.plum import PlumIntegration
@@ -164,7 +164,7 @@ class Executor:
             logger.warning(f"Database initialization failed: {e}")
         
         # Load command definition
-        command = await self.loader.load_command(command_name, project_path)
+        command = self.loader.load_command(command_name, project_path)
         if not command:
             return ExecutionResult(
                 success=False,
@@ -294,7 +294,7 @@ class Executor:
             output += f"  {i}. {step}\n"
         
         if command.cleanup_on_failure:
-            output += f"\nCleanup steps on failure:\n"
+            output += "\nCleanup steps on failure:\n"
             for step in command.cleanup_on_failure:
                 output += f"  - {step}\n"
         

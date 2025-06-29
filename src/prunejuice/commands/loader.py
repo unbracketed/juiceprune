@@ -18,14 +18,14 @@ class CommandLoader:
         """Initialize command loader."""
         self._command_cache: Dict[str, CommandDefinition] = {}
     
-    async def discover_commands(self, project_path: Path) -> List[CommandDefinition]:
+    def discover_commands(self, project_path: Path) -> List[CommandDefinition]:
         """Discover all available commands in project and templates."""
         commands_by_name = {}
         
         # Project-specific commands (higher priority)
         project_cmd_dir = project_path / ".prj" / "commands"
         if project_cmd_dir.exists():
-            project_commands = await self._load_commands_from_dir(project_cmd_dir)
+            project_commands = self._load_commands_from_dir(project_cmd_dir)
             for cmd in project_commands:
                 commands_by_name[cmd.name] = cmd
         
@@ -47,7 +47,7 @@ class CommandLoader:
         
         return list(commands_by_name.values())
     
-    async def load_command(self, command_name: str, project_path: Path) -> Optional[CommandDefinition]:
+    def load_command(self, command_name: str, project_path: Path) -> Optional[CommandDefinition]:
         """Load a specific command by name."""
         # Check cache first
         if command_name in self._command_cache:
@@ -88,7 +88,7 @@ class CommandLoader:
         
         return None
     
-    async def _load_commands_from_dir(self, cmd_dir: Path) -> List[CommandDefinition]:
+    def _load_commands_from_dir(self, cmd_dir: Path) -> List[CommandDefinition]:
         """Load all commands from a directory."""
         commands = []
         

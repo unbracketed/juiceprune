@@ -1,7 +1,6 @@
 """Artifact storage utilities."""
 
 from pathlib import Path
-from typing import Optional
 import shutil
 import logging
 from datetime import datetime, timezone

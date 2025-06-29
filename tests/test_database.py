@@ -1,11 +1,7 @@
 """Tests for database security and functionality."""
 
 import pytest
-import json
-from datetime import datetime
 
-from prunejuice.core.database import Database
-from prunejuice.core.models import ExecutionEvent
 
 
 @pytest.mark.asyncio

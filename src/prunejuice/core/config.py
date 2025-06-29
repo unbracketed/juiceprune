@@ -4,7 +4,6 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 from pathlib import Path
 from typing import Optional
-import os
 
 
 class Settings(BaseSettings):

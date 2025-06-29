@@ -1,10 +1,8 @@
 """Tests for command executor."""
 
 import pytest
-from pathlib import Path
 import yaml
 
-from prunejuice.core.executor import Executor
 from prunejuice.core.models import CommandDefinition, CommandArgument, ExecutionResult
 
 

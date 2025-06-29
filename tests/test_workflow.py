@@ -2,11 +2,8 @@
 
 import pytest
 from pathlib import Path
-import subprocess
 
 from prunejuice.core.executor import Executor
-from prunejuice.core.config import Settings
-from prunejuice.commands.loader import CommandLoader
 
 
 class TestWorkflows:
