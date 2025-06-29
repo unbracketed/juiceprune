@@ -1,0 +1,6 @@
+name: worktree-list
+description: List project worktrees using script-based step
+category: example
+steps:
+  - list-project-worktrees
+timeout: 300

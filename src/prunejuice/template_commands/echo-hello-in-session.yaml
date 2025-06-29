@@ -1,0 +1,8 @@
+name: echo-hello-in-session
+description: Demonstrate session workflow - create detached session, send commands, destroy session
+category: example
+steps:
+  - session-create
+  - session-echo-hello
+  - session-destroy
+timeout: 600

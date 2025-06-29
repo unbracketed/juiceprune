@@ -1,0 +1,37 @@
+[project]
+name = "prunejuice"
+version = "0.5.0"
+description = "Parallel agentic coding workflow orchestrator"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiosqlite>=0.19.0",
+    "gitpython>=3.1.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+    "typer>=0.12.0",
+]
+
+[project.scripts]
+prj = "prunejuice.cli:app"
+prunejuice = "prunejuice.cli:app"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.8.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true

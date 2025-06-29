@@ -1,0 +1,11 @@
+name: echo-arg
+description: Echo command with argument example - echoes back provided message
+category: example
+arguments:
+  - name: message
+    required: true
+    type: string
+    description: Message to echo back
+steps:
+  - echo-arg-step
+timeout: 300

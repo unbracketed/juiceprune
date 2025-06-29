@@ -1,0 +1,26 @@
+name: analyze-issue
+description: Analyze a GitHub issue and create implementation plan
+category: analysis
+arguments:
+  - name: issue_number
+    required: true
+    type: string
+    description: GitHub issue number to analyze
+  - name: branch_name
+    required: false
+    type: string
+    description: Optional branch name for worktree
+environment:
+  PRUNEJUICE_TASK: "analyze-issue"
+pre_steps:
+  - setup-environment
+  - validate-prerequisites
+steps:
+  - gather-context
+  - create-worktree
+  - start-session
+post_steps:
+  - store-artifacts
+cleanup_on_failure:
+  - cleanup
+timeout: 1800

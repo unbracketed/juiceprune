@@ -1,0 +1,6 @@
+name: echo-hello
+description: Simple echo command example - outputs hello
+category: example
+steps:
+  - echo-hello-step
+timeout: 300

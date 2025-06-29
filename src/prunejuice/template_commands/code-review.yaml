@@ -1,0 +1,27 @@
+name: code-review
+description: Perform comprehensive code review
+category: quality
+arguments:
+  - name: target_branch
+    required: false
+    type: string
+    default: "main"
+    description: Branch to compare against
+  - name: focus_areas
+    required: false
+    type: string
+    description: Specific areas to focus on (security, performance, etc.)
+environment:
+  PRUNEJUICE_TASK: "code-review"
+pre_steps:
+  - setup-environment
+  - validate-prerequisites
+steps:
+  - gather-context
+  - create-worktree
+  - start-session
+post_steps:
+  - store-artifacts
+cleanup_on_failure:
+  - cleanup
+timeout: 2400

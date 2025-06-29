@@ -1,0 +1,26 @@
+name: feature-branch
+description: Create feature branch with full development environment
+category: development
+arguments:
+  - name: feature_name
+    required: true
+    type: string
+    description: Name of the feature to implement
+  - name: issue_number
+    required: false
+    type: string
+    description: Related GitHub issue number
+environment:
+  PRUNEJUICE_TASK: "feature-development"
+pre_steps:
+  - setup-environment
+  - validate-prerequisites
+steps:
+  - gather-context
+  - create-worktree
+  - start-session
+post_steps:
+  - store-artifacts
+cleanup_on_failure:
+  - cleanup
+timeout: 1800
