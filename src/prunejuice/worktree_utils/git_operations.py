@@ -23,7 +23,7 @@ class GitWorktreeManager:
         """Get or initialize Git repository."""
         if self._repo is None:
             try:
-                self._repo = git.Repo(self.project_path)
+                self._repo = git.Repo(self.project_path, search_parent_directories=True)
             except InvalidGitRepositoryError:
                 raise RuntimeError(f"Not a git repository: {self.project_path}")
         return self._repo
@@ -147,7 +147,7 @@ class GitWorktreeManager:
     def is_git_repository(self) -> bool:
         """Check if the project path is a Git repository."""
         try:
-            git.Repo(self.project_path)
+            git.Repo(self.project_path, search_parent_directories=True)
             return True
         except InvalidGitRepositoryError:
             return False
@@ -161,4 +161,4 @@ class GitWorktreeManager:
     
     def get_main_worktree_path(self) -> Path:
         """Get the path to the main worktree (repository root)."""
-        return Path(self.repo.git_dir).parent
+        return Path(self.repo.working_dir)

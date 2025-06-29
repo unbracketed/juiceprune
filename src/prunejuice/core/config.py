@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 from pathlib import Path
 from typing import Optional
+from ..utils.path_resolver import ProjectPathResolver
 
 
 class Settings(BaseSettings):
@@ -11,13 +12,13 @@ class Settings(BaseSettings):
     
     # Database settings
     db_path: Path = Field(
-        default_factory=lambda: Path.cwd() / ".prj" / "prunejuice.db",
+        default_factory=lambda: ProjectPathResolver.resolve_database_path(),
         description="Path to SQLite database"
     )
     
     # Artifact storage
     artifacts_dir: Path = Field(
-        default_factory=lambda: Path.cwd() / ".prj" / "artifacts",
+        default_factory=lambda: ProjectPathResolver.resolve_artifacts_path(),
         description="Directory for storing artifacts"
     )
     
@@ -66,8 +67,20 @@ class Settings(BaseSettings):
         "extra": "ignore"
     }
         
-    def __init__(self, **kwargs):
-        """Initialize settings and create directories."""
+    def __init__(self, project_path: Optional[Path] = None, **kwargs):
+        """Initialize settings with optional project path override.
+        
+        Args:
+            project_path: Override project root path (for testing/special cases)
+            **kwargs: Additional settings overrides
+        """
+        # Override paths if project_path is provided
+        if project_path is not None:
+            kwargs.setdefault('db_path', project_path / ".prj" / "prunejuice.db")
+            kwargs.setdefault('artifacts_dir', project_path / ".prj" / "artifacts")
+            
         super().__init__(**kwargs)
+        
+        # Ensure directories exist
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.artifacts_dir.mkdir(parents=True, exist_ok=True)

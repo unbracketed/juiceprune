@@ -8,6 +8,7 @@ import json
 import logging
 
 from .session import Session
+from ..worktree_utils import GitWorktreeManager
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +36,13 @@ class BuiltinSteps:
         
         # Check if we're in a git repository
         project_path = session.project_path
-        if project_path and not (project_path / ".git").exists():
-            issues.append("Not in a git repository")
+        if project_path:
+            try:
+                manager = GitWorktreeManager(project_path)
+                if not manager.is_git_repository():
+                    issues.append("Not in a git repository")
+            except Exception:
+                issues.append("Not in a git repository")
         
         # Check for required tools
         if session.command_name.startswith('worktree-') and not self.plum.is_available():
@@ -76,17 +82,10 @@ class BuiltinSteps:
         
         # Try to get git branch
         try:
-            import subprocess
-            result = subprocess.run(
-                ["git", "branch", "--show-current"],
-                cwd=project_path,
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            context_info["git_branch"] = result.stdout.strip()
-        except subprocess.CalledProcessError:
-            pass
+            manager = GitWorktreeManager(project_path)
+            context_info["git_branch"] = manager.get_current_branch() or "unknown"
+        except Exception:
+            context_info["git_branch"] = "unknown"
         
         # Store context as artifact
         self.artifacts.store_content(

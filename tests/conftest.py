@@ -74,8 +74,15 @@ def test_project(temp_dir):
     project_path = temp_dir / "test-project"
     project_path.mkdir()
     
-    # Initialize git repo
-    (project_path / ".git").mkdir()
+    # Initialize real git repo
+    import subprocess
+    try:
+        subprocess.run(["git", "init"], cwd=project_path, check=True, capture_output=True)
+        subprocess.run(["git", "config", "user.name", "Test User"], cwd=project_path, check=True, capture_output=True)
+        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=project_path, check=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        # Fallback to fake .git directory if git is not available
+        (project_path / ".git").mkdir()
     
     # Create .prj structure
     prj_dir = project_path / ".prj"
