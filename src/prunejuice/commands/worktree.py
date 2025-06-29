@@ -5,7 +5,6 @@ from rich.console import Console
 from rich.table import Table
 from pathlib import Path
 from typing import Optional
-import asyncio
 
 from ..integrations.plum import PlumIntegration
 
@@ -34,7 +33,7 @@ def list(
         
         console.print("🌳 Listing worktrees...", style="bold green")
         
-        worktrees = asyncio.run(plum.list_worktrees(Path.cwd()))
+        worktrees = plum.list_worktrees(Path.cwd())
         
         if not worktrees:
             console.print("No worktrees found", style="yellow")
@@ -76,7 +75,7 @@ def create(
         
         console.print(f"🌱 Creating worktree for branch: [bold cyan]{branch_name}[/bold cyan]")
         
-        worktree_path = asyncio.run(plum.create_worktree(Path.cwd(), branch_name))
+        worktree_path = plum.create_worktree(Path.cwd(), branch_name)
         
         console.print(f"✅ Worktree created at: [bold green]{worktree_path}[/bold green]")
         
@@ -109,7 +108,7 @@ def remove(
         
         console.print(f"🗑️  Removing worktree: [bold yellow]{worktree_path}[/bold yellow]")
         
-        success = asyncio.run(plum.remove_worktree(Path.cwd(), worktree_path_obj))
+        success = plum.remove_worktree(Path.cwd(), worktree_path_obj)
         
         if success:
             console.print("✅ Worktree removed successfully", style="bold green")

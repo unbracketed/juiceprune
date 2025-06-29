@@ -5,7 +5,6 @@ from rich.console import Console
 from rich.table import Table
 from pathlib import Path
 from typing import Optional
-import asyncio
 
 from ..integrations.pots import PotsIntegration
 
@@ -34,7 +33,7 @@ def list(
         
         console.print("📺 Listing tmux sessions...", style="bold green")
         
-        sessions = asyncio.run(pots.list_sessions())
+        sessions = pots.list_sessions()
         
         if not sessions:
             console.print("No sessions found", style="yellow")
@@ -83,7 +82,7 @@ def create(
         console.print(f"🎬 Creating session: [bold cyan]{task_name}[/bold cyan]")
         console.print(f"Worktree directory: [dim]{work_dir}[/dim]")
         
-        session_name = asyncio.run(pots.create_session(work_dir, task_name))
+        session_name = pots.create_session(work_dir, task_name)
         
         console.print(f"✅ Session created: [bold green]{session_name}[/bold green]")
         console.print("Use 'prj session attach <name>' to connect to the session")
@@ -108,7 +107,7 @@ def attach(
         
         console.print(f"🔗 Attaching to session: [bold cyan]{session_name}[/bold cyan]")
         
-        success = asyncio.run(pots.attach_session(session_name))
+        success = pots.attach_session(session_name)
         
         if success:
             console.print("✅ Session attached successfully", style="bold green")
@@ -143,7 +142,7 @@ def kill(
         
         console.print(f"💀 Killing session: [bold yellow]{session_name}[/bold yellow]")
         
-        success = asyncio.run(pots.kill_session(session_name))
+        success = pots.kill_session(session_name)
         
         if success:
             console.print("✅ Session killed successfully", style="bold green")
@@ -176,7 +175,7 @@ def cleanup(
             console.print("DRY RUN - No sessions will be actually removed", style="yellow")
         
         # Get all sessions and identify inactive ones
-        sessions = asyncio.run(pots.list_sessions())
+        sessions = pots.list_sessions()
         
         if not sessions:
             console.print("No sessions to clean up", style="dim")
