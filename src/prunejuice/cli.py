@@ -25,7 +25,8 @@ from .utils.path_resolver import ProjectPathResolver
 app = typer.Typer(
     name="prunejuice",
     help="🧃 PruneJuice SDLC Orchestrator - Parallel Agentic Coding Workflow Manager",
-    rich_markup_mode="rich"
+    rich_markup_mode="rich",
+    no_args_is_help=False  # Allow handling no arguments
 )
 
 console = Console()
@@ -50,6 +51,22 @@ def _get_status_style(status: str) -> str:
 # Add subcommand groups
 app.add_typer(worktree_app, name="worktree")
 app.add_typer(session_app, name="session")
+
+
+@app.callback(invoke_without_command=True)
+def main_callback(
+    ctx: typer.Context,
+    help: bool = typer.Option(False, "--help", "-h", help="Show help message")
+):
+    """Handle invocation with no subcommand - default to resume."""
+    if help:
+        # Show help when explicitly requested
+        print(ctx.get_help())
+        ctx.exit()
+    elif ctx.invoked_subcommand is None:
+        # No subcommand provided, invoke resume
+        resume()
+        ctx.exit()
 
 
 @app.command()
@@ -478,6 +495,159 @@ def status(
         
     except Exception as e:
         console.print(f"❌ Error getting status: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def resume():
+    """Show available worktrees and sessions for quick navigation."""
+    try:
+        # Get project context
+        context = _get_project_context()
+        
+        # Collect available items
+        items = []
+        
+        # Add worktrees
+        if context['is_git_repo']:
+            try:
+                from .integrations.plum import PlumIntegration
+                plum = PlumIntegration()
+                worktrees = plum.list_worktrees(context['project_root'])
+                
+                for wt in worktrees:
+                    # Format branch name (remove refs/heads/ prefix)
+                    branch = wt.get('branch', 'unknown')
+                    if branch.startswith('refs/heads/'):
+                        branch = branch[11:]
+                    
+                    # Skip if this is the current worktree
+                    if context['current_worktree'] and context['current_worktree']['path'] == wt.get('path'):
+                        continue
+                    
+                    items.append({
+                        'type': 'worktree',
+                        'display': f"🌳 {branch}",
+                        'branch': branch,
+                        'path': wt.get('path'),
+                        'is_main': Path(wt.get('path', '')) == context['project_root']
+                    })
+            except Exception as e:
+                console.print(f"Warning: Could not list worktrees: {e}", style="yellow")
+        
+        # Add tmux sessions
+        try:
+            pots = PotsIntegration()
+            if pots.is_available():
+                sessions = pots.list_sessions()
+                
+                for session in sessions:
+                    items.append({
+                        'type': 'session',
+                        'display': f"📺 {session.get('name', 'unknown')}",
+                        'name': session.get('name', 'unknown'),
+                        'path': session.get('path', ''),
+                        'attached': session.get('attached', False)
+                    })
+        except Exception as e:
+            console.print(f"Warning: Could not list sessions: {e}", style="yellow")
+        
+        # Check if anything is available
+        if not items:
+            console.print("Nothing simmering. Use --help for help", style="dim")
+            return
+        
+        # Display items for selection
+        console.print("Available items:", style="bold")
+        for i, item in enumerate(items, 1):
+            console.print(f"  {i}. {item['display']}")
+        
+        # Get user selection
+        try:
+            selection = typer.prompt("\nSelect an item (number)")
+            selection_idx = int(selection) - 1
+            
+            if selection_idx < 0 or selection_idx >= len(items):
+                console.print("Invalid selection", style="red")
+                return
+                
+            selected_item = items[selection_idx]
+            
+        except (ValueError, KeyboardInterrupt):
+            console.print("\nCancelled", style="yellow")
+            return
+        
+        # Handle selection based on type
+        if selected_item['type'] == 'worktree':
+            # Show worktree options
+            console.print(f"\nSelected worktree: {selected_item['branch']}", style="cyan")
+            console.print("Options:")
+            console.print("  1. Change directory (cd)")
+            console.print("  2. Open in new tmux session")
+            
+            try:
+                action = typer.prompt("Choose action (1-2)")
+                
+                if action == "1":
+                    # Output cd command for shell to execute
+                    console.print(f"cd \"{selected_item['path']}\"", style="green")
+                    console.print(f"Changed to worktree: {selected_item['branch']}", style="dim")
+                    
+                elif action == "2":
+                    # Create new tmux session
+                    try:
+                        session_name = f"{context['project_name']}-{selected_item['branch']}"
+                        pots = PotsIntegration()
+                        pots.create_session(Path(selected_item['path']), selected_item['branch'])
+                        console.print(f"Created tmux session: {session_name}", style="green")
+                        console.print(f"Run: tmux attach -t {session_name}", style="dim")
+                    except Exception as e:
+                        console.print(f"Failed to create session: {e}", style="red")
+                else:
+                    console.print("Invalid action", style="red")
+                    
+            except (ValueError, KeyboardInterrupt):
+                console.print("\nCancelled", style="yellow")
+                return
+        
+        elif selected_item['type'] == 'session':
+            # Show session options
+            console.print(f"\nSelected session: {selected_item['name']}", style="cyan")
+            console.print("Options:")
+            console.print("  1. Attach to session")
+            if selected_item['path']:
+                console.print("  2. Change directory to session path (cd)")
+            
+            try:
+                max_option = 2 if selected_item['path'] else 1
+                action = typer.prompt(f"Choose action (1-{max_option})")
+                
+                if action == "1":
+                    # Attach to session
+                    try:
+                        pots = PotsIntegration()
+                        success = pots.attach_session(selected_item['name'])
+                        if success:
+                            console.print(f"Attached to session: {selected_item['name']}", style="green")
+                        else:
+                            console.print(f"Failed to attach to session: {selected_item['name']}", style="red")
+                    except Exception as e:
+                        console.print(f"Failed to attach: {e}", style="red")
+                
+                elif action == "2" and selected_item['path']:
+                    # Output cd command for shell to execute
+                    console.print(f"cd \"{selected_item['path']}\"", style="green")
+                    console.print(f"Changed to session path: {selected_item['path']}", style="dim")
+                    
+                else:
+                    console.print("Invalid action", style="red")
+                    
+            except (ValueError, KeyboardInterrupt):
+                console.print("\nCancelled", style="yellow")
+                return
+        
+    except Exception as e:
+        console.print(f"❌ Error in resume command: {e}", style="bold red")
         raise typer.Exit(code=1)
 
 
