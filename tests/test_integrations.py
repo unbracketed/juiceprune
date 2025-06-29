@@ -1,158 +1,154 @@
-"""Tests for external tool integrations."""
+"""Tests for worktree and session utilities."""
 
 import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from prunejuice.integrations.plum import PlumIntegration
-from prunejuice.integrations.pots import PotsIntegration
+from prunejuice.worktree_utils import GitWorktreeManager
+from prunejuice.session_utils import TmuxManager, SessionLifecycleManager
 
 
-class TestPlumIntegration:
-    """Tests for Plum worktree integration."""
-    
-    def test_plum_integration_available(self):
-        """Test that plum integration is available (native implementation)."""
-        plum = PlumIntegration()
-        assert plum.is_available()  # Native implementation is always available
-    
-    @patch('prunejuice.worktree_utils.GitWorktreeManager.create_worktree')
+class TestWorktreeUtils:
+    """Tests for Git worktree utilities."""
+
+    @patch("prunejuice.worktree_utils.GitWorktreeManager.create_worktree")
     def test_create_worktree_success(self, mock_create, temp_dir):
         """Test successful worktree creation."""
-        # Mock the native Git worktree creation
         expected_path = temp_dir / "test-worktree"
         mock_create.return_value = expected_path
-        
-        plum = PlumIntegration()
-        result = plum.create_worktree(temp_dir, "test-branch")
-        
+
+        git_manager = GitWorktreeManager(temp_dir)
+        result = git_manager.create_worktree("test-branch")
+
         assert result == expected_path
         mock_create.assert_called_once_with("test-branch")
-    
-    @patch('prunejuice.worktree_utils.GitWorktreeManager.create_worktree')
+
+    @patch("prunejuice.worktree_utils.GitWorktreeManager.create_worktree")
     def test_create_worktree_failure(self, mock_create, temp_dir):
         """Test worktree creation failure."""
-        # Mock native Git operation failure
         mock_create.side_effect = RuntimeError("Branch already exists")
-        
-        plum = PlumIntegration()
-        
-        with pytest.raises(RuntimeError, match="Failed to create worktree"):
-            plum.create_worktree(temp_dir, "existing-branch")
-    
-    @patch('prunejuice.worktree_utils.GitWorktreeManager.list_worktrees')
+
+        git_manager = GitWorktreeManager(temp_dir)
+
+        with pytest.raises(RuntimeError, match="Branch already exists"):
+            git_manager.create_worktree("existing-branch")
+
+    @patch("prunejuice.worktree_utils.GitWorktreeManager.list_worktrees")
     def test_list_worktrees(self, mock_list, temp_dir):
         """Test listing worktrees."""
-        # Mock native Git worktree listing
         mock_list.return_value = [
             {"path": "/path/to/worktree1", "branch": "branch1"},
-            {"path": "/path/to/worktree2", "branch": "branch2"}
+            {"path": "/path/to/worktree2", "branch": "branch2"},
         ]
-        
-        plum = PlumIntegration()
-        result = plum.list_worktrees(temp_dir)
-        
+
+        git_manager = GitWorktreeManager(temp_dir)
+        result = git_manager.list_worktrees()
+
         assert len(result) == 2
-        assert result[0]["path"] == "/path/to/worktree1"
         assert result[0]["branch"] == "branch1"
-        assert result[1]["path"] == "/path/to/worktree2"
         assert result[1]["branch"] == "branch2"
-    
-    @patch('prunejuice.worktree_utils.GitWorktreeManager.create_worktree')
-    def test_create_worktree_native_implementation(self, mock_create, temp_dir):
-        """Test native implementation (no fallback needed)."""
-        expected_path = temp_dir / "test-worktree"
-        mock_create.return_value = expected_path
-        
-        plum = PlumIntegration()
-        result = plum.create_worktree(temp_dir, "test-branch")
-        
-        assert result == expected_path
+
+    @patch("prunejuice.worktree_utils.GitWorktreeManager.remove_worktree")
+    def test_remove_worktree(self, mock_remove, temp_dir):
+        """Test removing a worktree."""
+        mock_remove.return_value = True
+
+        git_manager = GitWorktreeManager(temp_dir)
+        result = git_manager.remove_worktree(Path("/path/to/worktree"))
+
+        assert result is True
+        mock_remove.assert_called_once()
 
 
-class TestPotsIntegration:
-    """Tests for Pots tmux integration."""
-    
-    @patch('prunejuice.session_utils.TmuxManager.check_tmux_available')
-    def test_pots_availability(self, mock_check):
-        """Test pots integration availability check."""
+class TestSessionUtils:
+    """Tests for tmux session utilities."""
+
+    @patch("prunejuice.session_utils.TmuxManager.check_tmux_available")
+    def test_tmux_available(self, mock_check):
+        """Test checking tmux availability."""
         mock_check.return_value = True
-        
-        pots = PotsIntegration()
-        assert pots.is_available()
-    
-    @patch('prunejuice.session_utils.SessionLifecycleManager.create_session_for_worktree')
+
+        tmux_manager = TmuxManager()
+        assert tmux_manager.check_tmux_available()
+
+    @patch("prunejuice.session_utils.TmuxManager.check_tmux_available")
+    def test_tmux_not_available(self, mock_check):
+        """Test when tmux is not available."""
+        mock_check.return_value = False
+
+        tmux_manager = TmuxManager()
+        assert not tmux_manager.check_tmux_available()
+
+    @patch(
+        "prunejuice.session_utils.SessionLifecycleManager.create_session_for_worktree"
+    )
     def test_create_session_success(self, mock_create, temp_dir):
         """Test successful session creation."""
-        # Mock native tmux session creation
         mock_create.return_value = "test-session"
-        
-        pots = PotsIntegration()
-        result = pots.create_session(temp_dir, "test-task")
-        
+
+        tmux_manager = TmuxManager()
+        session_manager = SessionLifecycleManager(tmux_manager)
+
+        result = session_manager.create_session_for_worktree(
+            temp_dir, "test-task", auto_attach=False
+        )
+
         assert result == "test-session"
-        mock_create.assert_called_once_with(temp_dir, "test-task", auto_attach=False)
-    
-    @patch('prunejuice.session_utils.SessionLifecycleManager.create_session_for_worktree')
+        mock_create.assert_called_once()
+
+    @patch(
+        "prunejuice.session_utils.SessionLifecycleManager.create_session_for_worktree"
+    )
     def test_create_session_failure(self, mock_create, temp_dir):
-        """Test session creation failure - should return fallback."""
-        # Mock native session creation failure
+        """Test session creation failure."""
         mock_create.return_value = None
-        
-        pots = PotsIntegration()
-        result = pots.create_session(temp_dir, "test-task")
-        
-        # Should return fallback session name
-        assert result == "prunejuice-test-task"
-    
-    @patch('prunejuice.session_utils.TmuxManager.list_sessions')
-    def test_list_sessions(self, mock_list, temp_dir):
-        """Test listing sessions."""
-        # Mock native tmux session listing
+
+        tmux_manager = TmuxManager()
+        session_manager = SessionLifecycleManager(tmux_manager)
+
+        result = session_manager.create_session_for_worktree(
+            temp_dir, "test-task", auto_attach=False
+        )
+
+        assert result is None
+
+    @patch("prunejuice.session_utils.TmuxManager.list_sessions")
+    def test_list_sessions(self, mock_list):
+        """Test listing tmux sessions."""
         mock_list.return_value = [
-            {"name": "session1", "path": "/path1", "attached": True},
-            {"name": "session2", "path": "/path2", "attached": False}
+            {"name": "session1", "path": "/path/to/dir1"},
+            {"name": "session2", "path": "/path/to/dir2"},
         ]
-        
-        pots = PotsIntegration()
-        result = pots.list_sessions()
-        
+
+        tmux_manager = TmuxManager()
+        result = tmux_manager.list_sessions()
+
         assert len(result) == 2
         assert result[0]["name"] == "session1"
-        assert result[0]["path"] == "/path1"
-        assert result[0]["attached"] == True
-    
-    @patch('prunejuice.session_utils.SessionLifecycleManager.create_session_for_worktree')
-    def test_create_session_with_exception(self, mock_create, temp_dir):
-        """Test session creation with exception - should return fallback."""
-        # Mock exception during session creation
-        mock_create.side_effect = Exception("Tmux not available")
-        
-        pots = PotsIntegration()
-        result = pots.create_session(temp_dir, "test-task")
-        
-        # Should return fallback session name
-        assert result == "prunejuice-test-task"
-    
-    @patch('prunejuice.session_utils.SessionLifecycleManager.kill_session')
-    def test_kill_session(self, mock_kill, temp_dir):
+        assert result[1]["name"] == "session2"
+
+    @patch("prunejuice.session_utils.SessionLifecycleManager.attach_to_session")
+    def test_attach_session(self, mock_attach):
+        """Test attaching to a session."""
+        mock_attach.return_value = True
+
+        tmux_manager = TmuxManager()
+        session_manager = SessionLifecycleManager(tmux_manager)
+
+        result = session_manager.attach_to_session("test-session")
+
+        assert result is True
+        mock_attach.assert_called_once_with("test-session")
+
+    @patch("prunejuice.session_utils.SessionLifecycleManager.kill_session")
+    def test_kill_session(self, mock_kill):
         """Test killing a session."""
-        # Mock successful session kill
         mock_kill.return_value = True
-        
-        pots = PotsIntegration()
-        result = pots.kill_session("test-session")
-        
+
+        tmux_manager = TmuxManager()
+        session_manager = SessionLifecycleManager(tmux_manager)
+
+        result = session_manager.kill_session("test-session")
+
         assert result is True
         mock_kill.assert_called_once_with("test-session")
-    
-    @patch('prunejuice.session_utils.SessionLifecycleManager.kill_session')
-    def test_kill_session_failure(self, mock_kill, temp_dir):
-        """Test session kill failure."""
-        # Mock session kill failure
-        mock_kill.return_value = False
-        
-        pots = PotsIntegration()
-        result = pots.kill_session("nonexistent-session")
-        
-        assert result is False

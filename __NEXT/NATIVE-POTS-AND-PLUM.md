@@ -1,2 +1,2 @@
 /zen:refactor
-Remove the dependencies on `plum` and `pots`. Integrate their functionality into the Python core modules so there is no reliance on them. They will be maintained as separate, related projects; but I want to simplify installation and make PruneJuice more self contained. This should simplify the need for checks and fallbacks
+Remove the dependencies on `plum` and `pots`. Integrate their functionality into the Python core modules so there is no reliance on them. They will be maintained as separate, related projects; but I want to simplify installation and make PruneJuice more self contained. This should simplify the need for checks and fallbacks, and eliminate unneeded wrappers around core functionality

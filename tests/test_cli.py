@@ -16,19 +16,20 @@ def test_init_command(temp_dir):
     # Change to temp directory
     original_cwd = Path.cwd()
     import os
+
     os.chdir(temp_dir)
-    
+
     try:
         result = runner.invoke(app, ["init"])
         assert result.exit_code == 0
         assert "Project initialized successfully" in result.stdout
-        
+
         # Verify project structure
         assert (temp_dir / ".prj").exists()
         assert (temp_dir / ".prj" / "commands").exists()
         assert (temp_dir / ".prj" / "steps").exists()
         assert (temp_dir / ".prj" / "configs").exists()
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -37,15 +38,16 @@ def test_list_commands_empty(temp_dir):
     """Test listing commands in empty project."""
     original_cwd = Path.cwd()
     import os
+
     os.chdir(temp_dir)
-    
+
     try:
         result = runner.invoke(app, ["list-commands"])
         assert result.exit_code == 0
         # Should show deprecation notice and template commands
         assert "list-commands' is deprecated" in result.stdout
         assert "Available Commands" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -57,23 +59,24 @@ def test_list_commands_with_commands(test_project):
         name="test-cmd",
         description="Test command",
         category="test",
-        steps=["setup-environment"]
+        steps=["setup-environment"],
     )
-    
+
     cmd_file = test_project / ".prj" / "commands" / "test-cmd.yaml"
-    with open(cmd_file, 'w') as f:
+    with open(cmd_file, "w") as f:
         yaml.dump(sample_command.model_dump(), f)
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         result = runner.invoke(app, ["list-commands"])
         assert result.exit_code == 0
         assert "test-cmd" in result.stdout
         assert "Test command" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -85,22 +88,23 @@ def test_run_command_missing_args(test_project):
         name="arg-cmd",
         description="Command with args",
         arguments=[{"name": "required_arg", "required": True}],
-        steps=["setup-environment"]
+        steps=["setup-environment"],
     )
-    
+
     cmd_file = test_project / ".prj" / "commands" / "arg-cmd.yaml"
-    with open(cmd_file, 'w') as f:
+    with open(cmd_file, "w") as f:
         yaml.dump(sample_command.model_dump(), f)
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         result = runner.invoke(app, ["run", "arg-cmd"])
         assert result.exit_code == 1
         assert "Required argument" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -109,13 +113,14 @@ def test_run_nonexistent_command(test_project):
     """Test running non-existent command."""
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         result = runner.invoke(app, ["run", "nonexistent"])
         assert result.exit_code == 1
         assert "not found" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -123,24 +128,23 @@ def test_run_nonexistent_command(test_project):
 def test_dry_run(test_project):
     """Test dry run functionality."""
     sample_command = CommandDefinition(
-        name="dry-test",
-        description="Dry run test",
-        steps=["setup-environment"]
+        name="dry-test", description="Dry run test", steps=["setup-environment"]
     )
-    
+
     cmd_file = test_project / ".prj" / "commands" / "dry-test.yaml"
-    with open(cmd_file, 'w') as f:
+    with open(cmd_file, "w") as f:
         yaml.dump(sample_command.model_dump(), f)
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         result = runner.invoke(app, ["run", "dry-test", "--dry-run"])
         assert result.exit_code == 0
         assert "Dry run for command" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -149,17 +153,18 @@ def test_status_command(test_project):
     """Test status command."""
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         # First initialize the project
         runner.invoke(app, ["init"])
-        
+
         # Then check status
         result = runner.invoke(app, ["status"])
         assert result.exit_code == 0
         assert "Project Status" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -167,25 +172,24 @@ def test_status_command(test_project):
 def test_invalid_argument_format(test_project):
     """Test handling of invalid argument format."""
     sample_command = CommandDefinition(
-        name="arg-test",
-        description="Test args",
-        steps=["setup-environment"]
+        name="arg-test", description="Test args", steps=["setup-environment"]
     )
-    
+
     cmd_file = test_project / ".prj" / "commands" / "arg-test.yaml"
-    with open(cmd_file, 'w') as f:
+    with open(cmd_file, "w") as f:
         yaml.dump(sample_command.model_dump(), f)
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         # Invalid argument format (no = sign)
         result = runner.invoke(app, ["run", "arg-test", "invalid_arg"])
         assert result.exit_code == 1
         assert "Invalid argument format" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -194,39 +198,38 @@ def test_status_worktree_column(test_project):
     """Test status command shows worktree column in Recent Events."""
     import asyncio
     from prunejuice.core.database import Database
-    from prunejuice.core.models import ExecutionEvent
-    from datetime import datetime
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         # Initialize the project
         runner.invoke(app, ["init"])
-        
+
         # Add a test event with worktree info
         db_path = test_project / ".prj" / "prunejuice.db"
         db = Database(db_path)
-        
+
         async def add_test_event():
             event_id = await db.start_event(
                 command="test-command",
                 project_path=str(test_project),
                 session_id="test-session",
                 artifacts_path="test-artifacts",
-                worktree_name="feature-branch"
+                worktree_name="feature-branch",
             )
             await db.end_event(event_id, "completed", 0)
-        
+
         asyncio.run(add_test_event())
-        
+
         # Check status output includes worktree column
         result = runner.invoke(app, ["status"])
         assert result.exit_code == 0
         assert "Worktree" in result.stdout
         assert "feature-branch" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -236,19 +239,20 @@ def test_status_worktree_filtering(test_project):
     import asyncio
     from prunejuice.core.database import Database
     from unittest.mock import patch
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         # Initialize the project
         runner.invoke(app, ["init"])
-        
+
         # Add test events for different worktrees
         db_path = test_project / ".prj" / "prunejuice.db"
         db = Database(db_path)
-        
+
         async def add_test_events():
             # Main branch event
             event1_id = await db.start_event(
@@ -256,47 +260,47 @@ def test_status_worktree_filtering(test_project):
                 project_path=str(test_project),
                 session_id="main-session",
                 artifacts_path="main-artifacts",
-                worktree_name=None
+                worktree_name=None,
             )
             await db.end_event(event1_id, "completed", 0)
-            
+
             # Feature branch event
             event2_id = await db.start_event(
                 command="feature-command",
                 project_path=str(test_project),
                 session_id="feature-session",
                 artifacts_path="feature-artifacts",
-                worktree_name="feature-branch"
+                worktree_name="feature-branch",
             )
             await db.end_event(event2_id, "completed", 0)
-        
+
         asyncio.run(add_test_events())
-        
+
         # Mock being in a worktree context
         mock_context = {
-            'project_name': 'test',
-            'project_root': test_project,
-            'current_worktree': {
-                'branch': 'feature-branch',
-                'path': str(test_project),
-                'is_main': False
+            "project_name": "test",
+            "project_root": test_project,
+            "current_worktree": {
+                "branch": "feature-branch",
+                "path": str(test_project),
+                "is_main": False,
             },
-            'is_git_repo': True
+            "is_git_repo": True,
         }
-        
-        with patch('prunejuice.cli._get_project_context', return_value=mock_context):
+
+        with patch("prunejuice.cli._get_project_context", return_value=mock_context):
             # Status without --all should only show feature-branch events
             result = runner.invoke(app, ["status"])
             assert result.exit_code == 0
             assert "feature-command" in result.stdout
             assert "main-command" not in result.stdout
-            
+
             # Status with --all should show all events
             result = runner.invoke(app, ["status", "--all"])
             assert result.exit_code == 0
             assert "feature-command" in result.stdout
             assert "main-command" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -305,19 +309,20 @@ def test_history_worktree_display(test_project):
     """Test history command shows worktree information in project column."""
     import asyncio
     from prunejuice.core.database import Database
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         # Initialize the project
         runner.invoke(app, ["init"])
-        
+
         # Add test events with worktree info
         db_path = test_project / ".prj" / "prunejuice.db"
         db = Database(db_path)
-        
+
         async def add_test_events():
             # Main branch event
             event1_id = await db.start_event(
@@ -325,33 +330,33 @@ def test_history_worktree_display(test_project):
                 project_path=str(test_project),
                 session_id="main-session",
                 artifacts_path="main-artifacts",
-                worktree_name=None
+                worktree_name=None,
             )
             await db.end_event(event1_id, "completed", 0)
-            
+
             # Feature branch event
             event2_id = await db.start_event(
                 command="feature-command",
                 project_path=str(test_project),
                 session_id="feature-session",
                 artifacts_path="feature-artifacts",
-                worktree_name="feature-branch"
+                worktree_name="feature-branch",
             )
             await db.end_event(event2_id, "completed", 0)
-        
+
         asyncio.run(add_test_events())
-        
+
         # Check history output includes worktree info in project column
         result = runner.invoke(app, ["history"])
         assert result.exit_code == 0
-        
+
         # Verify the commands are displayed
         assert "main-command" in result.stdout
         assert "feature-command" in result.stdout
-        
-        # The actual formatting logic creates project-worktree display 
+
+        # The actual formatting logic creates project-worktree display
         # Even if truncated in Rich table, the logic is correct
-        
+
     finally:
         os.chdir(original_cwd)
 
@@ -361,19 +366,20 @@ def test_history_worktree_filtering(test_project):
     import asyncio
     from prunejuice.core.database import Database
     from unittest.mock import patch
-    
+
     original_cwd = Path.cwd()
     import os
+
     os.chdir(test_project)
-    
+
     try:
         # Initialize the project
         runner.invoke(app, ["init"])
-        
+
         # Add test events for different worktrees
         db_path = test_project / ".prj" / "prunejuice.db"
         db = Database(db_path)
-        
+
         async def add_test_events():
             # Main branch event
             event1_id = await db.start_event(
@@ -381,46 +387,46 @@ def test_history_worktree_filtering(test_project):
                 project_path=str(test_project),
                 session_id="main-session",
                 artifacts_path="main-artifacts",
-                worktree_name=None
+                worktree_name=None,
             )
             await db.end_event(event1_id, "completed", 0)
-            
+
             # Feature branch event
             event2_id = await db.start_event(
                 command="feature-command",
                 project_path=str(test_project),
                 session_id="feature-session",
                 artifacts_path="feature-artifacts",
-                worktree_name="feature-branch"
+                worktree_name="feature-branch",
             )
             await db.end_event(event2_id, "completed", 0)
-        
+
         asyncio.run(add_test_events())
-        
+
         # Mock being in a worktree context
         mock_context = {
-            'project_name': 'test',
-            'project_root': test_project,
-            'current_worktree': {
-                'branch': 'feature-branch',
-                'path': str(test_project),
-                'is_main': False
+            "project_name": "test",
+            "project_root": test_project,
+            "current_worktree": {
+                "branch": "feature-branch",
+                "path": str(test_project),
+                "is_main": False,
             },
-            'is_git_repo': True
+            "is_git_repo": True,
         }
-        
-        with patch('prunejuice.cli._get_project_context', return_value=mock_context):
+
+        with patch("prunejuice.cli._get_project_context", return_value=mock_context):
             # History without --all should only show feature-branch events
             result = runner.invoke(app, ["history"])
             assert result.exit_code == 0
             assert "feature-command" in result.stdout
             assert "main-command" not in result.stdout
-            
+
             # History with --all should show all events
             result = runner.invoke(app, ["history", "--all"])
             assert result.exit_code == 0
             assert "feature-command" in result.stdout
             assert "main-command" in result.stdout
-        
+
     finally:
         os.chdir(original_cwd)

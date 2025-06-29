@@ -32,10 +32,7 @@ def temp_dir():
 @pytest.fixture
 def test_settings(temp_dir):
     """Create test settings with temporary directories."""
-    return Settings(
-        db_path=temp_dir / "test.db",
-        artifacts_dir=temp_dir / "artifacts"
-    )
+    return Settings(db_path=temp_dir / "test.db", artifacts_dir=temp_dir / "artifacts")
 
 
 @pytest_asyncio.fixture
@@ -62,9 +59,9 @@ def sample_command():
         description="Test command for unit tests",
         arguments=[
             CommandArgument(name="input", required=True),
-            CommandArgument(name="optional", required=False, default="default_value")
+            CommandArgument(name="optional", required=False, default="default_value"),
         ],
-        steps=["validate-prerequisites", "store-artifacts"]
+        steps=["validate-prerequisites", "store-artifacts"],
     )
 
 
@@ -73,21 +70,34 @@ def test_project(temp_dir):
     """Create a test project structure."""
     project_path = temp_dir / "test-project"
     project_path.mkdir()
-    
+
     # Initialize real git repo
     import subprocess
+
     try:
-        subprocess.run(["git", "init"], cwd=project_path, check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.name", "Test User"], cwd=project_path, check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=project_path, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "init"], cwd=project_path, check=True, capture_output=True
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "Test User"],
+            cwd=project_path,
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.email", "test@example.com"],
+            cwd=project_path,
+            check=True,
+            capture_output=True,
+        )
     except subprocess.CalledProcessError:
         # Fallback to fake .git directory if git is not available
         (project_path / ".git").mkdir()
-    
+
     # Create .prj structure
     prj_dir = project_path / ".prj"
     prj_dir.mkdir()
     (prj_dir / "commands").mkdir()
     (prj_dir / "steps").mkdir()
-    
+
     return project_path
