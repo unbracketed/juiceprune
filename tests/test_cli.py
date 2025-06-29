@@ -42,7 +42,9 @@ def test_list_commands_empty(temp_dir):
     try:
         result = runner.invoke(app, ["list-commands"])
         assert result.exit_code == 0
-        assert "No commands found" in result.stdout
+        # Should show deprecation notice and template commands
+        assert "list-commands' is deprecated" in result.stdout
+        assert "Available Commands" in result.stdout
         
     finally:
         os.chdir(original_cwd)

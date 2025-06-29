@@ -10,7 +10,7 @@ import logging
 import os
 
 from .database import Database
-from .models import CommandDefinition, ExecutionResult, StepError
+from .models import CommandDefinition, ExecutionResult, StepError, CommandStep, StepType
 from .state import StateManager
 from ..commands.loader import CommandLoader
 from ..integrations.plum import PlumIntegration
@@ -29,28 +29,46 @@ class StepExecutor:
     
     async def execute(
         self,
-        step_name: str,
+        step: CommandStep,
         context: Dict[str, Any],
         timeout: int = 300
     ) -> Tuple[bool, str]:
         """Execute a step and return (success, output)."""
-        if step_name in self.builtin_steps:
-            # Execute built-in step
+        # Use the minimum of command timeout and step timeout (favor more restrictive)
+        step_timeout = min(timeout, step.timeout) if step.timeout > 0 else timeout
+        
+        if step.type == StepType.BUILTIN:
+            return await self._execute_builtin(step, context, step_timeout)
+        elif step.type == StepType.SCRIPT:
+            return await self._execute_script_step(step, context, step_timeout)
+        elif step.type == StepType.SHELL:
+            return await self._execute_shell_command(step, context, step_timeout)
+        else:
+            return False, f"Unknown step type: {step.type}"
+    
+    async def _execute_builtin(
+        self,
+        step: CommandStep,
+        context: Dict[str, Any],
+        timeout: int
+    ) -> Tuple[bool, str]:
+        """Execute a built-in step."""
+        if step.action in self.builtin_steps:
             try:
                 result = await asyncio.wait_for(
-                    self.builtin_steps[step_name](context),
+                    self.builtin_steps[step.action](context),
                     timeout=timeout
                 )
                 return True, str(result)
             except asyncio.TimeoutError:
-                return False, f"Step '{step_name}' timed out after {timeout}s"
+                return False, f"Step '{step.name}' timeout after {timeout}s"
             except Exception as e:
-                return False, f"Step '{step_name}' failed: {e}"
+                return False, f"Step '{step.name}' failed: {e}"
         else:
             # Look for custom step script
             step_paths = [
-                context['project_path'] / ".prj" / "steps" / f"{step_name}.py",
-                context['project_path'] / ".prj" / "steps" / f"{step_name}.sh",
+                context['project_path'] / ".prj" / "steps" / f"{step.action}.py",
+                context['project_path'] / ".prj" / "steps" / f"{step.action}.sh",
             ]
             
             for step_path in step_paths:
@@ -62,7 +80,7 @@ class StepExecutor:
                 from importlib import resources
                 template_steps = resources.files("prunejuice.template_steps")
                 for ext in [".py", ".sh"]:
-                    template_step = template_steps / f"{step_name}{ext}"
+                    template_step = template_steps / f"{step.action}{ext}"
                     if template_step.is_file():
                         # Copy template step to temporary location and execute
                         import tempfile
@@ -76,9 +94,71 @@ class StepExecutor:
                             finally:
                                 temp_path.unlink(missing_ok=True)
             except Exception as e:
-                logger.warning(f"Failed to load template step {step_name}: {e}")
+                logger.warning(f"Failed to load template step {step.action}: {e}")
             
-            return False, f"Step '{step_name}' not found"
+            return False, f"Step '{step.name}' not found"
+    
+    async def _execute_script_step(
+        self,
+        step: CommandStep,
+        context: Dict[str, Any],
+        timeout: int
+    ) -> Tuple[bool, str]:
+        """Execute a script step."""
+        script_path = Path(step.action)
+        if not script_path.is_absolute():
+            # Look for script in project steps directory
+            script_path = context['project_path'] / ".prj" / "steps" / step.action
+        
+        if script_path.exists():
+            return await self._execute_script(script_path, context, timeout)
+        else:
+            return False, f"Script not found: {step.action}"
+    
+    async def _execute_shell_command(
+        self,
+        step: CommandStep,
+        context: Dict[str, Any],
+        timeout: int
+    ) -> Tuple[bool, str]:
+        """Execute a shell command directly."""
+        env = os.environ.copy()
+        
+        # Add context to environment
+        for key, value in context.items():
+            if key == 'args' and isinstance(value, dict):
+                # Flatten args into individual environment variables
+                for arg_key, arg_value in value.items():
+                    if isinstance(arg_value, (str, int, float, bool)):
+                        env[f"PRUNEJUICE_ARG_{arg_key.upper()}"] = str(arg_value)
+            elif isinstance(value, (str, int, float, bool)):
+                env[f"PRUNEJUICE_{key.upper()}"] = str(value)
+        
+        # Add step args to environment
+        for key, value in step.args.items():
+            if isinstance(value, (str, int, float, bool)):
+                env[f"PRUNEJUICE_STEP_{key.upper()}"] = str(value)
+        
+        try:
+            # Execute using bash -c for full shell support
+            proc = await asyncio.create_subprocess_exec(
+                "bash", "-c", step.action,
+                env=env,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+                cwd=context.get('working_directory', context['project_path'])
+            )
+            
+            stdout, _ = await asyncio.wait_for(
+                proc.communicate(),
+                timeout=timeout
+            )
+            
+            return proc.returncode == 0, stdout.decode()
+        except asyncio.TimeoutError:
+            return False, f"Command timeout after {timeout}s"
+        except Exception as e:
+            return False, f"Command execution failed: {e}"
     
     async def _execute_script(
         self,
@@ -120,7 +200,7 @@ class StepExecutor:
             
             return proc.returncode == 0, stdout.decode()
         except asyncio.TimeoutError:
-            return False, f"Script timed out after {timeout}s"
+            return False, f"Script timeout after {timeout}s"
         except Exception as e:
             return False, f"Script execution failed: {e}"
 
@@ -213,13 +293,13 @@ class Executor:
         
         # Execute command with simple sequential execution
         try:
-            # Execute all steps sequentially
-            all_steps = command.pre_steps + command.steps + command.post_steps
+            # Get all steps as CommandStep objects
+            all_steps = command.get_all_steps()
             
             for i, step in enumerate(all_steps):
-                logger.info(f"Executing step {i+1}/{len(all_steps)}: {step}")
+                logger.info(f"Executing step {i+1}/{len(all_steps)}: {step.name}")
                 
-                await self.state.begin_step(session_id, step)
+                await self.state.begin_step(session_id, step.name)
                 success, output = await self.step_executor.execute(
                     step, context, command.timeout
                 )
@@ -227,14 +307,14 @@ class Executor:
                 # Store step output as artifact
                 if output:
                     self.artifacts.store_content(
-                        artifact_dir, output, f"step-{i+1}-{step}.log", "logs"
+                        artifact_dir, output, f"step-{i+1}-{step.name}.log", "logs"
                     )
                 
                 if success:
-                    await self.state.complete_step(session_id, step, output)
+                    await self.state.complete_step(session_id, step.name, output)
                 else:
-                    await self.state.fail_step(session_id, step, output)
-                    raise StepError(f"Step '{step}' failed: {output}")
+                    await self.state.fail_step(session_id, step.name, output)
+                    raise StepError(f"Step '{step.name}' failed: {output}")
             
             # Mark success
             if context.get('event_id'):
@@ -288,15 +368,19 @@ class Executor:
         output += f"Project path: {context['project_path']}\n"
         output += f"Arguments: {context['args']}\n\n"
         
-        all_steps = command.pre_steps + command.steps + command.post_steps
+        all_steps = command.get_all_steps()
         output += f"Steps to execute ({len(all_steps)}):\n"
         for i, step in enumerate(all_steps, 1):
-            output += f"  {i}. {step}\n"
+            output += f"  {i}. {step.name} ({step.type.value}): {step.action}\n"
         
         if command.cleanup_on_failure:
             output += "\nCleanup steps on failure:\n"
-            for step in command.cleanup_on_failure:
-                output += f"  - {step}\n"
+            for step_item in command.cleanup_on_failure:
+                if isinstance(step_item, str):
+                    step = CommandStep.from_string(step_item)
+                else:
+                    step = step_item
+                output += f"  - {step.name} ({step.type.value}): {step.action}\n"
         
         return ExecutionResult(
             success=True,

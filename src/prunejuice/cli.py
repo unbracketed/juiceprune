@@ -53,9 +53,13 @@ app.add_typer(session_app, name="session")
 
 @app.command()
 def init(
-    path: Path = typer.Argument(Path.cwd(), help="Project path to initialize")
+    path: Optional[Path] = typer.Argument(None, help="Project path to initialize")
 ):
     """Initialize a PruneJuice project."""
+    # Use runtime Path.cwd() if no path provided
+    if path is None:
+        path = Path.cwd()
+        
     console.print("🧃 Initializing PruneJuice project...", style="bold green")
     
     # Create project structure
@@ -272,6 +276,11 @@ def run(
         result = asyncio.run(
             executor.execute_command(command, Path.cwd(), parsed_args, dry_run)
         )
+        
+        # Handle dry run output specially
+        if dry_run:
+            console.print(result.output)
+            return
         
         if result.success:
             console.print("✅ Command completed successfully!", style="bold green")

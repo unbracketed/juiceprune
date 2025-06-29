@@ -90,5 +90,5 @@ steps:
         assert cmd is not None
         assert cmd.name == "simple-command"
         assert len(cmd.steps) == 2
-        assert "step1" in cmd.steps
-        assert "step2" in cmd.steps
+        assert any(step.name == "step1" for step in cmd.steps)
+        assert any(step.name == "step2" for step in cmd.steps)

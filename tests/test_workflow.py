@@ -79,7 +79,7 @@ description: Concurrent execution test
 steps:
   - echo "Running concurrent test"
 """
-        cmd_file = test_project / ".prj" / "commands" / "concurrent.yaml"
+        cmd_file = test_project / ".prj" / "commands" / "concurrent-test.yaml"
         cmd_file.parent.mkdir(parents=True, exist_ok=True)
         cmd_file.write_text(cmd_yaml)
         
