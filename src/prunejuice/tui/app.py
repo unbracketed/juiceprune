@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import List, Dict, Any
 import os
+import subprocess
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -55,6 +56,8 @@ class PrunejuiceApp(App):
         self.session_manager = SessionLifecycleManager()
         self.worktrees = []  # Store worktree data for reference
         self.highlighted_index = -1  # Track currently highlighted worktree
+        self.is_in_tmux = os.getenv("TMUX") is not None
+        self.current_tmux_session = self._get_current_tmux_session() if self.is_in_tmux else None
 
     def compose(self) -> ComposeResult:
         """Create application layout."""
@@ -78,6 +81,21 @@ class PrunejuiceApp(App):
         self.title = "PruneJuice TUI"
         # Start loading worktrees
         self.load_worktrees()
+
+    def _get_current_tmux_session(self) -> str | None:
+        """Get the name of the current tmux session."""
+        try:
+            result = subprocess.run(
+                ["tmux", "display-message", "-p", "#S"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            if result.returncode == 0:
+                return result.stdout.decode().strip()
+        except Exception:
+            pass
+        return None
 
     @work(exclusive=True)
     async def load_worktrees(self) -> None:
@@ -155,23 +173,40 @@ class PrunejuiceApp(App):
             
             if worktree_path:
                 try:
-                    # Create session first (without auto_attach)
-                    session_name = self.session_manager.create_session_for_worktree(
-                        Path(worktree_path), 
-                        branch,
-                        auto_attach=False
-                    )
-                    
-                    if session_name:
-                        # Exit the TUI app cleanly first
-                        self.exit()
-                        # Use os.execvp to replace the current process with tmux attach
-                        # This ensures proper terminal handling
-                        os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
+                    if self.is_in_tmux and self.current_tmux_session:
+                        # We're in tmux, use switch-client for better UX
+                        session_name = self.session_manager.create_session_for_worktree_with_tui_return(
+                            Path(worktree_path),
+                            self.current_tmux_session,
+                            branch
+                        )
+                        
+                        if session_name:
+                            # Switch to the worktree session
+                            success = self.session_manager.switch_to_session(session_name)
+                            if not success:
+                                main_content = self.query_one("#main-content", Static)
+                                main_content.update("Failed to switch to tmux session")
+                        else:
+                            main_content = self.query_one("#main-content", Static)
+                            main_content.update("Failed to create tmux session")
                     else:
-                        # Update main content to show error
-                        main_content = self.query_one("#main-content", Static)
-                        main_content.update("Failed to create tmux session")
+                        # Not in tmux, use the old approach
+                        session_name = self.session_manager.create_session_for_worktree(
+                            Path(worktree_path), 
+                            branch,
+                            auto_attach=False
+                        )
+                        
+                        if session_name:
+                            # Exit the TUI app cleanly first
+                            self.exit()
+                            # Use os.execvp to replace the current process with tmux attach
+                            os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
+                        else:
+                            # Update main content to show error
+                            main_content = self.query_one("#main-content", Static)
+                            main_content.update("Failed to create tmux session")
                         
                 except Exception as e:
                     # Update main content to show error

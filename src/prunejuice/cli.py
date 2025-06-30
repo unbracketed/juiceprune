@@ -10,6 +10,8 @@ from typing import Optional, List
 from datetime import datetime
 import asyncio
 import json
+import os
+import subprocess
 
 from .core.config import Settings
 from .core.database import Database
@@ -1111,6 +1113,84 @@ def tui(
         raise typer.Exit(code=1)
     except Exception as e:
         console.print(f"❌ Error launching TUI: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def tui_session(
+    path: Optional[Path] = typer.Option(
+        None, "--path", "-p", help="Path to project (defaults to current directory)"
+    ),
+):
+    """Launch the TUI in a dedicated tmux session with seamless worktree switching."""
+    try:
+        from prunejuice.tui import PrunejuiceApp
+
+        # Get working directory (where we're running from, not project root)
+        working_dir = path or Path.cwd()
+        # Get project name from the detected project root for session naming
+        project_root = ProjectPathResolver.get_project_root()
+        project_name = project_root.name
+
+        # Create session manager
+        tmux_manager = TmuxManager()
+
+        # Check if tmux is available
+        if not tmux_manager.check_tmux_available():
+            console.print("❌ tmux is not available. Please install tmux first.", style="bold red")
+            raise typer.Exit(code=1)
+
+        # Generate TUI session name
+        tui_session_name = f"{project_name}-tui"
+
+        # Check if we're already in the TUI session
+        current_session = None
+        if os.getenv("TMUX"):
+            try:
+                result = subprocess.run(
+                    ["tmux", "display-message", "-p", "#S"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                )
+                if result.returncode == 0:
+                    current_session = result.stdout.decode().strip()
+            except Exception:
+                pass
+
+        if current_session == tui_session_name:
+            # Already in TUI session, just run the app
+            tui_app = PrunejuiceApp(project_path=working_dir)
+            tui_app.run()
+        else:
+            # Create or attach to TUI session
+            if tmux_manager.session_exists(tui_session_name):
+                console.print(f"📺 Attaching to existing TUI session: {tui_session_name}", style="green")
+                os.execvp("tmux", ["tmux", "attach-session", "-t", tui_session_name])
+            else:
+                console.print(f"📺 Creating new TUI session: {tui_session_name}", style="green")
+                # Create the session in the current working directory
+                success = tmux_manager.create_session(tui_session_name, working_dir, auto_attach=False)
+                if success:
+                    # Send the TUI command to the session (will run from working_dir)
+                    subprocess.run([
+                        "tmux", "send-keys", "-t", tui_session_name,
+                        "uv run prj tui", "Enter"
+                    ], check=False)
+                    # Attach to the session
+                    os.execvp("tmux", ["tmux", "attach-session", "-t", tui_session_name])
+                else:
+                    console.print("❌ Failed to create TUI session", style="bold red")
+                    raise typer.Exit(code=1)
+
+    except ImportError:
+        console.print(
+            "❌ TUI dependencies not installed. Please install with: pip install textual",
+            style="bold red",
+        )
+        raise typer.Exit(code=1)
+    except Exception as e:
+        console.print(f"❌ Error launching TUI session: {e}", style="bold red")
         raise typer.Exit(code=1)
 
 
