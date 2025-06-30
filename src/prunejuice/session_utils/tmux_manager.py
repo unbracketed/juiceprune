@@ -173,11 +173,22 @@ class TmuxManager:
             if result.returncode != 0:
                 logger.warning(f"Failed to set custom keybinding for session '{session_name}'")
 
+            # Set custom status bar styling with dark plum/purple background
+            subprocess.run(
+                [
+                    "tmux", "set-option", "-t", session_name,
+                    "status-style", "bg=#5D4E75,fg=white"  # Dark plum background, white text
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            
             # Set a status message about the custom keybinding
             subprocess.run(
                 [
                     "tmux", "set-option", "-t", session_name,
-                    "status-right", "#[fg=yellow]Press prefix+x to return to TUI#[default] | %H:%M"
+                    "status-right", "#[fg=yellow,bold]Press prefix+x to return to TUI#[default] | %H:%M"
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,

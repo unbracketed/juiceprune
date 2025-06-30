@@ -1172,6 +1172,15 @@ def tui_session(
                 # Create the session in the current working directory
                 success = tmux_manager.create_session(tui_session_name, working_dir, auto_attach=False)
                 if success:
+                    # Set the session title and hide status bar
+                    subprocess.run([
+                        "tmux", "set-option", "-t", tui_session_name,
+                        "set-titles-string", "PRUNEJUICE TUI"
+                    ], check=False)
+                    subprocess.run([
+                        "tmux", "set-option", "-t", tui_session_name,
+                        "status", "off"
+                    ], check=False)
                     # Send the TUI command to the session (will run from working_dir)
                     subprocess.run([
                         "tmux", "send-keys", "-t", tui_session_name,
