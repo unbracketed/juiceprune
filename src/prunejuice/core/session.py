@@ -108,13 +108,13 @@ class Session(BaseModel):
         self.tmux_session_name = session_name
         return session_name
 
-    async def create_worktree(self, branch_name: str) -> Path:
+    async def create_worktree(self, branch_name: str, base_branch: str = "main") -> Path:
         """Create worktree and store worktree path."""
         git_manager = GitWorktreeManager(self.project_path)
         file_manager = FileManager(self.project_path)
 
         # Create the worktree
-        worktree_path = git_manager.create_worktree(branch_name)
+        worktree_path = git_manager.create_worktree(branch_name, base_branch)
 
         # Copy default files to the new worktree
         default_files = file_manager.get_default_files_to_copy()
