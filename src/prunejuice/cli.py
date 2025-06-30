@@ -111,6 +111,7 @@ def init(
             "echo-arg.yaml",
             "worktree-list.yaml",
             "echo-hello-in-session.yaml",
+            "start.yaml",
         ]
 
         # Check if templates directory exists
