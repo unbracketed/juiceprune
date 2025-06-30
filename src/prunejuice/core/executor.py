@@ -16,6 +16,7 @@ from .commands import create_command
 from ..commands.loader import CommandLoader
 from ..utils.artifacts import ArtifactStore
 from ..worktree_utils import GitWorktreeManager
+from ..env_utils import prepare_clean_environment, is_uv_command
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,11 @@ class StepExecutor:
         self, step: CommandStep, context: Dict[str, Any], timeout: int
     ) -> Tuple[bool, str]:
         """Execute a shell command directly."""
-        env = os.environ.copy()
+        # Use clean environment for uv commands, regular environment otherwise
+        if is_uv_command(step.action):
+            env = prepare_clean_environment()
+        else:
+            env = os.environ.copy()
 
         # Add context to environment
         for key, value in context.items():
@@ -156,7 +161,16 @@ class StepExecutor:
         self, script_path: Path, context: Dict[str, Any], timeout: int
     ) -> Tuple[bool, str]:
         """Execute external script with context."""
-        env = os.environ.copy()
+        # Check if the script contains uv commands by reading its content
+        try:
+            script_content = script_path.read_text()
+            if any(is_uv_command(line.strip()) for line in script_content.split('\n')):
+                env = prepare_clean_environment()
+            else:
+                env = os.environ.copy()
+        except Exception:
+            # Fallback to regular environment if we can't read the script
+            env = os.environ.copy()
 
         # Add context to environment
         for key, value in context.items():

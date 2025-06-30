@@ -1,0 +1,21 @@
+name: start
+description: Create a worktree and start a tmux session in it
+category: development
+arguments:
+  - name: name
+    required: true
+    type: string
+    description: Name for the worktree and branch
+  - name: base_branch
+    required: false
+    type: string
+    default: main
+    description: Base branch to create worktree from
+  - name: no_attach
+    required: false
+    type: boolean
+    default: false
+    description: Create without attaching to tmux session
+steps:
+  - start-worktree-session
+timeout: 300

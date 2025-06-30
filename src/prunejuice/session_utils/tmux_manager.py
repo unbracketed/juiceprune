@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import logging
 
+from ..env_utils import prepare_clean_environment
+
 logger = logging.getLogger(__name__)
 
 
@@ -119,6 +121,9 @@ class TmuxManager:
                 logger.warning(f"Session '{session_name}' already exists")
                 return False
 
+            # Use clean environment for session creation to ensure proper VIRTUAL_ENV
+            env = prepare_clean_environment()
+
             # Create session
             args = ["tmux", "new-session"]
             if not auto_attach:
@@ -126,7 +131,8 @@ class TmuxManager:
             args.extend(["-s", session_name, "-c", str(working_dir)])
 
             result = subprocess.run(
-                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False
+                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
+                check=False, env=env
             )
             stderr = result.stderr
 

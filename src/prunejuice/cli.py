@@ -839,6 +839,84 @@ def resume():
 
 
 @app.command()
+def start(
+    name: str = typer.Argument(help="Name for the worktree and branch"),
+    base_branch: str = typer.Option("main", "--base", "-b", help="Base branch to create worktree from"),
+    no_attach: bool = typer.Option(False, "--no-attach", help="Create without attaching to tmux session"),
+):
+    """Create a worktree and start a tmux session in it."""
+    try:
+        console.print(f"🚀 Starting new development environment: [bold cyan]{name}[/bold cyan]")
+        
+        # Get project context
+        context = _get_project_context()
+        if not context["is_git_repo"]:
+            console.print("❌ Not in a Git repository", style="bold red")
+            raise typer.Exit(code=1)
+        
+        project_root = context["project_root"]
+        
+        # Create worktree
+        console.print(f"Creating worktree '{name}' from '{base_branch}'...")
+        git_manager = GitWorktreeManager(project_root)
+        
+        # Create worktree
+        try:
+            worktree_path = git_manager.create_worktree(name, base_branch)
+            console.print(f"✅ Worktree created at: {worktree_path}", style="green")
+        except Exception as e:
+            console.print(f"❌ Failed to create worktree: {e}", style="bold red")
+            raise typer.Exit(code=1)
+        
+        # Create tmux session
+        console.print(f"Creating tmux session for '{name}'...")
+        try:
+            tmux_manager = TmuxManager()
+            session_manager = SessionLifecycleManager(tmux_manager)
+            
+            session_name = session_manager.create_session_for_worktree(
+                worktree_path,
+                name,
+                auto_attach=False
+            )
+            
+            if not session_name:
+                session_name = f"prunejuice-{name}"
+            
+            console.print(f"✅ Session created: {session_name}", style="green")
+            
+            # Attach to session if requested
+            if not no_attach:
+                console.print("Attaching to session...", style="dim")
+                success = session_manager.attach_to_session(session_name)
+                if success:
+                    console.print(f"✅ Attached to session: {session_name}", style="bold green")
+                else:
+                    console.print(
+                        f"⚠️  Session created but attachment failed. Run: tmux attach -t {session_name}",
+                        style="yellow"
+                    )
+            else:
+                console.print(f"Session ready. Attach with: tmux attach -t {session_name}", style="dim")
+                
+        except Exception as e:
+            console.print(f"❌ Failed to create session: {e}", style="bold red")
+            # Clean up worktree if session creation failed
+            try:
+                git_manager.remove_worktree(name)
+                console.print("Cleaned up worktree after session failure", style="dim")
+            except Exception:
+                pass
+            raise typer.Exit(code=1)
+            
+        console.print(f"🎉 Development environment '{name}' is ready!", style="bold green")
+        
+    except Exception as e:
+        console.print(f"❌ Error starting development environment: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+@app.command()
 def cleanup(
     days: int = typer.Option(30, help="Clean up artifacts older than N days"),
     confirm: bool = typer.Option(False, "--yes", "-y", help="Skip confirmation"),
