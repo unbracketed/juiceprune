@@ -46,6 +46,7 @@ class PrunejuiceApp(App):
 
     BINDINGS = [
         Binding("c", "connect", "Connect", priority=True),
+        Binding("enter", "connect", "Connect", priority=True),
         Binding("s", "start", "Start", priority=True),
         Binding("q", "quit", "Quit", priority=True),
     ]
@@ -98,6 +99,27 @@ class PrunejuiceApp(App):
         except Exception:
             pass
         return None
+
+    def _get_git_status(self, worktree_path: str) -> str:
+        """Get git status for a worktree."""
+        try:
+            result = subprocess.run(
+                ["git", "status", "--porcelain", "--branch"],
+                cwd=worktree_path,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
+            if result.returncode == 0:
+                output = result.stdout.strip()
+                if not output:
+                    return "Working tree clean"
+                return output
+            else:
+                return f"Git status error: {result.stderr.strip()}"
+        except Exception as e:
+            return f"Error getting git status: {str(e)}"
 
     @work(exclusive=True)
     async def load_worktrees(self) -> None:
@@ -155,9 +177,12 @@ class PrunejuiceApp(App):
                     path = worktree.get("path", "No path available")
                     branch = worktree.get("branch", "unknown")
                     
-                    # Update main content with worktree details
+                    # Get git status for this worktree
+                    git_status = self._get_git_status(path)
+                    
+                    # Update main content with worktree details and git status
                     main_content = self.query_one("#main-content", Static)
-                    main_content.update(f"Branch: {branch}\nPath: {path}\n\nPress 'c' to connect to tmux session")
+                    main_content.update(f"Branch: {branch}\nPath: {path}\n\nGit Status:\n{git_status}")
             except (ValueError, IndexError):
                 # Handle any parsing errors gracefully
                 pass

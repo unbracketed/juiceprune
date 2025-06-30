@@ -6,3 +6,5 @@ without creating either a worktree or a Tmux session. Sometimes, Commands will u
 One shared DB per project, used by all worktrees
 
 Additional sqlite DBs can be specified as external to receive event writes
+
+## Core Commands, Built-in Commands, Project Commands
