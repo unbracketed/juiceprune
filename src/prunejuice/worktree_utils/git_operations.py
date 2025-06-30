@@ -47,7 +47,7 @@ class GitWorktreeManager:
         """
         if parent_dir is None:
             parent_dir = self.project_path.parent / "worktrees"
-        
+
         # Handle relative paths by making them relative to project_path
         if not parent_dir.is_absolute():
             parent_dir = self.project_path / parent_dir
@@ -181,39 +181,39 @@ class GitWorktreeManager:
         return Path(self.repo.working_dir)
 
     def get_worktree_diff(
-        self, 
-        worktree_path: Path, 
-        base_branch: str = "main", 
+        self,
+        worktree_path: Path,
+        base_branch: str = "main",
         context_lines: int = 3,
         staged_only: bool = False,
-        unstaged_only: bool = False
+        unstaged_only: bool = False,
     ) -> str:
         """Get git diff between worktree branch and base branch.
-        
+
         Args:
             worktree_path: Path to the worktree
             base_branch: Base branch to compare against
             context_lines: Number of context lines in diff
             staged_only: Show only staged changes
             unstaged_only: Show only unstaged changes
-            
+
         Returns:
             Formatted diff string
         """
         try:
             # Create a repo object for the worktree
             worktree_repo = git.Repo(worktree_path)
-            
+
             if staged_only:
                 # Show only staged changes
                 diff_output = worktree_repo.git.diff("--cached", f"-U{context_lines}")
             elif unstaged_only:
-                # Show only unstaged changes  
+                # Show only unstaged changes
                 diff_output = worktree_repo.git.diff(f"-U{context_lines}")
             else:
                 # Compare worktree branch against base branch
                 current_branch = worktree_repo.active_branch.name
-                
+
                 # Check if base branch exists
                 try:
                     worktree_repo.git.rev_parse("--verify", f"{base_branch}")
@@ -224,36 +224,38 @@ class GitWorktreeManager:
                         base_branch = f"origin/{base_branch}"
                     except GitCommandError:
                         raise ValueError(f"Base branch '{base_branch}' not found")
-                
-                diff_output = worktree_repo.git.diff(base_branch, current_branch, f"-U{context_lines}")
-            
+
+                diff_output = worktree_repo.git.diff(
+                    base_branch, current_branch, f"-U{context_lines}"
+                )
+
             return diff_output
-            
+
         except Exception as e:
             logger.error(f"Failed to get diff for worktree {worktree_path}: {e}")
             raise RuntimeError(f"Failed to get diff: {e}")
 
     def get_diff_summary(
-        self, 
-        worktree_path: Path, 
+        self,
+        worktree_path: Path,
         base_branch: str = "main",
         staged_only: bool = False,
-        unstaged_only: bool = False
+        unstaged_only: bool = False,
     ) -> Dict[str, Any]:
         """Get summary statistics of differences.
-        
+
         Args:
             worktree_path: Path to the worktree
             base_branch: Base branch to compare against
             staged_only: Show only staged changes
             unstaged_only: Show only unstaged changes
-            
+
         Returns:
             Dictionary with diff statistics
         """
         try:
             worktree_repo = git.Repo(worktree_path)
-            
+
             if staged_only:
                 # Get staged changes summary
                 stat_output = worktree_repo.git.diff("--cached", "--stat")
@@ -263,7 +265,7 @@ class GitWorktreeManager:
             else:
                 # Compare against base branch
                 current_branch = worktree_repo.active_branch.name
-                
+
                 # Check if base branch exists
                 try:
                     worktree_repo.git.rev_parse("--verify", f"{base_branch}")
@@ -273,95 +275,105 @@ class GitWorktreeManager:
                         base_branch = f"origin/{base_branch}"
                     except GitCommandError:
                         base_branch = "main"  # Fallback
-                
-                stat_output = worktree_repo.git.diff(base_branch, current_branch, "--stat")
-            
+
+                stat_output = worktree_repo.git.diff(
+                    base_branch, current_branch, "--stat"
+                )
+
             # Parse the stat output to extract numbers
             files_changed = 0
             insertions = 0
             deletions = 0
-            
+
             if stat_output.strip():
-                lines = stat_output.strip().split('\n')
+                lines = stat_output.strip().split("\n")
                 if lines:
                     # Last line usually contains summary like "1 file changed, 2 insertions(+), 1 deletion(-)"
                     summary_line = lines[-1]
-                    
+
                     # Count files changed
-                    files_changed = len([line for line in lines[:-1] if '|' in line])
-                    
+                    files_changed = len([line for line in lines[:-1] if "|" in line])
+
                     # Parse insertions and deletions from summary
-                    if 'insertion' in summary_line:
-                        insertions_match = re.search(r'(\d+) insertion', summary_line)
+                    if "insertion" in summary_line:
+                        insertions_match = re.search(r"(\d+) insertion", summary_line)
                         if insertions_match:
                             insertions = int(insertions_match.group(1))
-                    
-                    if 'deletion' in summary_line:
-                        deletions_match = re.search(r'(\d+) deletion', summary_line)
+
+                    if "deletion" in summary_line:
+                        deletions_match = re.search(r"(\d+) deletion", summary_line)
                         if deletions_match:
                             deletions = int(deletions_match.group(1))
-            
+
             return {
                 "files_changed": files_changed,
                 "insertions": insertions,
                 "deletions": deletions,
                 "has_changes": bool(stat_output.strip()),
                 "base_branch": base_branch,
-                "current_branch": worktree_repo.active_branch.name if not staged_only and not unstaged_only else None
+                "current_branch": worktree_repo.active_branch.name
+                if not staged_only and not unstaged_only
+                else None,
             }
-            
+
         except Exception as e:
-            logger.error(f"Failed to get diff summary for worktree {worktree_path}: {e}")
+            logger.error(
+                f"Failed to get diff summary for worktree {worktree_path}: {e}"
+            )
             return {
                 "files_changed": 0,
                 "insertions": 0,
                 "deletions": 0,
                 "has_changes": False,
-                "error": str(e)
+                "error": str(e),
             }
 
     def get_worktree_status(self, worktree_path: Path) -> Dict[str, Any]:
         """Get working directory status (staged/unstaged changes).
-        
+
         Args:
             worktree_path: Path to the worktree
-            
+
         Returns:
             Dictionary with status information
         """
         try:
             worktree_repo = git.Repo(worktree_path)
-            
+
             # Get status using git status --porcelain
             status_output = worktree_repo.git.status("--porcelain")
-            
+
             staged_files = []
             unstaged_files = []
             untracked_files = []
-            
+
             for line in status_output.splitlines():
                 if len(line) >= 2:
                     staged_status = line[0]
                     unstaged_status = line[1]
                     filename = line[3:]  # Skip status chars and space
-                    
-                    if staged_status != ' ':
+
+                    if staged_status != " ":
                         staged_files.append({"file": filename, "status": staged_status})
-                    
-                    if unstaged_status != ' ':
-                        if unstaged_status == '?':
+
+                    if unstaged_status != " ":
+                        if unstaged_status == "?":
                             untracked_files.append(filename)
                         else:
-                            unstaged_files.append({"file": filename, "status": unstaged_status})
-            
+                            unstaged_files.append(
+                                {"file": filename, "status": unstaged_status}
+                            )
+
             return {
                 "staged_files": staged_files,
                 "unstaged_files": unstaged_files,
                 "untracked_files": untracked_files,
-                "is_clean": len(staged_files) == 0 and len(unstaged_files) == 0 and len(untracked_files) == 0,
-                "current_branch": worktree_repo.active_branch.name
+                "is_clean": len(staged_files) == 0
+                and len(unstaged_files) == 0
+                and len(untracked_files) == 0,
+                "current_branch": worktree_repo.active_branch.name,
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to get status for worktree {worktree_path}: {e}")
             return {
@@ -369,5 +381,5 @@ class GitWorktreeManager:
                 "unstaged_files": [],
                 "untracked_files": [],
                 "is_clean": True,
-                "error": str(e)
+                "error": str(e),
             }

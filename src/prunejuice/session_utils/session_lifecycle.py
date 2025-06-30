@@ -203,6 +203,67 @@ class SessionLifecycleManager:
         """
         return self.tmux.attach_session(session_name)
 
+    def switch_to_session(self, session_name: str) -> bool:
+        """Switch to a session (for use within tmux).
+
+        Args:
+            session_name: Name of the session to switch to
+
+        Returns:
+            True if successful, False otherwise
+        """
+        return self.tmux.switch_session(session_name)
+
+    def create_session_for_worktree_with_tui_return(
+        self,
+        worktree_path: Path,
+        tui_session_name: str,
+        task_name: Optional[str] = None,
+    ) -> Optional[str]:
+        """Create a tmux session for a worktree with TUI return capability.
+
+        Args:
+            worktree_path: Path to the worktree
+            tui_session_name: Name of the TUI session to return to
+            task_name: Task identifier (defaults to 'dev')
+
+        Returns:
+            Session name if successful, None otherwise
+        """
+        try:
+            if not worktree_path.exists():
+                logger.error(f"Worktree path does not exist: {worktree_path}")
+                return None
+
+            # Extract project and worktree names
+            project_name = self._extract_project_name(worktree_path)
+            worktree_name = self._extract_worktree_name(worktree_path)
+            task = task_name or self.default_task
+
+            # Generate session name
+            session_name = self.tmux.format_session_name(project_name, worktree_name, task)
+
+            # Check if session already exists
+            if self.tmux.session_exists(session_name):
+                logger.info(f"Session '{session_name}' already exists")
+                return session_name
+
+            # Create session with TUI return capability
+            success = self.tmux.create_session_with_tui_return(
+                session_name, worktree_path, tui_session_name, auto_attach=False
+            )
+
+            if success:
+                logger.info(f"Created session for worktree: {session_name}")
+                return session_name
+            else:
+                logger.error(f"Failed to create session for worktree: {worktree_path}")
+                return None
+
+        except Exception as e:
+            logger.error(f"Failed to create session for worktree '{worktree_path}': {e}")
+            return None
+
     def kill_session(self, session_name: str) -> bool:
         """Kill a session with validation.
 

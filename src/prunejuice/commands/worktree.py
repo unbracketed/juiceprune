@@ -75,12 +75,10 @@ def create(
 
         # Get settings and base_dir
         settings = Settings()
-        
+
         # Create the worktree
         worktree_path = git_manager.create_worktree(
-            branch_name, 
-            base_branch or "main",
-            parent_dir=settings.base_dir
+            branch_name, base_branch or "main", parent_dir=settings.base_dir
         )
 
         # Copy default files to the new worktree

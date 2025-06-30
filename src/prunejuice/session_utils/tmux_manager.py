@@ -146,6 +146,71 @@ class TmuxManager:
             logger.error(f"Failed to create session '{session_name}': {e}")
             return False
 
+    def create_session_with_tui_return(
+        self, session_name: str, working_dir: Path, tui_session_name: str, auto_attach: bool = False
+    ) -> bool:
+        """Create a new tmux session with a custom keybinding to return to TUI.
+
+        Args:
+            session_name: Name for the new session
+            working_dir: Working directory for the session
+            tui_session_name: Name of the TUI session to return to
+            auto_attach: Whether to attach to the session after creation
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            # Create the session first
+            if not self.create_session(session_name, working_dir, auto_attach=False):
+                return False
+
+            # Add custom keybinding for returning to TUI (prefix + x)
+            result = subprocess.run(
+                [
+                    "tmux", "bind-key", "-T", "prefix", "x",
+                    "switch-client", "-t", tui_session_name
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"Failed to set custom keybinding for session '{session_name}'")
+
+            # Set custom status bar styling with dark plum/purple background
+            subprocess.run(
+                [
+                    "tmux", "set-option", "-t", session_name,
+                    "status-style", "bg=#5D4E75,fg=white"  # Dark plum background, white text
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            
+            # Set a status message about the custom keybinding
+            subprocess.run(
+                [
+                    "tmux", "set-option", "-t", session_name,
+                    "status-right", "#[fg=yellow,bold]Press prefix+x to return to TUI#[default] | %H:%M"
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+
+            if auto_attach:
+                return self.attach_session(session_name)
+
+            logger.info(f"Created tmux session with TUI return: {session_name}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to create session with TUI return '{session_name}': {e}")
+            return False
+
     def attach_session(self, session_name: str) -> bool:
         """Attach to an existing tmux session.
 
@@ -169,6 +234,40 @@ class TmuxManager:
 
         except Exception as e:
             logger.error(f"Failed to attach to session '{session_name}': {e}")
+            return False
+
+    def switch_session(self, session_name: str) -> bool:
+        """Switch to an existing tmux session.
+
+        Args:
+            session_name: Name of the session to switch to
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            if not self.session_exists(session_name):
+                logger.error(f"Session '{session_name}' does not exist")
+                return False
+
+            # Use switch-client to change to the target session
+            result = subprocess.run(
+                ["tmux", "switch-client", "-t", session_name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+
+            if result.returncode != 0:
+                stderr = result.stderr.decode() if result.stderr else "Unknown error"
+                logger.error(f"Failed to switch to session '{session_name}': {stderr}")
+                return False
+
+            logger.info(f"Switched to tmux session: {session_name}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to switch to session '{session_name}': {e}")
             return False
 
     def kill_session(self, session_name: str) -> bool:
