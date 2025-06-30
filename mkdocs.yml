@@ -3,6 +3,7 @@ site_description: Parallel agentic coding workflow orchestrator
 site_url: https://your-username.github.io/prunejuice/
 repo_url: https://github.com/your-username/prunejuice
 repo_name: your-username/prunejuice
+site_dir: docs-build
 
 theme:
   name: material
