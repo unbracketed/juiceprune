@@ -49,6 +49,7 @@ class PrunejuiceApp(App):
         super().__init__()
         self.project_path = project_path or Path.cwd()
         self.git_manager = GitWorktreeManager(self.project_path)
+        self.worktrees = []  # Store worktree data for reference
 
     def compose(self) -> ComposeResult:
         """Create application layout."""
@@ -89,6 +90,7 @@ class PrunejuiceApp(App):
 
     def update_worktree_list(self, worktrees: List[Dict[str, Any]]) -> None:
         """Update the worktree list view."""
+        self.worktrees = worktrees  # Store for later reference
         list_view = self.query_one("#worktree-list", ListView)
         list_view.clear()
 
@@ -96,15 +98,44 @@ class PrunejuiceApp(App):
             list_view.append(ListItem(Label("No worktrees found")))
             return
 
-        for worktree in worktrees:
+        # Get project name for prefix removal
+        project_name = self.project_path.name
+
+        for i, worktree in enumerate(worktrees):
             branch = worktree.get("branch", "detached")
             path = worktree.get("path", "")
 
-            # Extract worktree name from path or use branch name
+            # Extract and clean up worktree name
             if path:
                 worktree_name = Path(path).name
-                display_name = worktree_name if worktree_name != branch else branch
+                # Remove project prefix if present (e.g., "juiceprune-feature" -> "feature")
+                if worktree_name.startswith(f"{project_name}-"):
+                    display_name = worktree_name[len(project_name) + 1:]
+                elif worktree_name != branch:
+                    display_name = worktree_name
+                else:
+                    display_name = branch
             else:
                 display_name = branch
 
-            list_view.append(ListItem(Label(display_name)))
+            # Create list item with index for tracking
+            item = ListItem(Label(display_name), id=f"worktree-{i}")
+            list_view.append(item)
+
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
+        """Handle when a list item is highlighted."""
+        if event.list_view.id == "worktree-list" and event.item and event.item.id:
+            # Extract index from item id
+            try:
+                index = int(event.item.id.split("-")[1])
+                if 0 <= index < len(self.worktrees):
+                    worktree = self.worktrees[index]
+                    path = worktree.get("path", "No path available")
+                    branch = worktree.get("branch", "unknown")
+                    
+                    # Update main content with worktree details
+                    main_content = self.query_one("#main-content", Static)
+                    main_content.update(f"Branch: {branch}\nPath: {path}")
+            except (ValueError, IndexError):
+                # Handle any parsing errors gracefully
+                pass
