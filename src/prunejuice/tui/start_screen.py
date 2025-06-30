@@ -56,7 +56,7 @@ class StartWorkTreeScreen(ModalScreen[Optional[dict]]):
     
     #dialog {
         width: 60;
-        height: 16;
+        height: 80%;
         border: thick $background 80%;
         background: $surface;
         padding: 1;
