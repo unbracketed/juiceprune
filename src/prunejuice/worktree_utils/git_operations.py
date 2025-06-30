@@ -47,6 +47,10 @@ class GitWorktreeManager:
         """
         if parent_dir is None:
             parent_dir = self.project_path.parent / "worktrees"
+        
+        # Handle relative paths by making them relative to project_path
+        if not parent_dir.is_absolute():
+            parent_dir = self.project_path / parent_dir
 
         parent_dir.mkdir(parents=True, exist_ok=True)
         worktree_path = parent_dir / f"{self.project_path.name}-{branch_name}"

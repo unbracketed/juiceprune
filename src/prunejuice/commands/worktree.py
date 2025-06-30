@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..worktree_utils import GitWorktreeManager, FileManager
+from ..core.config import Settings
 
 console = Console()
 
@@ -72,8 +73,15 @@ def create(
             f"🌱 Creating worktree for branch: [bold cyan]{branch_name}[/bold cyan]"
         )
 
+        # Get settings and base_dir
+        settings = Settings()
+        
         # Create the worktree
-        worktree_path = git_manager.create_worktree(branch_name)
+        worktree_path = git_manager.create_worktree(
+            branch_name, 
+            base_branch or "main",
+            parent_dir=settings.base_dir
+        )
 
         # Copy default files to the new worktree
         default_files = file_manager.get_default_files_to_copy()

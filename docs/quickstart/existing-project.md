@@ -135,39 +135,33 @@ git commit -m "Add Prunejuice workflow orchestration
 
 ### 1. Project Configuration
 
-Create `.prj/configs/project.yaml` to customize Prunejuice for your project:
+Create a `.env` file in your project root to customize Prunejuice settings:
 
-```yaml
-# .prj/configs/project.yaml
-project:
-  name: "your-existing-project"
-  description: "Your project description"
-  default_base_branch: "main"  # or "master", "develop"
-  
-worktrees:
-  base_directory: "../worktrees"
-  naming_pattern: "{{project}}-{{branch}}"
-  auto_cleanup: true
-  
-sessions:
-  tmux_config: ".tmux.conf"
-  default_task: "dev"
-  auto_attach: false
-  
-environments:
-  development:
-    NODE_ENV: "development"     # For Node.js projects
-    ENVIRONMENT: "dev"
-    DEBUG: "true"
-  staging:
-    NODE_ENV: "staging"
-    ENVIRONMENT: "staging"
-    DEBUG: "false"
-  production:
-    NODE_ENV: "production"
-    ENVIRONMENT: "prod"
-    DEBUG: "false"
+```bash
+# .env - Project-specific Prunejuice configuration
+PRUNEJUICE_BASE_DIR=.worktrees
+PRUNEJUICE_GITHUB_USERNAME=your-github-username
+PRUNEJUICE_EDITOR=code
+PRUNEJUICE_DEFAULT_TIMEOUT=3600
+
+# Project-specific environment variables
+NODE_ENV=development
+ENVIRONMENT=dev
+DEBUG=true
 ```
+
+For staging and production, use separate `.env.staging` and `.env.production` files or set environment variables directly:
+
+```bash
+# .env.production
+PRUNEJUICE_BASE_DIR=/var/worktrees
+PRUNEJUICE_DEFAULT_TIMEOUT=7200
+NODE_ENV=production
+ENVIRONMENT=prod
+DEBUG=false
+```
+
+See the [Configuration Reference](../reference/config.md) for all available options.
 
 ### 2. Language-Specific Setup
 
@@ -450,22 +444,19 @@ Create team documentation:
 
 ### 3. Configuration Management
 
-**Team Configuration**: Share common settings via `.prj/configs/project.yaml`
-**Personal Configuration**: Keep personal settings in `~/.config/prunejuice/config.yaml`
+**Team Configuration**: Share common settings via project `.env` file (checked into git)
+**Personal Configuration**: Keep personal settings in shell profile or personal `.env` file
 
-```yaml
-# ~/.config/prunejuice/config.yaml (personal)
-defaults:
-  editor: "code"  # or "vim", "emacs"
-  shell: "zsh"    # or "bash", "fish"
-  
-git:
-  worktree_base: "~/dev/worktrees"
-  auto_cleanup: true
-  
-tmux:
-  auto_attach: true
-  session_timeout: "8h"
+```bash
+# ~/.bashrc or ~/.zshrc (personal configuration)
+export PRUNEJUICE_EDITOR="code"  # or "vim", "emacs"
+export PRUNEJUICE_BASE_DIR="$HOME/dev/worktrees"
+export PRUNEJUICE_DEFAULT_TIMEOUT=3600
+
+# Or create a personal .env file that's not checked in
+# .env.local (add to .gitignore)
+PRUNEJUICE_EDITOR=vim
+PRUNEJUICE_BASE_DIR=/Users/yourname/worktrees
 ```
 
 ## Troubleshooting Integration Issues

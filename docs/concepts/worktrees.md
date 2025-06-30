@@ -24,62 +24,67 @@ Git worktrees allow you to check out multiple branches of the same repository si
 
 ## Worktree Configuration
 
-### Command-Level Configuration
+### Environment Variable Configuration
 
-Define worktree requirements in your command YAML:
+Configure worktree base directory using environment variables:
 
-```yaml
-# .prj/commands/feature-dev.yaml
-name: feature-dev
-description: Develop a new feature in isolated worktree
+```bash
+# Set worktree base directory (relative to project root)
+export PRUNEJUICE_BASE_DIR=".worktrees"
 
-# Worktree specification
-worktree:
-  branch: "feature-{{task_id}}"
-  base_branch: "main"
-  
-steps:
-  - setup-environment
-  - run-tests
+# Or set absolute path
+export PRUNEJUICE_BASE_DIR="/workspace/worktrees"
 ```
 
 ### Project-Level Configuration
 
-Configure global worktree settings in `.prj/configs/project.yaml`:
+Use a `.env` file in your project root for project-specific settings:
 
-```yaml
-project:
-  name: my-project
-  default_base_branch: main
-  
-worktrees:
-  base_directory: "../worktrees"
-  naming_pattern: "{{project}}-{{branch}}"
-  auto_cleanup: true
+```bash
+# .env file in project root
+PRUNEJUICE_BASE_DIR=.worktrees
+PRUNEJUICE_GITHUB_USERNAME=your-username
+PRUNEJUICE_EDITOR=code
 ```
 
 ### Global Configuration
 
-Set system-wide defaults in `~/.config/prunejuice/config.yaml`:
+Set system-wide defaults using environment variables:
 
-```yaml
-git:
-  worktree_base: "~/worktrees"
-  auto_cleanup: true
-  
-defaults:
-  base_branch: "main"
+```bash
+# In your shell profile (.bashrc, .zshrc, etc.)
+export PRUNEJUICE_BASE_DIR="$HOME/worktrees"
+export PRUNEJUICE_EDITOR="code"
+export PRUNEJUICE_DEFAULT_TIMEOUT=3600
 ```
+
+For a complete list of configuration options, see the [Configuration Reference](../reference/config.md).
 
 ## Directory Structure
 
-Prunejuice organizes worktrees in a predictable structure:
+Prunejuice organizes worktrees in a predictable structure. The base directory can be configured via `PRUNEJUICE_BASE_DIR`:
 
+**Default Structure (../worktrees):**
 ```
 project-root/
 ├── .git/
 ├── main-code/
 └── ../worktrees/
+    ├── project-feature-auth/
+    ├── project-hotfix-bug123/
+    └── project-experiment-perf/
+```
+
+**Custom Structure (.worktrees in project):**
+```bash
+# With PRUNEJUICE_BASE_DIR=.worktrees
+export PRUNEJUICE_BASE_DIR=.worktrees
+```
+```
+project-root/
+├── .git/
+├── main-code/
+└── .worktrees/
     ├── project-feature-auth/
     ├── project-hotfix-bug123/
     └── project-experiment-perf/
@@ -100,14 +105,25 @@ The core worktree management is handled by the `GitWorktreeManager` class:
 
 ```python
 from prunejuice.worktree_utils import GitWorktreeManager
+from prunejuice.core.config import Settings
+from pathlib import Path
 
+# Initialize with settings
+settings = Settings()
 manager = GitWorktreeManager(project_path)
 
-# Create a new worktree
+# Create a new worktree using configured base directory
 worktree_path = manager.create_worktree(
     branch_name="feature-auth",
     base_branch="main",
-    parent_dir=Path("../worktrees")
+    parent_dir=settings.base_dir  # Uses PRUNEJUICE_BASE_DIR
+)
+
+# Or specify custom directory
+worktree_path = manager.create_worktree(
+    branch_name="feature-auth",
+    base_branch="main",
+    parent_dir=Path(".worktrees")  # Custom directory
 )
 
 # List all worktrees
@@ -292,34 +308,35 @@ git worktree prune
 
 ### Custom Worktree Locations
 
-```yaml
-# Per-command custom location
-worktree:
-  branch: "experiment-{{feature}}"
-  base_branch: "develop"
-  parent_directory: "/tmp/experiments"
+You can override the base directory on a per-command basis or use different locations for different purposes:
+
+```bash
+# Temporary experiments
+export PRUNEJUICE_BASE_DIR="/tmp/experiments"
+prj worktree create experiment-feature
+
+# Project-specific worktrees
+export PRUNEJUICE_BASE_DIR=".worktrees"
+prj worktree create feature-auth
+
+# System-wide worktrees
+export PRUNEJUICE_BASE_DIR="$HOME/worktrees"
+prj worktree create shared-feature
 ```
 
-### Conditional Worktree Creation
+### Dynamic Configuration
 
-```yaml
-# Only create worktree if specific conditions are met
-worktree:
-  branch: "{{branch_name}}"
-  base_branch: "main"
-  create_if: "{{create_isolated | default(false)}}"
-```
+Use different base directories for different project types:
 
-### Integration with External Tools
-
-```yaml
-# Post-creation hooks
-worktree:
-  branch: "feature-{{name}}"
-  post_create_steps:
-    - setup-development-environment
-    - install-dependencies
-    - configure-ide
+```bash
+# In your shell profile
+if [[ $(pwd) == *"/experiments/"* ]]; then
+    export PRUNEJUICE_BASE_DIR="/tmp/worktrees"
+elif [[ $(pwd) == *"/client-projects/"* ]]; then
+    export PRUNEJUICE_BASE_DIR=".worktrees"
+else
+    export PRUNEJUICE_BASE_DIR="$HOME/worktrees"
+fi
 ```
 
 ## Migration from Shell Scripts
