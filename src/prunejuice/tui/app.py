@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import List, Dict, Any
+import os
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -10,6 +11,7 @@ from textual.containers import Horizontal, Vertical
 from textual import work
 
 from prunejuice.worktree_utils import GitWorktreeManager
+from prunejuice.session_utils import SessionLifecycleManager
 
 
 class PrunejuiceApp(App):
@@ -41,6 +43,7 @@ class PrunejuiceApp(App):
     """
 
     BINDINGS = [
+        Binding("c", "connect", "Connect", priority=True),
         Binding("q", "quit", "Quit", priority=True),
     ]
 
@@ -49,7 +52,9 @@ class PrunejuiceApp(App):
         super().__init__()
         self.project_path = project_path or Path.cwd()
         self.git_manager = GitWorktreeManager(self.project_path)
+        self.session_manager = SessionLifecycleManager()
         self.worktrees = []  # Store worktree data for reference
+        self.highlighted_index = -1  # Track currently highlighted worktree
 
     def compose(self) -> ComposeResult:
         """Create application layout."""
@@ -129,13 +134,50 @@ class PrunejuiceApp(App):
             try:
                 index = int(event.item.id.split("-")[1])
                 if 0 <= index < len(self.worktrees):
+                    self.highlighted_index = index  # Store highlighted index
                     worktree = self.worktrees[index]
                     path = worktree.get("path", "No path available")
                     branch = worktree.get("branch", "unknown")
                     
                     # Update main content with worktree details
                     main_content = self.query_one("#main-content", Static)
-                    main_content.update(f"Branch: {branch}\nPath: {path}")
+                    main_content.update(f"Branch: {branch}\nPath: {path}\n\nPress 'c' to connect to tmux session")
             except (ValueError, IndexError):
                 # Handle any parsing errors gracefully
                 pass
+
+    def action_connect(self) -> None:
+        """Connect to the highlighted worktree's tmux session."""
+        if self.highlighted_index >= 0 and self.highlighted_index < len(self.worktrees):
+            worktree = self.worktrees[self.highlighted_index]
+            worktree_path = worktree.get("path")
+            branch = worktree.get("branch", "unknown")
+            
+            if worktree_path:
+                try:
+                    # Create session first (without auto_attach)
+                    session_name = self.session_manager.create_session_for_worktree(
+                        Path(worktree_path), 
+                        branch,
+                        auto_attach=False
+                    )
+                    
+                    if session_name:
+                        # Exit the TUI app cleanly first
+                        self.exit()
+                        # Use os.execvp to replace the current process with tmux attach
+                        # This ensures proper terminal handling
+                        os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
+                    else:
+                        # Update main content to show error
+                        main_content = self.query_one("#main-content", Static)
+                        main_content.update("Failed to create tmux session")
+                        
+                except Exception as e:
+                    # Update main content to show error
+                    main_content = self.query_one("#main-content", Static)
+                    main_content.update(f"Error connecting to session: {str(e)}")
+        else:
+            # Update main content to show message
+            main_content = self.query_one("#main-content", Static)
+            main_content.update("Please select a worktree first")
