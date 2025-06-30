@@ -25,7 +25,7 @@ from .utils.diff_display import (
     display_diff_with_pager,
     display_worktree_status,
     get_diff_type_menu,
-    display_diff_error
+    display_diff_error,
 )
 
 # Create Typer app
@@ -721,59 +721,93 @@ def resume():
                     # Show git diff options and display diff
                     try:
                         diff_choice = get_diff_type_menu()
-                        
+
                         git_manager = GitWorktreeManager(context["project_root"])
                         worktree_path = Path(selected_item["path"])
-                        
+
                         if diff_choice == "1":
                             # Compare against main branch
-                            console.print("\nGenerating diff against main branch...", style="dim")
-                            summary = git_manager.get_diff_summary(worktree_path, "main")
+                            console.print(
+                                "\nGenerating diff against main branch...", style="dim"
+                            )
+                            summary = git_manager.get_diff_summary(
+                                worktree_path, "main"
+                            )
                             display_diff_summary(summary)
-                            
+
                             if summary.get("has_changes"):
-                                diff_text = git_manager.get_worktree_diff(worktree_path, "main")
-                                display_diff_with_pager(diff_text, f"Diff: {selected_item['branch']} vs main")
-                        
+                                diff_text = git_manager.get_worktree_diff(
+                                    worktree_path, "main"
+                                )
+                                display_diff_with_pager(
+                                    diff_text,
+                                    f"Diff: {selected_item['branch']} vs main",
+                                )
+
                         elif diff_choice == "2":
                             # Compare against origin/main
-                            console.print("\nGenerating diff against origin/main...", style="dim")
-                            summary = git_manager.get_diff_summary(worktree_path, "origin/main")
+                            console.print(
+                                "\nGenerating diff against origin/main...", style="dim"
+                            )
+                            summary = git_manager.get_diff_summary(
+                                worktree_path, "origin/main"
+                            )
                             display_diff_summary(summary)
-                            
+
                             if summary.get("has_changes"):
-                                diff_text = git_manager.get_worktree_diff(worktree_path, "origin/main")
-                                display_diff_with_pager(diff_text, f"Diff: {selected_item['branch']} vs origin/main")
-                        
+                                diff_text = git_manager.get_worktree_diff(
+                                    worktree_path, "origin/main"
+                                )
+                                display_diff_with_pager(
+                                    diff_text,
+                                    f"Diff: {selected_item['branch']} vs origin/main",
+                                )
+
                         elif diff_choice == "3":
                             # Show staged changes only
                             console.print("\nShowing staged changes...", style="dim")
-                            summary = git_manager.get_diff_summary(worktree_path, staged_only=True)
+                            summary = git_manager.get_diff_summary(
+                                worktree_path, staged_only=True
+                            )
                             display_diff_summary(summary)
-                            
+
                             if summary.get("has_changes"):
-                                diff_text = git_manager.get_worktree_diff(worktree_path, staged_only=True)
-                                display_diff_with_pager(diff_text, f"Staged changes: {selected_item['branch']}")
-                        
+                                diff_text = git_manager.get_worktree_diff(
+                                    worktree_path, staged_only=True
+                                )
+                                display_diff_with_pager(
+                                    diff_text,
+                                    f"Staged changes: {selected_item['branch']}",
+                                )
+
                         elif diff_choice == "4":
                             # Show unstaged changes only
                             console.print("\nShowing unstaged changes...", style="dim")
-                            summary = git_manager.get_diff_summary(worktree_path, unstaged_only=True)
+                            summary = git_manager.get_diff_summary(
+                                worktree_path, unstaged_only=True
+                            )
                             display_diff_summary(summary)
-                            
+
                             if summary.get("has_changes"):
-                                diff_text = git_manager.get_worktree_diff(worktree_path, unstaged_only=True)
-                                display_diff_with_pager(diff_text, f"Unstaged changes: {selected_item['branch']}")
-                        
+                                diff_text = git_manager.get_worktree_diff(
+                                    worktree_path, unstaged_only=True
+                                )
+                                display_diff_with_pager(
+                                    diff_text,
+                                    f"Unstaged changes: {selected_item['branch']}",
+                                )
+
                         elif diff_choice == "5":
                             # Show working directory status
-                            console.print("\nShowing working directory status...", style="dim")
+                            console.print(
+                                "\nShowing working directory status...", style="dim"
+                            )
                             status = git_manager.get_worktree_status(worktree_path)
                             display_worktree_status(status)
-                        
+
                         else:
                             console.print("Invalid diff choice", style="red")
-                    
+
                     except Exception as e:
                         display_diff_error(f"Failed to generate diff: {e}")
 
@@ -841,25 +875,31 @@ def resume():
 @app.command()
 def start(
     name: str = typer.Argument(help="Name for the worktree and branch"),
-    base_branch: str = typer.Option("main", "--base", "-b", help="Base branch to create worktree from"),
-    no_attach: bool = typer.Option(False, "--no-attach", help="Create without attaching to tmux session"),
+    base_branch: str = typer.Option(
+        "main", "--base", "-b", help="Base branch to create worktree from"
+    ),
+    no_attach: bool = typer.Option(
+        False, "--no-attach", help="Create without attaching to tmux session"
+    ),
 ):
     """Create a worktree and start a tmux session in it."""
     try:
-        console.print(f"🚀 Starting new development environment: [bold cyan]{name}[/bold cyan]")
-        
+        console.print(
+            f"🚀 Starting new development environment: [bold cyan]{name}[/bold cyan]"
+        )
+
         # Get project context
         context = _get_project_context()
         if not context["is_git_repo"]:
             console.print("❌ Not in a Git repository", style="bold red")
             raise typer.Exit(code=1)
-        
+
         project_root = context["project_root"]
-        
+
         # Create worktree
         console.print(f"Creating worktree '{name}' from '{base_branch}'...")
         git_manager = GitWorktreeManager(project_root)
-        
+
         # Create worktree
         try:
             worktree_path = git_manager.create_worktree(name, base_branch)
@@ -867,38 +907,41 @@ def start(
         except Exception as e:
             console.print(f"❌ Failed to create worktree: {e}", style="bold red")
             raise typer.Exit(code=1)
-        
+
         # Create tmux session
         console.print(f"Creating tmux session for '{name}'...")
         try:
             tmux_manager = TmuxManager()
             session_manager = SessionLifecycleManager(tmux_manager)
-            
+
             session_name = session_manager.create_session_for_worktree(
-                worktree_path,
-                name,
-                auto_attach=False
+                worktree_path, name, auto_attach=False
             )
-            
+
             if not session_name:
                 session_name = f"prunejuice-{name}"
-            
+
             console.print(f"✅ Session created: {session_name}", style="green")
-            
+
             # Attach to session if requested
             if not no_attach:
                 console.print("Attaching to session...", style="dim")
                 success = session_manager.attach_to_session(session_name)
                 if success:
-                    console.print(f"✅ Attached to session: {session_name}", style="bold green")
+                    console.print(
+                        f"✅ Attached to session: {session_name}", style="bold green"
+                    )
                 else:
                     console.print(
                         f"⚠️  Session created but attachment failed. Run: tmux attach -t {session_name}",
-                        style="yellow"
+                        style="yellow",
                     )
             else:
-                console.print(f"Session ready. Attach with: tmux attach -t {session_name}", style="dim")
-                
+                console.print(
+                    f"Session ready. Attach with: tmux attach -t {session_name}",
+                    style="dim",
+                )
+
         except Exception as e:
             console.print(f"❌ Failed to create session: {e}", style="bold red")
             # Clean up worktree if session creation failed
@@ -908,11 +951,15 @@ def start(
             except Exception:
                 pass
             raise typer.Exit(code=1)
-            
-        console.print(f"🎉 Development environment '{name}' is ready!", style="bold green")
-        
+
+        console.print(
+            f"🎉 Development environment '{name}' is ready!", style="bold green"
+        )
+
     except Exception as e:
-        console.print(f"❌ Error starting development environment: {e}", style="bold red")
+        console.print(
+            f"❌ Error starting development environment: {e}", style="bold red"
+        )
         raise typer.Exit(code=1)
 
 
@@ -1036,6 +1083,34 @@ def history(
 
     except Exception as e:
         console.print(f"❌ Error fetching history: {e}", style="bold red")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def tui(
+    path: Optional[Path] = typer.Option(
+        None, "--path", "-p", help="Path to project (defaults to current directory)"
+    ),
+):
+    """Launch the interactive TUI for worktree management."""
+    try:
+        from prunejuice.tui import PrunejuiceApp
+
+        # Get project path
+        project_path = path or ProjectPathResolver.get_project_root()
+
+        # Create and run the TUI app
+        tui_app = PrunejuiceApp(project_path=project_path)
+        tui_app.run()
+
+    except ImportError:
+        console.print(
+            "❌ TUI dependencies not installed. Please install with: pip install textual",
+            style="bold red",
+        )
+        raise typer.Exit(code=1)
+    except Exception as e:
+        console.print(f"❌ Error launching TUI: {e}", style="bold red")
         raise typer.Exit(code=1)
 
 

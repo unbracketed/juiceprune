@@ -119,28 +119,31 @@ class BuiltinSteps:
         name = args.get("name")
         base_branch = args.get("base_branch", "main")
         no_attach = args.get("no_attach", False)
-        
+
         if not name:
             raise ValueError("'name' argument is required for start command")
-        
+
         # Create worktree with the specified name
         logger.info(f"Creating worktree '{name}' from base branch '{base_branch}'")
         worktree_path = await session.create_worktree(name, base_branch)
         session.set_shared_data("branch_name", name)
         logger.info(f"Created worktree at {worktree_path}")
-        
+
         # Create tmux session in the worktree
         logger.info(f"Creating tmux session for worktree '{name}'")
         session_name = await session.create_tmux_session()
         logger.info(f"Created tmux session: {session_name}")
-        
+
         # Attach to the session if requested
         if not no_attach:
             logger.info(f"Attaching to tmux session: {session_name}")
             from ..session_utils import TmuxManager
+
             tmux = TmuxManager()
             tmux.attach_session(session_name)
-            return f"Attached to session '{session_name}' in worktree at {worktree_path}"
+            return (
+                f"Attached to session '{session_name}' in worktree at {worktree_path}"
+            )
         else:
             return f"Created worktree at {worktree_path} and session '{session_name}' (not attached)"
 
@@ -156,7 +159,9 @@ class BuiltinSteps:
             "gather-context": self._wrap_session_method(self.gather_context),
             "store-artifacts": self._wrap_session_method(self.store_artifacts),
             "cleanup": self._wrap_session_method(self.cleanup),
-            "start-worktree-session": self._wrap_session_method(self.start_worktree_session),
+            "start-worktree-session": self._wrap_session_method(
+                self.start_worktree_session
+            ),
         }
 
     def _wrap_session_method(self, session_method):

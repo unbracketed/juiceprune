@@ -430,3 +430,38 @@ def test_history_worktree_filtering(test_project):
 
     finally:
         os.chdir(original_cwd)
+
+
+def test_tui_command(test_project):
+    """Test that the tui command can be invoked."""
+    from unittest.mock import patch, Mock
+
+    original_cwd = Path.cwd()
+    import os
+
+    os.chdir(test_project)
+
+    try:
+        # Initialize the project
+        runner.invoke(app, ["init"])
+
+        # Mock the TUI app to prevent actual UI from running
+        mock_app = Mock()
+        mock_app_class = Mock(return_value=mock_app)
+
+        with patch("prunejuice.tui.PrunejuiceApp", mock_app_class):
+            result = runner.invoke(app, ["tui"])
+
+            # Check that the command ran without errors
+            assert result.exit_code == 0
+
+            # Verify the TUI app was created with the correct project path
+            mock_app_class.assert_called_once()
+            call_kwargs = mock_app_class.call_args.kwargs
+            assert "project_path" in call_kwargs
+
+            # Verify run was called
+            mock_app.run.assert_called_once()
+
+    finally:
+        os.chdir(original_cwd)
