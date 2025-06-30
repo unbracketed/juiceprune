@@ -5,8 +5,8 @@ from typing import List, Dict, Any
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import Footer, Header, ListView, ListItem, Label
-from textual.containers import Container
+from textual.widgets import Footer, Header, ListView, ListItem, Label, Static
+from textual.containers import Horizontal, Vertical
 from textual import work
 
 from prunejuice.worktree_utils import GitWorktreeManager
@@ -20,9 +20,19 @@ class PrunejuiceApp(App):
         background: $surface;
     }
 
+    #sidebar {
+        width: 30%;
+        border: solid $primary;
+    }
+
+    #main-content {
+        width: 70%;
+        border: solid $secondary;
+        padding: 1;
+    }
+
     ListView {
         height: 100%;
-        border: solid $primary;
     }
 
     ListItem {
@@ -43,18 +53,23 @@ class PrunejuiceApp(App):
     def compose(self) -> ComposeResult:
         """Create application layout."""
         yield Header()
-        yield Container(
-            ListView(
-                ListItem(Label("Loading worktrees...")),
-                id="worktree-list",
+        yield Horizontal(
+            Vertical(
+                ListView(
+                    ListItem(Label("Loading worktrees...")),
+                    id="worktree-list",
+                ),
+                id="sidebar",
+            ),
+            Vertical(
+                Static("It helps the PM go smoother", id="main-content"),
             ),
         )
         yield Footer()
 
     def on_mount(self) -> None:
         """Initialize the app when mounted."""
-        self.title = "Prunejuice TUI"
-        self.sub_title = "Worktree Management"
+        self.title = "PruneJuice TUI"
         # Start loading worktrees
         self.load_worktrees()
 
@@ -64,7 +79,7 @@ class PrunejuiceApp(App):
         try:
             worktrees = await self.fetch_worktrees()
             self.app.call_later(self.update_worktree_list, worktrees)
-        except Exception as e:
+        except Exception:
             # Handle errors gracefully
             self.app.call_later(self.update_worktree_list, [])
 
@@ -85,11 +100,11 @@ class PrunejuiceApp(App):
             branch = worktree.get("branch", "detached")
             path = worktree.get("path", "")
 
-            # Create a formatted label for each worktree
-            if branch == "detached":
-                branch_label = f"[red]detached[/red] ({worktree.get('commit', '')[:8]})"
+            # Extract worktree name from path or use branch name
+            if path:
+                worktree_name = Path(path).name
+                display_name = worktree_name if worktree_name != branch else branch
             else:
-                branch_label = f"[bold cyan]{branch}[/bold cyan]"
+                display_name = branch
 
-            label_text = f"{branch_label} - [dim]{path}[/dim]"
-            list_view.append(ListItem(Label(label_text, markup=True)))
+            list_view.append(ListItem(Label(display_name)))
