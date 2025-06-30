@@ -20,6 +20,13 @@ from .commands.session import session_app
 from .worktree_utils import GitWorktreeManager
 from .session_utils import TmuxManager, SessionLifecycleManager
 from .utils.path_resolver import ProjectPathResolver
+from .utils.diff_display import (
+    display_diff_summary,
+    display_diff_with_pager,
+    display_worktree_status,
+    get_diff_type_menu,
+    display_diff_error
+)
 
 # Create Typer app
 app = typer.Typer(
@@ -665,9 +672,10 @@ def resume():
             console.print("Options:")
             console.print("  1. Show worktree path (for copying)")
             console.print("  2. Open in new tmux session")
+            console.print("  3. View git diff")
 
             try:
-                action = typer.prompt("Choose action (1-2)")
+                action = typer.prompt("Choose action (1-3)")
 
                 if action == "1":
                     # Display path for easy copying
@@ -708,6 +716,67 @@ def resume():
                             )
                     except Exception as e:
                         console.print(f"Failed to create session: {e}", style="red")
+
+                elif action == "3":
+                    # Show git diff options and display diff
+                    try:
+                        diff_choice = get_diff_type_menu()
+                        
+                        git_manager = GitWorktreeManager(context["project_root"])
+                        worktree_path = Path(selected_item["path"])
+                        
+                        if diff_choice == "1":
+                            # Compare against main branch
+                            console.print("\nGenerating diff against main branch...", style="dim")
+                            summary = git_manager.get_diff_summary(worktree_path, "main")
+                            display_diff_summary(summary)
+                            
+                            if summary.get("has_changes"):
+                                diff_text = git_manager.get_worktree_diff(worktree_path, "main")
+                                display_diff_with_pager(diff_text, f"Diff: {selected_item['branch']} vs main")
+                        
+                        elif diff_choice == "2":
+                            # Compare against origin/main
+                            console.print("\nGenerating diff against origin/main...", style="dim")
+                            summary = git_manager.get_diff_summary(worktree_path, "origin/main")
+                            display_diff_summary(summary)
+                            
+                            if summary.get("has_changes"):
+                                diff_text = git_manager.get_worktree_diff(worktree_path, "origin/main")
+                                display_diff_with_pager(diff_text, f"Diff: {selected_item['branch']} vs origin/main")
+                        
+                        elif diff_choice == "3":
+                            # Show staged changes only
+                            console.print("\nShowing staged changes...", style="dim")
+                            summary = git_manager.get_diff_summary(worktree_path, staged_only=True)
+                            display_diff_summary(summary)
+                            
+                            if summary.get("has_changes"):
+                                diff_text = git_manager.get_worktree_diff(worktree_path, staged_only=True)
+                                display_diff_with_pager(diff_text, f"Staged changes: {selected_item['branch']}")
+                        
+                        elif diff_choice == "4":
+                            # Show unstaged changes only
+                            console.print("\nShowing unstaged changes...", style="dim")
+                            summary = git_manager.get_diff_summary(worktree_path, unstaged_only=True)
+                            display_diff_summary(summary)
+                            
+                            if summary.get("has_changes"):
+                                diff_text = git_manager.get_worktree_diff(worktree_path, unstaged_only=True)
+                                display_diff_with_pager(diff_text, f"Unstaged changes: {selected_item['branch']}")
+                        
+                        elif diff_choice == "5":
+                            # Show working directory status
+                            console.print("\nShowing working directory status...", style="dim")
+                            status = git_manager.get_worktree_status(worktree_path)
+                            display_worktree_status(status)
+                        
+                        else:
+                            console.print("Invalid diff choice", style="red")
+                    
+                    except Exception as e:
+                        display_diff_error(f"Failed to generate diff: {e}")
+
                 else:
                     console.print("Invalid action", style="red")
 
