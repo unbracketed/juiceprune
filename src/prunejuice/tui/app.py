@@ -130,18 +130,14 @@ class PrunejuiceApp(App):
             branch = worktree.get("branch", "detached")
             path = worktree.get("path", "")
 
-            # Extract and clean up worktree name
-            if path:
-                worktree_name = Path(path).name
-                # Remove project prefix if present (e.g., "juiceprune-feature" -> "feature")
-                if worktree_name.startswith(f"{project_name}-"):
-                    display_name = worktree_name[len(project_name) + 1:]
-                elif worktree_name != branch:
-                    display_name = worktree_name
-                else:
-                    display_name = branch
+            # Clean up branch name (remove refs/heads/ prefix)
+            if branch.startswith("refs/heads/"):
+                clean_branch = branch[11:]  # Remove 'refs/heads/' prefix
             else:
-                display_name = branch
+                clean_branch = branch
+
+            # Use the clean branch name as display name
+            display_name = clean_branch
 
             # Create list item with index for tracking
             item = ListItem(Label(display_name), id=f"worktree-{i}")
