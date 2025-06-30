@@ -13,6 +13,7 @@ from textual import work
 
 from prunejuice.worktree_utils import GitWorktreeManager
 from prunejuice.session_utils import SessionLifecycleManager
+from .start_screen import StartWorkTreeScreen
 
 
 class PrunejuiceApp(App):
@@ -45,6 +46,7 @@ class PrunejuiceApp(App):
 
     BINDINGS = [
         Binding("c", "connect", "Connect", priority=True),
+        Binding("s", "start", "Start", priority=True),
         Binding("q", "quit", "Quit", priority=True),
     ]
 
@@ -54,7 +56,7 @@ class PrunejuiceApp(App):
         self.project_path = project_path or Path.cwd()
         self.git_manager = GitWorktreeManager(self.project_path)
         self.session_manager = SessionLifecycleManager()
-        self.worktrees = []  # Store worktree data for reference
+        self.worktrees: List[Dict[str, Any]] = []  # Store worktree data for reference
         self.highlighted_index = -1  # Track currently highlighted worktree
         self.is_in_tmux = os.getenv("TMUX") is not None
         self.current_tmux_session = self._get_current_tmux_session() if self.is_in_tmux else None
@@ -216,3 +218,71 @@ class PrunejuiceApp(App):
             # Update main content to show message
             main_content = self.query_one("#main-content", Static)
             main_content.update("Please select a worktree first")
+
+    def action_start(self) -> None:
+        """Show the start worktree screen."""
+        def handle_result(result):
+            """Handle the result from the start worktree screen."""
+            if result:  # User didn't cancel
+                self.start_new_worktree(result["name"], result["base_branch"])
+        
+        self.push_screen(StartWorkTreeScreen(), handle_result)
+
+    def start_new_worktree(self, name: str, base_branch: str) -> None:
+        """Create a new worktree and start a tmux session."""
+        main_content = self.query_one("#main-content", Static)
+        
+        try:
+            # Update UI to show progress
+            main_content.update(f"Creating worktree '{name}' from '{base_branch}'...")
+            
+            # Create worktree
+            worktree_path = self.git_manager.create_worktree(name, base_branch)
+            main_content.update(f"Worktree created at: {worktree_path}\n\nCreating tmux session...")
+            
+            # Create tmux session
+            if self.is_in_tmux and self.current_tmux_session:
+                # We're in tmux, use the TUI return approach
+                session_name = self.session_manager.create_session_for_worktree_with_tui_return(
+                    worktree_path,
+                    self.current_tmux_session,
+                    name
+                )
+                
+                if session_name:
+                    main_content.update(f"Session '{session_name}' created!\n\nSwitching to session...")
+                    # Switch to the new session
+                    success = self.session_manager.switch_to_session(session_name)
+                    if not success:
+                        main_content.update(f"Session created but failed to switch. Run: tmux attach -t {session_name}")
+                else:
+                    main_content.update("Failed to create tmux session")
+            else:
+                # Not in tmux, use the standard approach
+                session_name = self.session_manager.create_session_for_worktree(
+                    worktree_path, 
+                    name,
+                    auto_attach=False
+                )
+                
+                if session_name:
+                    main_content.update(f"Session '{session_name}' created!\n\nExiting TUI and attaching to session...")
+                    # Exit the TUI app cleanly first
+                    self.exit()
+                    # Use os.execvp to replace the current process with tmux attach
+                    os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
+                else:
+                    main_content.update("Failed to create tmux session")
+            
+            # Refresh the worktree list to include the new worktree
+            self.load_worktrees()
+            
+        except Exception as e:
+            main_content.update(f"Error creating worktree: {str(e)}")
+            # Try to clean up the worktree if it was created but session failed
+            try:
+                self.git_manager.remove_worktree(Path(name))
+                main_content.update(f"Error creating worktree: {str(e)}\n\nCleaned up partial worktree.")
+            except Exception:
+                # If cleanup also fails, just show the original error
+                pass
