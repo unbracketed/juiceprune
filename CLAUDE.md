@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `make typecheck` - Run mypy type checking
 - `make check` - Run all code quality checks (lint + typecheck)
 
-### Project Commands
+### PruneJuice prj tool built-in Commands
 - `uv run prj init` - Initialize a new prunejuice project
 - `uv run prj status` - Show project status including worktrees and sessions
 - `uv run prj list-commands` - List available commands
@@ -34,23 +34,23 @@ Prunejuice is a Python-based parallel agentic coding workflow orchestrator with 
 ### Core Architecture
 - **CLI Layer** (`prunejuice.cli`): Typer-based command interface with rich console output
 - **Core Models** (`prunejuice.core.models`): Pydantic models for configuration, commands, and execution
-- **Command System** (`prunejuice.core.commands`): YAML-based command loading and execution with step orchestration
+- **Action System** (`prunejuice.core.commands`): YAML-based action loading and execution with step orchestration
 - **Database** (`prunejuice.core.database`): SQLite-based session and execution tracking
 - **Executor** (`prunejuice.core.executor`): Async step execution engine
 
 ### Key Integrations
 - **Worktree Management** (`prunejuice.worktree_utils`): Native Git worktree operations using GitPython
 - **Session Management** (`prunejuice.session_utils`): Native tmux session lifecycle management
-- **Command Loading** (`prunejuice.commands.loader`): YAML command definition parsing and validation
+- **Action Loading** (`prunejuice.commands.loader`): YAML action definition parsing and validation
 
 ### Data Models
-- **ActionDefintion**: YAML-based command specifications with steps, arguments, and environment
+- **ActionDefintion**: YAML-based action specifications with steps, arguments, and environment
 - **ActionStep**: Individual execution units with support for builtin, shell, and script types
-- **ExecutionResult**: Tracking of command execution status and outputs
+- **ExecutionResult**: Tracking of action execution status and outputs
 - **Session**: Persistent execution context with artifact management
 
-### Command System Architecture
-Commands are defined in YAML files with the following structure:
+### Action System Architecture
+Actions are defined in YAML files with the following structure:
 - `pre_steps`: Setup operations before main execution
 - `steps`: Main command logic
 - `post_steps`: Cleanup and finalization
@@ -64,11 +64,11 @@ Step types include:
 ### Project Structure
 - `src/prunejuice/` - Main package source
 - `src/prunejuice/core/` - Core orchestration logic
-- `src/prunejuice/commands/` - Command system implementation
+- `src/prunejuice/commands/` - Action system implementation
 - `src/prunejuice/worktree_utils/` - Git worktree management
 - `src/prunejuice/session_utils/` - Tmux session management
 - `src/prunejuice/integrations/` - High-level integration interfaces
-- `src/prunejuice/template_commands/` - Example YAML command definitions
+- `src/prunejuice/template_commands/` - Example YAML action definitions
 - `src/prunejuice/template_steps/` - Example shell script steps
 - `tests/` - Comprehensive test suite with pytest + pytest-asyncio
 
@@ -81,7 +81,7 @@ Step types include:
 - Comprehensive test coverage with integration tests
 
 ### Project Management
-- Commands are defined in `.prj/commands/*.yaml` files
+- Actions are defined in `.prj/commands/*.yaml` files
 - Steps can be reusable shell scripts in `.prj/steps/`
 - Sessions are automatically managed with tmux integration
 - Worktrees are created and managed automatically for parallel development
