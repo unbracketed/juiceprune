@@ -11,7 +11,7 @@ from textual.widgets import Footer, Header, ListView, ListItem, Label, Static
 from textual.containers import Horizontal, Vertical
 from textual import work
 
-from prunejuice.worktree_utils import GitWorktreeManager
+from prunejuice.worktree_utils import GitWorktreeManager, WorktreeOperations
 from prunejuice.session_utils import SessionLifecycleManager
 from .start_screen import StartWorkTreeScreen
 
@@ -45,9 +45,13 @@ class PrunejuiceApp(App):
     """
 
     BINDINGS = [
-        Binding("c", "connect", "Connect", priority=True),
         Binding("enter", "connect", "Connect", priority=True),
-        Binding("s", "start", "Start", priority=True),
+        Binding("s", "start", "Start new worktree", priority=True),
+        Binding("c", "commit", "Commit changes", priority=True),
+        Binding("m", "merge", "Merge to parent", priority=True),
+        Binding("p", "pull_request", "Create PR", priority=True),
+        Binding("d", "delete", "Delete worktree", priority=True),
+        Binding("r", "refresh", "Refresh", priority=True),
         Binding("q", "quit", "Quit", priority=True),
     ]
 
@@ -57,6 +61,7 @@ class PrunejuiceApp(App):
         self.project_path = project_path or Path.cwd()
         self.git_manager = GitWorktreeManager(self.project_path)
         self.session_manager = SessionLifecycleManager()
+        self.worktree_ops = WorktreeOperations(self.project_path)
         self.worktrees: List[Dict[str, Any]] = []  # Store worktree data for reference
         self.highlighted_index = -1  # Track currently highlighted worktree
         self.is_in_tmux = os.getenv("TMUX") is not None
@@ -74,7 +79,7 @@ class PrunejuiceApp(App):
                 id="sidebar",
             ),
             Vertical(
-                Static("It helps the PM go smoother", id="main-content"),
+                Static("Welcome to PruneJuice TUI!\n\nSelect a worktree to see details and available actions.\n\nKey Bindings:\n  [s] Start new worktree\n  [c] Commit changes\n  [m] Merge to parent\n  [p] Create pull request\n  [d] Delete worktree\n  [r] Refresh list\n  [q] Quit", id="main-content"),
             ),
         )
         yield Footer()
@@ -145,8 +150,12 @@ class PrunejuiceApp(App):
             list_view.append(ListItem(Label("No worktrees found")))
             return
 
+        # Get project name for prefix removal
+        # project_name = self.project_path.name  # Currently unused
+
         for i, worktree in enumerate(worktrees):
             branch = worktree.get("branch", "detached")
+            # path = worktree.get("path", "")  # Currently unused
 
             # Clean up branch name (remove refs/heads/ prefix)
             if branch.startswith("refs/heads/"):
@@ -178,7 +187,14 @@ class PrunejuiceApp(App):
                     
                     # Update main content with worktree details and git status
                     main_content = self.query_one("#main-content", Static)
-                    main_content.update(f"Branch: {branch}\nPath: {path}\n\nGit Status:\n{git_status}")
+                    content = f"Branch: {branch}\nPath: {path}\n\nGit Status:\n{git_status}\n\n"
+                    content += "Available Actions:\n"
+                    content += "  [c] Commit changes\n"
+                    content += "  [m] Merge to parent branch\n"
+                    content += "  [p] Create pull request\n"
+                    content += "  [d] Delete worktree\n"
+                    content += "  [Enter] Connect to tmux session\n"
+                    main_content.update(content)
             except (ValueError, IndexError):
                 # Handle any parsing errors gracefully
                 pass
@@ -303,3 +319,86 @@ class PrunejuiceApp(App):
             except Exception:
                 # If cleanup also fails, just show the original error
                 pass
+
+    def action_commit(self) -> None:
+        """Commit changes in the selected worktree."""
+        if self.highlighted_index >= 0 and self.highlighted_index < len(self.worktrees):
+            worktree = self.worktrees[self.highlighted_index]
+            worktree_path = worktree.get("path", "")
+            
+            if worktree_path:
+                # Update main content to show status
+                main_content = self.query_one("#main-content", Static)
+                main_content.update(f"Opening commit interface for: {worktree_path}\n\nNote: Full interactive commit UI coming soon!\nFor now, use: prj worktree commit {worktree_path}")
+                
+                # TODO: Implement full interactive commit dialog
+                # For now, just show the command the user can run
+            else:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update("Invalid worktree selection")
+        else:
+            main_content = self.query_one("#main-content", Static)
+            main_content.update("Please select a worktree first")
+
+    def action_merge(self) -> None:
+        """Merge the selected worktree to its parent branch."""
+        if self.highlighted_index >= 0 and self.highlighted_index < len(self.worktrees):
+            worktree = self.worktrees[self.highlighted_index]
+            worktree_path = worktree.get("path", "")
+            branch = worktree.get("branch", "unknown")
+            
+            if worktree_path:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update(f"Merge operation for branch '{branch}'\n\nRun: prj worktree merge {worktree_path}")
+                
+                # TODO: Add confirmation dialog and execute merge
+            else:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update("Invalid worktree selection")
+        else:
+            main_content = self.query_one("#main-content", Static)
+            main_content.update("Please select a worktree first")
+
+    def action_pull_request(self) -> None:
+        """Create a pull request for the selected worktree."""
+        if self.highlighted_index >= 0 and self.highlighted_index < len(self.worktrees):
+            worktree = self.worktrees[self.highlighted_index]
+            worktree_path = worktree.get("path", "")
+            branch = worktree.get("branch", "unknown")
+            
+            if worktree_path:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update(f"Create PR for branch '{branch}'\n\nRun: prj worktree pull-request {worktree_path}")
+                
+                # TODO: Add PR creation dialog
+            else:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update("Invalid worktree selection")
+        else:
+            main_content = self.query_one("#main-content", Static)
+            main_content.update("Please select a worktree first")
+
+    def action_delete(self) -> None:
+        """Delete the selected worktree."""
+        if self.highlighted_index >= 0 and self.highlighted_index < len(self.worktrees):
+            worktree = self.worktrees[self.highlighted_index]
+            worktree_path = worktree.get("path", "")
+            branch = worktree.get("branch", "unknown")
+            
+            if worktree_path:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update(f"Delete worktree '{branch}'?\n\nRun: prj worktree delete {worktree_path}")
+                
+                # TODO: Add confirmation dialog and execute delete
+            else:
+                main_content = self.query_one("#main-content", Static)
+                main_content.update("Invalid worktree selection")
+        else:
+            main_content = self.query_one("#main-content", Static)
+            main_content.update("Please select a worktree first")
+
+    def action_refresh(self) -> None:
+        """Refresh the worktree list."""
+        self.load_worktrees()
+        main_content = self.query_one("#main-content", Static)
+        main_content.update("Worktree list refreshed")
