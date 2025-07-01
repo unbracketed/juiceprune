@@ -1098,8 +1098,8 @@ def tui(
     try:
         from prunejuice.tui import PrunejuiceApp
 
-        # Get project path
-        project_path = path or ProjectPathResolver.get_project_root()
+        # Get project path - use current directory by default to support worktrees
+        project_path = path or Path.cwd()
 
         # Create and run the TUI app
         tui_app = PrunejuiceApp(project_path=project_path)
@@ -1182,9 +1182,10 @@ def tui_session(
                         "status", "off"
                     ], check=False)
                     # Send the TUI command to the session (will run from working_dir)
+                    # Use cd to ensure we're in the right directory and then run the command
                     subprocess.run([
                         "tmux", "send-keys", "-t", tui_session_name,
-                        "uv run prj tui", "Enter"
+                        f"cd {working_dir} && uv run prj tui", "Enter"
                     ], check=False)
                     # Attach to the session
                     os.execvp("tmux", ["tmux", "attach-session", "-t", tui_session_name])
