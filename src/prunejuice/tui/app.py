@@ -140,11 +140,11 @@ class PrunejuiceApp(App):
         """Fetch worktrees from git."""
         return self.git_manager.list_worktrees()
 
-    def update_worktree_list(self, worktrees: List[Dict[str, Any]]) -> None:
+    async def update_worktree_list(self, worktrees: List[Dict[str, Any]]) -> None:
         """Update the worktree list view."""
         self.worktrees = worktrees  # Store for later reference
         list_view = self.query_one("#worktree-list", ListView)
-        list_view.clear()
+        await list_view.clear()
 
         if not worktrees:
             list_view.append(ListItem(Label("No worktrees found")))

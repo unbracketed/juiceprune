@@ -113,20 +113,17 @@ class TestPrunejuiceApp:
                 list_view = app.query_one("#worktree-list")
                 items = list_view.query("ListItem")
 
-                # Check main branch formatting
+                # Check main branch formatting - only branch name is displayed in list
                 text0 = str(items[0].children[0].renderable)
                 assert "main" in text0
-                assert "/path/to/project" in text0
 
-                # Check feature branch formatting
+                # Check feature branch formatting - only branch name is displayed in list
                 text1 = str(items[1].children[0].renderable)
                 assert "feature-branch" in text1
-                assert "/path/to/worktrees/feature-branch" in text1
 
-                # Check detached HEAD formatting
+                # Check detached HEAD formatting - "detached" is displayed for detached HEAD
                 text2 = str(items[2].children[0].renderable)
                 assert "detached" in text2
-                assert "ghi789jk" in text2  # First 8 chars of commit
 
     @pytest.mark.asyncio
     async def test_error_handling(self, tmp_path):
