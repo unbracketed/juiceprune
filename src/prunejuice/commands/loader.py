@@ -6,7 +6,7 @@ from typing import List, Optional, Dict, Any
 import hashlib
 import logging
 
-from ..core.models import CommandDefinition, CommandArgument
+from ..core.models import ActionDefintion, CommandArgument
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +16,9 @@ class CommandLoader:
 
     def __init__(self):
         """Initialize command loader."""
-        self._command_cache: Dict[str, CommandDefinition] = {}
+        self._command_cache: Dict[str, ActionDefintion] = {}
 
-    def discover_commands(self, project_path: Path) -> List[CommandDefinition]:
+    def discover_commands(self, project_path: Path) -> List[ActionDefintion]:
         """Discover all available commands in project and templates."""
         commands_by_name = {}
 
@@ -52,7 +52,7 @@ class CommandLoader:
 
     def load_command(
         self, command_name: str, project_path: Path
-    ) -> Optional[CommandDefinition]:
+    ) -> Optional[ActionDefintion]:
         """Load a specific command by name."""
         # Check cache first
         if command_name in self._command_cache:
@@ -94,7 +94,7 @@ class CommandLoader:
 
         return None
 
-    def _load_commands_from_dir(self, cmd_dir: Path) -> List[CommandDefinition]:
+    def _load_commands_from_dir(self, cmd_dir: Path) -> List[ActionDefintion]:
         """Load all commands from a directory."""
         commands = []
 
@@ -114,8 +114,8 @@ class CommandLoader:
 
     def _parse_command_yaml(
         self, content: str, file_path: str
-    ) -> Optional[CommandDefinition]:
-        """Parse YAML content into CommandDefinition."""
+    ) -> Optional[ActionDefintion]:
+        """Parse YAML content into ActionDefintion."""
         try:
             data = yaml.safe_load(content)
             if not data:
@@ -137,7 +137,7 @@ class CommandLoader:
                     arguments.append(CommandArgument(name=arg_data))
 
             # Create command definition
-            cmd = CommandDefinition(
+            cmd = ActionDefintion(
                 name=data["name"],
                 description=data.get("description", ""),
                 extends=data.get("extends"),

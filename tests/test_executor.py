@@ -3,7 +3,7 @@
 import pytest
 import yaml
 
-from prunejuice.core.models import CommandDefinition, CommandArgument, ExecutionResult
+from prunejuice.core.models import ActionDefintion, CommandArgument, ExecutionResult
 
 
 @pytest.mark.asyncio
@@ -83,7 +83,7 @@ async def test_dry_run(test_executor, test_project, sample_command):
 async def test_step_failure_cleanup(test_executor, test_project):
     """Test cleanup execution when a step fails."""
     # Create command with failing step and cleanup
-    failing_command = CommandDefinition(
+    failing_command = ActionDefintion(
         name="failing-command",
         description="Command that fails",
         steps=["nonexistent-step"],
@@ -107,7 +107,7 @@ async def test_step_failure_cleanup(test_executor, test_project):
 async def test_built_in_steps(test_executor, test_project):
     """Test built-in step execution."""
     # Create command using built-in steps
-    builtin_command = CommandDefinition(
+    builtin_command = ActionDefintion(
         name="builtin-test",
         description="Test built-in steps",
         steps=[
@@ -134,7 +134,7 @@ async def test_built_in_steps(test_executor, test_project):
 async def test_environment_variables(test_executor, test_project):
     """Test environment variable handling."""
     # Create command with environment variables
-    env_command = CommandDefinition(
+    env_command = ActionDefintion(
         name="env-test",
         description="Test environment variables",
         environment={"TEST_VAR": "test_value"},
@@ -184,7 +184,7 @@ async def test_argument_injection_protection(
 async def test_command_injection_prevention(test_executor, test_project):
     """Test prevention of command injection attacks."""
     # Create malicious command
-    malicious_cmd = CommandDefinition(
+    malicious_cmd = ActionDefintion(
         name="evil-command",
         description="Command injection test",
         steps=["echo 'safe' && rm -rf /"],
@@ -214,7 +214,7 @@ async def test_command_injection_prevention(test_executor, test_project):
 @pytest.mark.asyncio
 async def test_environment_variable_sanitization(test_executor, test_project):
     """Test sanitization of environment variables."""
-    cmd = CommandDefinition(
+    cmd = ActionDefintion(
         name="env-test",
         description="Environment test",
         environment={
@@ -243,7 +243,7 @@ async def test_environment_variable_sanitization(test_executor, test_project):
 async def test_script_timeout_handling(test_executor, test_project):
     """Test timeout handling for long-running scripts."""
     # Create command with very short timeout
-    timeout_cmd = CommandDefinition(
+    timeout_cmd = ActionDefintion(
         name="timeout-test",
         description="Timeout test",
         steps=["sleep 10"],

@@ -241,7 +241,9 @@ class SessionLifecycleManager:
             task = task_name or self.default_task
 
             # Generate session name
-            session_name = self.tmux.format_session_name(project_name, worktree_name, task)
+            session_name = self.tmux.format_session_name(
+                project_name, worktree_name, task
+            )
 
             # Check if session already exists
             if self.tmux.session_exists(session_name):
@@ -261,7 +263,9 @@ class SessionLifecycleManager:
                 return None
 
         except Exception as e:
-            logger.error(f"Failed to create session for worktree '{worktree_path}': {e}")
+            logger.error(
+                f"Failed to create session for worktree '{worktree_path}': {e}"
+            )
             return None
 
     def kill_session(self, session_name: str) -> bool:

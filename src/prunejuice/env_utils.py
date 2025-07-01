@@ -34,15 +34,15 @@ def get_current_venv_path() -> Path:
 def prepare_clean_environment() -> Dict[str, str]:
     """Prepare a clean environment dict without conflicting VIRTUAL_ENV."""
     env = os.environ.copy()
-    
+
     # Remove any existing VIRTUAL_ENV to prevent conflicts
     env.pop("VIRTUAL_ENV", None)
-    
+
     # Set the correct virtual environment path for the current context
     venv_path = get_current_venv_path()
     if venv_path.exists():
         env["VIRTUAL_ENV"] = str(venv_path)
-    
+
     return env
 
 
@@ -50,22 +50,22 @@ def is_uv_command(command: str) -> bool:
     """Check if a command is a uv command that needs environment handling."""
     if not command:
         return False
-    
+
     # Split command and check the first part
     parts = command.strip().split()
     if not parts:
         return False
-    
+
     first_part = parts[0]
-    
+
     # Direct uv commands
     if first_part == "uv":
         return True
-    
+
     # uv run commands
     if len(parts) >= 2 and first_part == "uv" and parts[1] == "run":
         return True
-    
+
     return False
 
 
@@ -73,13 +73,13 @@ def get_worktree_info() -> Optional[Dict[str, str]]:
     """Get information about the current worktree."""
     try:
         repo = git.Repo(search_parent_directories=True)
-        
+
         if not is_in_worktree():
             return None
-        
+
         worktree_path = Path(repo.working_dir)
         main_repo_path = Path(repo.git_dir).parent
-        
+
         return {
             "worktree_path": str(worktree_path),
             "main_repo_path": str(main_repo_path),

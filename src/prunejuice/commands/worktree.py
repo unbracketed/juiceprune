@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Optional, List
 
 from ..worktree_utils import (
-    GitWorktreeManager, 
-    FileManager, 
+    GitWorktreeManager,
+    FileManager,
     WorktreeOperations,
     CommitStatusAnalyzer,
     InteractiveStaging,
@@ -169,17 +169,19 @@ def commit(
     """Commit changes in a worktree with interactive staging and message editing."""
     try:
         worktree_path_obj = Path(worktree_path)
-        
+
         if not worktree_path_obj.exists():
-            console.print(f"❌ Worktree path does not exist: {worktree_path}", style="bold red")
+            console.print(
+                f"❌ Worktree path does not exist: {worktree_path}", style="bold red"
+            )
             raise typer.Exit(code=1)
 
         operations = WorktreeOperations(Path.cwd())
-        
+
         # Show current status
         analyzer = CommitStatusAnalyzer(worktree_path_obj)
         analysis = analyzer.analyze()
-        
+
         console.print(f"📊 Commit Status for [bold cyan]{worktree_path}[/bold cyan]")
         _display_commit_status(analysis)
 
@@ -189,7 +191,7 @@ def commit(
 
         # Handle file staging
         staging = InteractiveStaging(worktree_path_obj)
-        
+
         if all:
             console.print("📥 Staging all changes...")
             success = asyncio.run(staging.stage_all_changes())
@@ -206,15 +208,17 @@ def commit(
         # Handle commit message
         if not message and interactive:
             editor = CommitMessageEditor(worktree_path_obj)
-            
+
             if conventional:
                 template = editor.generate_conventional_commit_template()
-            
+
             console.print("✏️  Opening editor for commit message...")
             message = asyncio.run(editor.get_commit_message_interactive(template))
-            
+
             if not message:
-                console.print("❌ Commit cancelled - no message provided", style="yellow")
+                console.print(
+                    "❌ Commit cancelled - no message provided", style="yellow"
+                )
                 raise typer.Exit(code=0)
 
         if not message:
@@ -230,16 +234,20 @@ def commit(
 
         # Perform the commit
         console.print("💾 Committing changes...")
-        result = asyncio.run(operations.commit_changes(
-            worktree_path_obj,
-            message=message,
-            interactive=False,  # Already handled interactivity
-            stage_all=False,    # Already handled staging
-        ))
+        result = asyncio.run(
+            operations.commit_changes(
+                worktree_path_obj,
+                message=message,
+                interactive=False,  # Already handled interactivity
+                stage_all=False,  # Already handled staging
+            )
+        )
 
         if result.status == OperationResult.SUCCESS:
             hash_display = result.commit_hash[:8] if result.commit_hash else "unknown"
-            console.print(f"✅ Successfully committed: [bold green]{hash_display}[/bold green]")
+            console.print(
+                f"✅ Successfully committed: [bold green]{hash_display}[/bold green]"
+            )
             console.print(f"📝 Message: {result.message}")
             files_count = len(result.files_committed) if result.files_committed else 0
             console.print(f"📁 Files committed: {files_count}")
@@ -268,13 +276,15 @@ def merge(
     """Merge worktree branch to parent branch."""
     try:
         worktree_path_obj = Path(worktree_path)
-        
+
         if not worktree_path_obj.exists():
-            console.print(f"❌ Worktree path does not exist: {worktree_path}", style="bold red")
+            console.print(
+                f"❌ Worktree path does not exist: {worktree_path}", style="bold red"
+            )
             raise typer.Exit(code=1)
 
         operations = WorktreeOperations(Path.cwd())
-        
+
         # Show confirmation unless force is specified
         if not force:
             merge_target = target_branch or "auto-detected parent"
@@ -286,23 +296,31 @@ def merge(
                 return
 
         console.print(f"🔀 Merging worktree: [bold cyan]{worktree_path}[/bold cyan]")
-        
-        result = asyncio.run(operations.merge_to_parent(
-            worktree_path_obj,
-            delete_after=delete_after,
-            target_branch=target_branch
-        ))
+
+        result = asyncio.run(
+            operations.merge_to_parent(
+                worktree_path_obj,
+                delete_after=delete_after,
+                target_branch=target_branch,
+            )
+        )
 
         if result.status == OperationResult.SUCCESS:
-            console.print(f"✅ Successfully merged into [bold green]{result.target_branch}[/bold green]")
+            console.print(
+                f"✅ Successfully merged into [bold green]{result.target_branch}[/bold green]"
+            )
             merge_hash = result.merge_commit[:8] if result.merge_commit else "unknown"
             console.print(f"📝 Merge commit: {merge_hash}")
         elif result.status == OperationResult.CONFLICT:
-            console.print(f"⚠️  Merge conflicts detected in [bold yellow]{result.target_branch}[/bold yellow]")
+            console.print(
+                f"⚠️  Merge conflicts detected in [bold yellow]{result.target_branch}[/bold yellow]"
+            )
             console.print("📋 Conflicted files:")
-            for conflict in (result.conflicts or []):
+            for conflict in result.conflicts or []:
                 console.print(f"  - {conflict}")
-            console.print("🔧 Resolve conflicts manually and run 'git commit' to complete the merge")
+            console.print(
+                "🔧 Resolve conflicts manually and run 'git commit' to complete the merge"
+            )
         else:
             console.print(f"❌ Merge failed: {result.error}", style="bold red")
             raise typer.Exit(code=1)
@@ -318,9 +336,7 @@ def pull_request(
     title: Optional[str] = typer.Option(
         None, "--title", "-t", help="Pull request title"
     ),
-    body: Optional[str] = typer.Option(
-        None, "--body", "-b", help="Pull request body"
-    ),
+    body: Optional[str] = typer.Option(None, "--body", "-b", help="Pull request body"),
     draft: bool = typer.Option(
         False, "--draft", "-d", help="Create as draft pull request"
     ),
@@ -328,21 +344,24 @@ def pull_request(
     """Create a pull request for the worktree branch."""
     try:
         worktree_path_obj = Path(worktree_path)
-        
+
         if not worktree_path_obj.exists():
-            console.print(f"❌ Worktree path does not exist: {worktree_path}", style="bold red")
+            console.print(
+                f"❌ Worktree path does not exist: {worktree_path}", style="bold red"
+            )
             raise typer.Exit(code=1)
 
         operations = WorktreeOperations(Path.cwd())
-        
-        console.print(f"🔗 Creating pull request for: [bold cyan]{worktree_path}[/bold cyan]")
-        
-        result = asyncio.run(operations.create_pull_request(
-            worktree_path_obj,
-            title=title,
-            body=body,
-            draft=draft
-        ))
+
+        console.print(
+            f"🔗 Creating pull request for: [bold cyan]{worktree_path}[/bold cyan]"
+        )
+
+        result = asyncio.run(
+            operations.create_pull_request(
+                worktree_path_obj, title=title, body=body, draft=draft
+            )
+        )
 
         if result.status == OperationResult.SUCCESS:
             console.print("✅ Pull request created successfully!")
@@ -350,7 +369,9 @@ def pull_request(
             if result.pr_number:
                 console.print(f"📝 PR Number: #{result.pr_number}")
         else:
-            console.print(f"❌ Failed to create pull request: {result.error}", style="bold red")
+            console.print(
+                f"❌ Failed to create pull request: {result.error}", style="bold red"
+            )
             raise typer.Exit(code=1)
 
     except Exception as e:
@@ -365,20 +386,23 @@ def delete(
         False, "--force", "-f", help="Force deletion without confirmation"
     ),
     cleanup_sessions: bool = typer.Option(
-        True, "--cleanup-sessions/--no-cleanup-sessions", 
-        help="Cleanup associated tmux sessions"
+        True,
+        "--cleanup-sessions/--no-cleanup-sessions",
+        help="Cleanup associated tmux sessions",
     ),
 ):
     """Delete a worktree and perform cleanup."""
     try:
         worktree_path_obj = Path(worktree_path)
-        
+
         if not worktree_path_obj.exists():
-            console.print(f"❌ Worktree path does not exist: {worktree_path}", style="bold red")
+            console.print(
+                f"❌ Worktree path does not exist: {worktree_path}", style="bold red"
+            )
             raise typer.Exit(code=1)
 
         operations = WorktreeOperations(Path.cwd())
-        
+
         # Show confirmation unless force is specified
         if not force:
             response = typer.confirm(f"Delete worktree at {worktree_path}?")
@@ -386,13 +410,15 @@ def delete(
                 console.print("Operation cancelled", style="yellow")
                 return
 
-        console.print(f"🗑️  Deleting worktree: [bold yellow]{worktree_path}[/bold yellow]")
-        
-        result = asyncio.run(operations.delete_worktree(
-            worktree_path_obj,
-            force=force,
-            cleanup_sessions=cleanup_sessions
-        ))
+        console.print(
+            f"🗑️  Deleting worktree: [bold yellow]{worktree_path}[/bold yellow]"
+        )
+
+        result = asyncio.run(
+            operations.delete_worktree(
+                worktree_path_obj, force=force, cleanup_sessions=cleanup_sessions
+            )
+        )
 
         if result.status == OperationResult.SUCCESS:
             console.print("✅ Successfully deleted worktree")
@@ -410,42 +436,50 @@ def delete(
 @worktree_app.command()
 def status(
     worktree_path: str = typer.Argument(help="Path to the worktree"),
-    show_diff: bool = typer.Option(
-        False, "--diff", "-d", help="Show diff of changes"
-    ),
+    show_diff: bool = typer.Option(False, "--diff", "-d", help="Show diff of changes"),
 ):
     """Show detailed status of a worktree."""
     try:
         worktree_path_obj = Path(worktree_path)
-        
+
         if not worktree_path_obj.exists():
-            console.print(f"❌ Worktree path does not exist: {worktree_path}", style="bold red")
+            console.print(
+                f"❌ Worktree path does not exist: {worktree_path}", style="bold red"
+            )
             raise typer.Exit(code=1)
 
         analyzer = CommitStatusAnalyzer(worktree_path_obj)
         analysis = analyzer.analyze()
-        
+
         console.print(f"📊 Status for [bold cyan]{worktree_path}[/bold cyan]")
         _display_commit_status(analysis)
 
         if show_diff:
             staging = InteractiveStaging(worktree_path_obj)
-            
+
             # Show staged diff
             if analysis.staged_files:
                 console.print("\n📝 [bold green]Staged Changes:[/bold green]")
                 for file_info in analysis.staged_files[:5]:  # Limit to first 5
-                    diff = staging.get_file_diff(file_info.path, staged=True, context_lines=2)
+                    diff = staging.get_file_diff(
+                        file_info.path, staged=True, context_lines=2
+                    )
                     if diff:
-                        console.print(Panel(diff, title=f"📄 {file_info.path}", expand=False))
+                        console.print(
+                            Panel(diff, title=f"📄 {file_info.path}", expand=False)
+                        )
 
             # Show unstaged diff
             if analysis.unstaged_files:
                 console.print("\n📝 [bold yellow]Unstaged Changes:[/bold yellow]")
                 for file_info in analysis.unstaged_files[:5]:  # Limit to first 5
-                    diff = staging.get_file_diff(file_info.path, staged=False, context_lines=2)
+                    diff = staging.get_file_diff(
+                        file_info.path, staged=False, context_lines=2
+                    )
                     if diff:
-                        console.print(Panel(diff, title=f"📄 {file_info.path}", expand=False))
+                        console.print(
+                            Panel(diff, title=f"📄 {file_info.path}", expand=False)
+                        )
 
     except Exception as e:
         console.print(f"❌ Error getting worktree status: {e}", style="bold red")
@@ -461,9 +495,11 @@ def _display_commit_status(analysis):
     status_text.append("Total changes: ", style="bold")
     status_text.append(f"{analysis.total_changes}\n", style="white")
     status_text.append("Can commit: ", style="bold")
-    status_text.append("✅ Yes" if analysis.can_commit else "❌ No", 
-                      style="green" if analysis.can_commit else "red")
-    
+    status_text.append(
+        "✅ Yes" if analysis.can_commit else "❌ No",
+        style="green" if analysis.can_commit else "red",
+    )
+
     if analysis.has_conflicts:
         status_text.append("\n", style="white")
         status_text.append("⚠️  Has conflicts", style="bold red")
@@ -481,37 +517,35 @@ def _display_commit_status(analysis):
         # Add staged files
         for file_info in analysis.staged_files:
             changes = ""
-            if file_info.lines_added is not None and file_info.lines_removed is not None:
+            if (
+                file_info.lines_added is not None
+                and file_info.lines_removed is not None
+            ):
                 changes = f"+{file_info.lines_added} -{file_info.lines_removed}"
-            
+
             table.add_row(
-                file_info.status.value,
-                "[green]Staged[/green]",
-                file_info.path,
-                changes
+                file_info.status.value, "[green]Staged[/green]", file_info.path, changes
             )
 
         # Add unstaged files
         for file_info in analysis.unstaged_files:
             changes = ""
-            if file_info.lines_added is not None and file_info.lines_removed is not None:
+            if (
+                file_info.lines_added is not None
+                and file_info.lines_removed is not None
+            ):
                 changes = f"+{file_info.lines_added} -{file_info.lines_removed}"
-            
+
             table.add_row(
                 file_info.status.value,
                 "[yellow]Unstaged[/yellow]",
                 file_info.path,
-                changes
+                changes,
             )
 
         # Add untracked files
         for file_info in analysis.untracked_files:
-            table.add_row(
-                "?",
-                "[blue]Untracked[/blue]",
-                file_info.path,
-                ""
-            )
+            table.add_row("?", "[blue]Untracked[/blue]", file_info.path, "")
 
         console.print(table)
     else:

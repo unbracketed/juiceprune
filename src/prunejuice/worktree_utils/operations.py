@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class OperationResult(Enum):
     """Result status for worktree operations."""
+
     SUCCESS = "success"
     FAILURE = "failure"
     CANCELLED = "cancelled"
@@ -26,6 +27,7 @@ class OperationResult(Enum):
 @dataclass
 class CommitResult:
     """Result of a commit operation."""
+
     status: OperationResult
     commit_hash: Optional[str] = None
     message: Optional[str] = None
@@ -40,6 +42,7 @@ class CommitResult:
 @dataclass
 class MergeResult:
     """Result of a merge operation."""
+
     status: OperationResult
     merge_commit: Optional[str] = None
     target_branch: Optional[str] = None
@@ -54,6 +57,7 @@ class MergeResult:
 @dataclass
 class PRResult:
     """Result of a pull request operation."""
+
     status: OperationResult
     pr_url: Optional[str] = None
     pr_number: Optional[int] = None
@@ -63,6 +67,7 @@ class PRResult:
 @dataclass
 class DeleteResult:
     """Result of a delete operation."""
+
     status: OperationResult
     deleted_path: Optional[str] = None
     cleanup_performed: bool = False
@@ -102,7 +107,7 @@ class WorktreeOperations:
             if not worktree_path.exists():
                 return CommitResult(
                     status=OperationResult.FAILURE,
-                    error=f"Worktree path does not exist: {worktree_path}"
+                    error=f"Worktree path does not exist: {worktree_path}",
                 )
 
             # Get worktree repo
@@ -126,8 +131,7 @@ class WorktreeOperations:
             updated_status = self.git_manager.get_worktree_status(worktree_path)
             if not updated_status.get("staged_files"):
                 return CommitResult(
-                    status=OperationResult.FAILURE,
-                    error="No staged changes to commit"
+                    status=OperationResult.FAILURE, error="No staged changes to commit"
                 )
 
             # Handle commit message
@@ -137,12 +141,12 @@ class WorktreeOperations:
                 else:
                     return CommitResult(
                         status=OperationResult.FAILURE,
-                        error="No commit message provided"
+                        error="No commit message provided",
                     )
 
             # Perform the commit
             commit = worktree_repo.index.commit(message)
-            
+
             # Get list of committed files
             committed_files = list(commit.stats.files.keys())
 
@@ -152,15 +156,12 @@ class WorktreeOperations:
                 status=OperationResult.SUCCESS,
                 commit_hash=commit.hexsha,
                 message=message,
-                files_committed=committed_files
+                files_committed=committed_files,
             )
 
         except Exception as e:
             logger.error(f"Failed to commit changes: {e}")
-            return CommitResult(
-                status=OperationResult.FAILURE,
-                error=str(e)
-            )
+            return CommitResult(status=OperationResult.FAILURE, error=str(e))
 
     async def merge_to_parent(
         self,
@@ -184,14 +185,14 @@ class WorktreeOperations:
             if not worktree_info:
                 return MergeResult(
                     status=OperationResult.FAILURE,
-                    error=f"Worktree not found: {worktree_path}"
+                    error=f"Worktree not found: {worktree_path}",
                 )
 
             source_branch = worktree_info.get("branch")
             if not source_branch:
                 return MergeResult(
                     status=OperationResult.FAILURE,
-                    error="Could not determine source branch"
+                    error="Could not determine source branch",
                 )
 
             # Determine target branch
@@ -211,7 +212,7 @@ class WorktreeOperations:
             # Perform merge
             try:
                 main_repo.git.merge(source_branch, "--no-ff")
-                
+
                 # Get merge commit hash
                 merge_commit = main_repo.head.commit.hexsha
 
@@ -221,12 +222,14 @@ class WorktreeOperations:
                 if delete_after:
                     delete_result = await self.delete_worktree(worktree_path)
                     if delete_result.status != OperationResult.SUCCESS:
-                        logger.warning(f"Failed to delete worktree: {delete_result.error}")
+                        logger.warning(
+                            f"Failed to delete worktree: {delete_result.error}"
+                        )
 
                 return MergeResult(
                     status=OperationResult.SUCCESS,
                     merge_commit=merge_commit,
-                    target_branch=target_branch
+                    target_branch=target_branch,
                 )
 
             except GitCommandError as e:
@@ -237,17 +240,14 @@ class WorktreeOperations:
                         status=OperationResult.CONFLICT,
                         target_branch=target_branch,
                         conflicts=conflicts,
-                        error=f"Merge conflicts detected: {e}"
+                        error=f"Merge conflicts detected: {e}",
                     )
                 else:
                     raise
 
         except Exception as e:
             logger.error(f"Failed to merge worktree: {e}")
-            return MergeResult(
-                status=OperationResult.FAILURE,
-                error=str(e)
-            )
+            return MergeResult(status=OperationResult.FAILURE, error=str(e))
 
     async def create_pull_request(
         self,
@@ -273,14 +273,14 @@ class WorktreeOperations:
             if not worktree_info:
                 return PRResult(
                     status=OperationResult.FAILURE,
-                    error=f"Worktree not found: {worktree_path}"
+                    error=f"Worktree not found: {worktree_path}",
                 )
 
             source_branch = worktree_info.get("branch")
             if not source_branch:
                 return PRResult(
                     status=OperationResult.FAILURE,
-                    error="Could not determine source branch"
+                    error="Could not determine source branch",
                 )
 
             # Ensure branch is pushed to remote
@@ -297,10 +297,10 @@ class WorktreeOperations:
 
             # Use GitHub CLI to create PR
             cmd = ["gh", "pr", "create", "--title", title, "--head", source_branch]
-            
+
             if body:
                 cmd.extend(["--body", body])
-            
+
             if draft:
                 cmd.append("--draft")
 
@@ -309,7 +309,7 @@ class WorktreeOperations:
                 *cmd,
                 cwd=self.project_path,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
 
             stdout, stderr = await result.communicate()
@@ -326,23 +326,18 @@ class WorktreeOperations:
                         pass
 
                 return PRResult(
-                    status=OperationResult.SUCCESS,
-                    pr_url=pr_url,
-                    pr_number=pr_number
+                    status=OperationResult.SUCCESS, pr_url=pr_url, pr_number=pr_number
                 )
             else:
                 error_msg = stderr.decode().strip()
                 return PRResult(
                     status=OperationResult.FAILURE,
-                    error=f"GitHub CLI error: {error_msg}"
+                    error=f"GitHub CLI error: {error_msg}",
                 )
 
         except Exception as e:
             logger.error(f"Failed to create pull request: {e}")
-            return PRResult(
-                status=OperationResult.FAILURE,
-                error=str(e)
-            )
+            return PRResult(status=OperationResult.FAILURE, error=str(e))
 
     async def delete_worktree(
         self,
@@ -365,19 +360,19 @@ class WorktreeOperations:
             if not worktree_path.exists():
                 return DeleteResult(
                     status=OperationResult.FAILURE,
-                    error=f"Worktree does not exist: {worktree_path}"
+                    error=f"Worktree does not exist: {worktree_path}",
                 )
 
             # Get worktree info before deletion
             worktree_info = self.git_manager.get_worktree_info(worktree_path)
-            
+
             # Check for uncommitted changes unless force is specified
             if not force:
                 status = self.git_manager.get_worktree_status(worktree_path)
                 if not status.get("is_clean", True):
                     return DeleteResult(
                         status=OperationResult.FAILURE,
-                        error="Worktree has uncommitted changes. Use --force to override."
+                        error="Worktree has uncommitted changes. Use --force to override.",
                     )
 
             # Cleanup tmux sessions if requested
@@ -389,25 +384,21 @@ class WorktreeOperations:
 
             # Remove the worktree
             success = self.git_manager.remove_worktree(worktree_path, force=force)
-            
+
             if success:
                 return DeleteResult(
                     status=OperationResult.SUCCESS,
                     deleted_path=str(worktree_path),
-                    cleanup_performed=cleanup_performed
+                    cleanup_performed=cleanup_performed,
                 )
             else:
                 return DeleteResult(
-                    status=OperationResult.FAILURE,
-                    error="Failed to remove worktree"
+                    status=OperationResult.FAILURE, error="Failed to remove worktree"
                 )
 
         except Exception as e:
             logger.error(f"Failed to delete worktree: {e}")
-            return DeleteResult(
-                status=OperationResult.FAILURE,
-                error=str(e)
-            )
+            return DeleteResult(status=OperationResult.FAILURE, error=str(e))
 
     # Private helper methods
 
@@ -421,25 +412,25 @@ class WorktreeOperations:
         """Detect the parent branch for a worktree."""
         try:
             worktree_repo = git.Repo(worktree_path)
-            
+
             # Try to find the merge base with common branches
             common_branches = ["main", "master", "develop"]
-            
+
             for branch in common_branches:
                 try:
                     # Check if branch exists
                     worktree_repo.git.rev_parse("--verify", branch)
-                    
+
                     # Check if there's a merge base
                     merge_base = worktree_repo.git.merge_base(branch, "HEAD")
                     if merge_base:
                         return branch
                 except GitCommandError:
                     continue
-            
+
             # Default to main
             return "main"
-            
+
         except Exception:
             return "main"
 
@@ -448,7 +439,7 @@ class WorktreeOperations:
         try:
             status = repo.git.status("--porcelain")
             conflicts = []
-            
+
             for line in status.splitlines():
                 if line.startswith("UU "):  # Both modified
                     conflicts.append(line[3:])
@@ -456,7 +447,7 @@ class WorktreeOperations:
                     conflicts.append(line[3:])
                 elif line.startswith("DD "):  # Both deleted
                     conflicts.append(line[3:])
-            
+
             return conflicts
         except Exception:
             return []
@@ -465,18 +456,18 @@ class WorktreeOperations:
         """Generate a PR title based on commits."""
         try:
             worktree_repo = git.Repo(worktree_path)
-            
+
             # Get recent commits
             commits = list(worktree_repo.iter_commits("HEAD", max_count=5))
-            
+
             if commits:
                 # Use the most recent commit message as title
-                return commits[0].message.split('\n')[0]
+                return commits[0].message.split("\n")[0]
             else:
                 # Fallback to branch name
                 branch_name = worktree_repo.active_branch.name
                 return f"Changes from {branch_name}"
-                
+
         except Exception:
             return "Pull request from worktree"
 
@@ -485,15 +476,13 @@ class WorktreeOperations:
         try:
             # Kill tmux sessions that match the branch name pattern
             cmd = ["tmux", "kill-session", "-t", f"*{branch_name}*"]
-            
+
             result = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
-            
+
             await result.communicate()
             return result.returncode == 0
-            
+
         except Exception:
             return False

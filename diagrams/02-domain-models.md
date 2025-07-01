@@ -5,7 +5,7 @@ This class diagram shows the core domain models and their relationships, represe
 ```mermaid
 classDiagram
     %% Core Models
-    class CommandDefinition {
+    class ActionDefintion {
         +String name
         +String description
         +String category
@@ -109,8 +109,8 @@ classDiagram
     }
     
     %% Relationships
-    CommandDefinition ||--o{ CommandStep : contains
-    CommandDefinition ||--o{ CommandArgument : has
+    ActionDefintion ||--o{ CommandStep : contains
+    ActionDefintion ||--o{ CommandArgument : has
     CommandStep ||--|| StepType : typed_as
     Session ||--o{ StepExecution : tracks
     Session ||--|| SessionStatus : has_status
@@ -120,7 +120,7 @@ classDiagram
 
 ## Key Model Relationships
 
-- **CommandDefinition**: The central configuration model loaded from YAML files, containing all steps and metadata
+- **ActionDefintion**: The central configuration model loaded from YAML files, containing all steps and metadata
 - **CommandStep**: Individual execution units that can be builtin functions, shell commands, or external scripts
 - **Session**: Runtime execution context that tracks state, shared data, and step history
 - **ExecutionEvent**: Persistent database record of command execution for history and tracking

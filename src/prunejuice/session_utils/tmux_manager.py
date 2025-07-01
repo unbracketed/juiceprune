@@ -131,8 +131,11 @@ class TmuxManager:
             args.extend(["-s", session_name, "-c", str(working_dir)])
 
             result = subprocess.run(
-                args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
-                check=False, env=env
+                args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                env=env,
             )
             stderr = result.stderr
 
@@ -147,7 +150,11 @@ class TmuxManager:
             return False
 
     def create_session_with_tui_return(
-        self, session_name: str, working_dir: Path, tui_session_name: str, auto_attach: bool = False
+        self,
+        session_name: str,
+        working_dir: Path,
+        tui_session_name: str,
+        auto_attach: bool = False,
     ) -> bool:
         """Create a new tmux session with a custom keybinding to return to TUI.
 
@@ -168,9 +175,12 @@ class TmuxManager:
             # Add custom keybinding for returning to TUI (prefix + x) by executing within session
             result = subprocess.run(
                 [
-                    "tmux", "send-keys", "-t", session_name,
+                    "tmux",
+                    "send-keys",
+                    "-t",
+                    session_name,
                     f"tmux bind-key -T prefix x switch-client -t {tui_session_name}",
-                    "Enter"
+                    "Enter",
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -178,24 +188,34 @@ class TmuxManager:
             )
 
             if result.returncode != 0:
-                logger.warning(f"Failed to set custom keybinding for session '{session_name}'")
+                logger.warning(
+                    f"Failed to set custom keybinding for session '{session_name}'"
+                )
 
             # Set custom status bar styling with dark plum/purple background
             subprocess.run(
                 [
-                    "tmux", "set-option", "-t", session_name,
-                    "status-style", "bg=#5D4E75,fg=white"  # Dark plum background, white text
+                    "tmux",
+                    "set-option",
+                    "-t",
+                    session_name,
+                    "status-style",
+                    "bg=#5D4E75,fg=white",  # Dark plum background, white text
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 check=False,
             )
-            
+
             # Set a status message about the custom keybinding
             subprocess.run(
                 [
-                    "tmux", "set-option", "-t", session_name,
-                    "status-right", "#[fg=yellow,bold]Press prefix+x to return to TUI#[default] | %H:%M"
+                    "tmux",
+                    "set-option",
+                    "-t",
+                    session_name,
+                    "status-right",
+                    "#[fg=yellow,bold]Press prefix+x to return to TUI#[default] | %H:%M",
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -209,7 +229,9 @@ class TmuxManager:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to create session with TUI return '{session_name}': {e}")
+            logger.error(
+                f"Failed to create session with TUI return '{session_name}': {e}"
+            )
             return False
 
     def attach_session(self, session_name: str) -> bool:

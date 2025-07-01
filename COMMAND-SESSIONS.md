@@ -13,7 +13,7 @@ This document outlines the implementation plan for three new features in PruneJu
 ### Strengths
 - Good modular design with separate concerns (models, execution, integrations)
 - Existing tmux and worktree utilities are well-implemented (`TmuxManager`, `GitWorktreeManager`)
-- Strong foundation with `CommandDefinition`, `CommandStep` models
+- Strong foundation with `ActionDefintion`, `CommandStep` models
 - Database integration for execution tracking
 - Artifact management system
 
@@ -30,7 +30,7 @@ This document outlines the implementation plan for three new features in PruneJu
 #### 1.1 Add prompt_file Property
 **File**: `src/prunejuice/core/models.py` (line 81)
 ```python
-class CommandDefinition(BaseModel):
+class ActionDefintion(BaseModel):
     name: str
     description: str
     prompt_file: Optional[str] = None  # NEW: location of prompt text/markdown file
@@ -270,7 +270,7 @@ from pathlib import Path
 from typing import Dict, Any
 import logging
 
-from .models import CommandDefinition, ExecutionResult
+from .models import ActionDefintion, ExecutionResult
 from .session import Session, SessionStatus
 
 logger = logging.getLogger(__name__)
@@ -278,7 +278,7 @@ logger = logging.getLogger(__name__)
 class BaseCommand(ABC):
     """Base interface for all commands"""
     
-    def __init__(self, definition: CommandDefinition, session: Session, step_executor, builtin_steps):
+    def __init__(self, definition: ActionDefintion, session: Session, step_executor, builtin_steps):
         self.definition = definition
         self.session = session
         self.step_executor = step_executor
@@ -404,7 +404,7 @@ class WorktreeCommand(SessionCommand):
             logger.info(f"Cleaning up worktree: {self.session.worktree_path}")
             # Implementation would use plum integration to remove worktree
 
-def create_command(definition: CommandDefinition, session: Session, step_executor, builtin_steps) -> BaseCommand:
+def create_command(definition: ActionDefintion, session: Session, step_executor, builtin_steps) -> BaseCommand:
     """Factory function to create appropriate command type based on definition"""
     
     # Determine command type based on steps or metadata

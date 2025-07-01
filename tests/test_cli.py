@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 
 from prunejuice.cli import app
-from prunejuice.core.models import CommandDefinition
+from prunejuice.core.models import ActionDefintion
 
 
 runner = CliRunner()
@@ -55,7 +55,7 @@ def test_list_commands_empty(temp_dir):
 def test_list_commands_with_commands(test_project):
     """Test listing commands when commands exist."""
     # Create a test command
-    sample_command = CommandDefinition(
+    sample_command = ActionDefintion(
         name="test-cmd",
         description="Test command",
         category="test",
@@ -84,7 +84,7 @@ def test_list_commands_with_commands(test_project):
 def test_run_command_missing_args(test_project):
     """Test running command with missing arguments."""
     # Create a command that requires arguments
-    sample_command = CommandDefinition(
+    sample_command = ActionDefintion(
         name="arg-cmd",
         description="Command with args",
         arguments=[{"name": "required_arg", "required": True}],
@@ -127,7 +127,7 @@ def test_run_nonexistent_command(test_project):
 
 def test_dry_run(test_project):
     """Test dry run functionality."""
-    sample_command = CommandDefinition(
+    sample_command = ActionDefintion(
         name="dry-test", description="Dry run test", steps=["setup-environment"]
     )
 
@@ -171,7 +171,7 @@ def test_status_command(test_project):
 
 def test_invalid_argument_format(test_project):
     """Test handling of invalid argument format."""
-    sample_command = CommandDefinition(
+    sample_command = ActionDefintion(
         name="arg-test", description="Test args", steps=["setup-environment"]
     )
 

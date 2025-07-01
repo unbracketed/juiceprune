@@ -3,7 +3,13 @@
 from .git_operations import GitWorktreeManager
 from .file_operations import FileManager
 from .branch_utils import BranchPatternValidator
-from .operations import WorktreeOperations, CommitResult, MergeResult, PRResult, DeleteResult
+from .operations import (
+    WorktreeOperations,
+    CommitResult,
+    MergeResult,
+    PRResult,
+    DeleteResult,
+)
 from .commit import (
     CommitStatusAnalyzer,
     InteractiveStaging,
@@ -15,11 +21,11 @@ from .commit import (
 
 __all__ = [
     "GitWorktreeManager",
-    "FileManager", 
+    "FileManager",
     "BranchPatternValidator",
     "WorktreeOperations",
     "CommitResult",
-    "MergeResult", 
+    "MergeResult",
     "PRResult",
     "DeleteResult",
     "CommitStatusAnalyzer",

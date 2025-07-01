@@ -1137,7 +1137,9 @@ def tui_session(
 
         # Check if tmux is available
         if not tmux_manager.check_tmux_available():
-            console.print("❌ tmux is not available. Please install tmux first.", style="bold red")
+            console.print(
+                "❌ tmux is not available. Please install tmux first.", style="bold red"
+            )
             raise typer.Exit(code=1)
 
         # Generate TUI session name
@@ -1165,30 +1167,53 @@ def tui_session(
         else:
             # Create or attach to TUI session
             if tmux_manager.session_exists(tui_session_name):
-                console.print(f"📺 Attaching to existing TUI session: {tui_session_name}", style="green")
+                console.print(
+                    f"📺 Attaching to existing TUI session: {tui_session_name}",
+                    style="green",
+                )
                 os.execvp("tmux", ["tmux", "attach-session", "-t", tui_session_name])
             else:
-                console.print(f"📺 Creating new TUI session: {tui_session_name}", style="green")
+                console.print(
+                    f"📺 Creating new TUI session: {tui_session_name}", style="green"
+                )
                 # Create the session in the current working directory
-                success = tmux_manager.create_session(tui_session_name, working_dir, auto_attach=False)
+                success = tmux_manager.create_session(
+                    tui_session_name, working_dir, auto_attach=False
+                )
                 if success:
                     # Set the session title and hide status bar
-                    subprocess.run([
-                        "tmux", "set-option", "-t", tui_session_name,
-                        "set-titles-string", "PRUNEJUICE TUI"
-                    ], check=False)
-                    subprocess.run([
-                        "tmux", "set-option", "-t", tui_session_name,
-                        "status", "off"
-                    ], check=False)
+                    subprocess.run(
+                        [
+                            "tmux",
+                            "set-option",
+                            "-t",
+                            tui_session_name,
+                            "set-titles-string",
+                            "PRUNEJUICE TUI",
+                        ],
+                        check=False,
+                    )
+                    subprocess.run(
+                        ["tmux", "set-option", "-t", tui_session_name, "status", "off"],
+                        check=False,
+                    )
                     # Send the TUI command to the session (will run from working_dir)
                     # Use cd to ensure we're in the right directory and then run the command
-                    subprocess.run([
-                        "tmux", "send-keys", "-t", tui_session_name,
-                        f"cd {working_dir} && uv run prj tui", "Enter"
-                    ], check=False)
+                    subprocess.run(
+                        [
+                            "tmux",
+                            "send-keys",
+                            "-t",
+                            tui_session_name,
+                            f"cd {working_dir} && uv run prj tui",
+                            "Enter",
+                        ],
+                        check=False,
+                    )
                     # Attach to the session
-                    os.execvp("tmux", ["tmux", "attach-session", "-t", tui_session_name])
+                    os.execvp(
+                        "tmux", ["tmux", "attach-session", "-t", tui_session_name]
+                    )
                 else:
                     console.print("❌ Failed to create TUI session", style="bold red")
                     raise typer.Exit(code=1)

@@ -1,6 +1,6 @@
 """Tests for step models and execution types."""
 
-from prunejuice.core.models import CommandStep, StepType, CommandDefinition
+from prunejuice.core.models import CommandStep, StepType, ActionDefintion
 
 
 class TestCommandStep:
@@ -44,12 +44,12 @@ class TestCommandStep:
         assert step.type == StepType.BUILTIN  # Should default to builtin
 
 
-class TestCommandDefinition:
-    """Test CommandDefinition with new step support."""
+class TestActionDefintion:
+    """Test ActionDefintion with new step support."""
 
     def test_command_with_string_steps(self):
         """Test command definition with string steps."""
-        cmd = CommandDefinition(
+        cmd = ActionDefintion(
             name="test-cmd",
             description="Test command",
             steps=["setup-environment", "echo hello", "cleanup.sh"],
@@ -67,7 +67,7 @@ class TestCommandDefinition:
             name="custom", type=StepType.SHELL, action="ls -la", timeout=60
         )
 
-        cmd = CommandDefinition(
+        cmd = ActionDefintion(
             name="test-cmd",
             description="Test command",
             steps=["setup-environment", custom_step],
@@ -81,7 +81,7 @@ class TestCommandDefinition:
 
     def test_command_serialization(self):
         """Test command serialization preserves step types as strings."""
-        cmd = CommandDefinition(
+        cmd = ActionDefintion(
             name="test-cmd",
             description="Test command",
             steps=["setup-environment", "echo hello"],
@@ -96,7 +96,7 @@ class TestCommandDefinition:
         """Test YAML serialization and deserialization."""
         import yaml
 
-        cmd = CommandDefinition(
+        cmd = ActionDefintion(
             name="test-cmd",
             description="Test command",
             steps=["setup-environment", "echo hello"],
@@ -107,7 +107,7 @@ class TestCommandDefinition:
 
         # Parse back from YAML
         data = yaml.safe_load(yaml_str)
-        cmd2 = CommandDefinition(**data)
+        cmd2 = ActionDefintion(**data)
 
         # Should preserve step structure
         all_steps = cmd2.get_all_steps()

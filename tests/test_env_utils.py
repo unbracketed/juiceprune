@@ -28,7 +28,7 @@ class TestWorktreeDetection:
         mock_repo_instance.git_dir = "/path/to/main/.git/worktrees/branch"
         mock_repo_instance.working_dir = "/path/to/worktree"
         mock_repo.return_value = mock_repo_instance
-        
+
         assert is_in_worktree() is True
 
     @patch("prunejuice.env_utils.git.Repo")
@@ -38,14 +38,14 @@ class TestWorktreeDetection:
         mock_repo_instance.git_dir = "/path/to/main/.git"
         mock_repo_instance.working_dir = "/path/to/main"
         mock_repo.return_value = mock_repo_instance
-        
+
         assert is_in_worktree() is False
 
     @patch("prunejuice.env_utils.git.Repo")
     def test_is_in_worktree_no_git(self, mock_repo):
         """Test behavior when not in a git repository."""
         mock_repo.side_effect = git.InvalidGitRepositoryError
-        
+
         assert is_in_worktree() is False
 
 
@@ -58,7 +58,7 @@ class TestProjectRoot:
         mock_repo_instance = MagicMock()
         mock_repo_instance.working_dir = "/path/to/project"
         mock_repo.return_value = mock_repo_instance
-        
+
         result = get_project_root()
         assert result == Path("/path/to/project")
 
@@ -68,7 +68,7 @@ class TestProjectRoot:
         """Test fallback to current directory when not in git repo."""
         mock_repo.side_effect = git.InvalidGitRepositoryError
         mock_cwd.return_value = Path("/current/dir")
-        
+
         result = get_project_root()
         assert result == Path("/current/dir")
 
@@ -80,7 +80,7 @@ class TestVenvPath:
     def test_get_current_venv_path(self, mock_get_project_root):
         """Test venv path construction."""
         mock_get_project_root.return_value = Path("/project/root")
-        
+
         result = get_current_venv_path()
         assert result == Path("/project/root/.venv")
 
@@ -93,9 +93,9 @@ class TestEnvironmentPreparation:
         with patch.dict(os.environ, {"VIRTUAL_ENV": "/old/venv", "OTHER_VAR": "value"}):
             with patch("prunejuice.env_utils.get_current_venv_path") as mock_venv_path:
                 mock_venv_path.return_value = Path("/nonexistent")
-                
+
                 env = prepare_clean_environment()
-                
+
                 assert "VIRTUAL_ENV" not in env
                 assert env["OTHER_VAR"] == "value"
 
@@ -104,37 +104,40 @@ class TestEnvironmentPreparation:
         with tempfile.TemporaryDirectory() as temp_dir:
             venv_path = Path(temp_dir) / ".venv"
             venv_path.mkdir()
-            
+
             with patch("prunejuice.env_utils.get_current_venv_path") as mock_venv_path:
                 mock_venv_path.return_value = venv_path
-                
+
                 env = prepare_clean_environment()
-                
+
                 assert env["VIRTUAL_ENV"] == str(venv_path)
 
     def test_prepare_clean_environment_no_venv_exists(self):
         """Test behavior when venv doesn't exist."""
         with patch("prunejuice.env_utils.get_current_venv_path") as mock_venv_path:
             mock_venv_path.return_value = Path("/nonexistent/.venv")
-            
+
             env = prepare_clean_environment()
-            
+
             assert "VIRTUAL_ENV" not in env
 
 
 class TestUvCommandDetection:
     """Test UV command detection."""
 
-    @pytest.mark.parametrize("command,expected", [
-        ("uv sync", True),
-        ("uv run python script.py", True),
-        ("uv add package", True),
-        ("python script.py", False),
-        ("pip install package", False),
-        ("", False),
-        ("   ", False),
-        ("not-uv command", False),
-    ])
+    @pytest.mark.parametrize(
+        "command,expected",
+        [
+            ("uv sync", True),
+            ("uv run python script.py", True),
+            ("uv add package", True),
+            ("python script.py", False),
+            ("pip install package", False),
+            ("", False),
+            ("   ", False),
+            ("not-uv command", False),
+        ],
+    )
     def test_is_uv_command(self, command, expected):
         """Test UV command detection with various inputs."""
         assert is_uv_command(command) is expected
@@ -148,15 +151,15 @@ class TestWorktreeInfo:
     def test_get_worktree_info_success(self, mock_repo, mock_is_in_worktree):
         """Test successful worktree info retrieval."""
         mock_is_in_worktree.return_value = True
-        
+
         mock_repo_instance = MagicMock()
         mock_repo_instance.working_dir = "/path/to/worktree/branch-name"
         mock_repo_instance.git_dir = "/path/to/main/.git/worktrees/branch-name"
         mock_repo_instance.active_branch.name = "feature-branch"
         mock_repo.return_value = mock_repo_instance
-        
+
         result = get_worktree_info()
-        
+
         assert result is not None
         assert result["worktree_path"] == "/path/to/worktree/branch-name"
         assert result["main_repo_path"] == "/path/to/main/.git/worktrees"
@@ -167,7 +170,7 @@ class TestWorktreeInfo:
     def test_get_worktree_info_not_in_worktree(self, mock_is_in_worktree):
         """Test when not in a worktree."""
         mock_is_in_worktree.return_value = False
-        
+
         result = get_worktree_info()
         assert result is None
 
@@ -175,6 +178,6 @@ class TestWorktreeInfo:
     def test_get_worktree_info_no_git(self, mock_repo):
         """Test when not in a git repository."""
         mock_repo.side_effect = git.InvalidGitRepositoryError
-        
+
         result = get_worktree_info()
         assert result is None

@@ -17,7 +17,7 @@ sequenceDiagram
     CLI->>Executor: execute_command(name, path, args)
     Executor->>Database: initialize()
     Executor->>CommandLoader: load_command(name, path)
-    CommandLoader-->>Executor: CommandDefinition
+    CommandLoader-->>Executor: ActionDefintion
     
     Executor->>Executor: validate_arguments()
     Executor->>Session: create(id, command_name, path)

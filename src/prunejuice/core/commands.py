@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 import logging
 
-from .models import CommandDefinition, ExecutionResult
+from .models import ActionDefintion, ExecutionResult
 from .session import ActionContext, ActionStatus
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class BaseAction(ABC):
 
     def __init__(
         self,
-        definition: CommandDefinition,
+        definition: ActionDefintion,
         context: ActionContext,
         step_executor,
         builtin_steps,
@@ -170,7 +170,7 @@ class WorktreeAction(SessionAction):
 
 
 def create_action(
-    definition: CommandDefinition, context: ActionContext, step_executor, builtin_steps
+    definition: ActionDefintion, context: ActionContext, step_executor, builtin_steps
 ) -> BaseAction:
     """Factory function to create appropriate action type based on definition"""
 

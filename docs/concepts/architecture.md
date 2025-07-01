@@ -65,7 +65,7 @@ Pydantic-based data models provide type safety and validation:
 
 ```python
 # Command Definition Model
-class CommandDefinition(BaseModel):
+class ActionDefintion(BaseModel):
     name: str
     description: str
     category: str = "workflow"
@@ -110,9 +110,9 @@ YAML-based command definition and loading system:
 
 ```python
 class CommandLoader:
-    def load_commands(self, commands_dir: Path) -> Dict[str, CommandDefinition]
-    def load_command(self, yaml_path: Path) -> CommandDefinition
-    def validate_command(self, command: CommandDefinition) -> bool
+    def load_commands(self, commands_dir: Path) -> Dict[str, ActionDefintion]
+    def load_command(self, yaml_path: Path) -> ActionDefintion
+    def validate_command(self, command: ActionDefintion) -> bool
 ```
 
 **Features:**
@@ -144,7 +144,7 @@ The async execution engine orchestrates command execution:
 class CommandExecutor:
     async def execute_command(
         self,
-        command: CommandDefinition,
+        command: ActionDefintion,
         args: Dict[str, Any],
         project_path: Path
     ) -> ExecutionResult
@@ -423,7 +423,7 @@ class ConfigurationError(Exception):
 
 ```python
 # Cleanup on failure
-async def execute_with_cleanup(command: CommandDefinition, context: ExecutionContext):
+async def execute_with_cleanup(command: ActionDefintion, context: ExecutionContext):
     try:
         result = await execute_command_steps(command, context)
         return result

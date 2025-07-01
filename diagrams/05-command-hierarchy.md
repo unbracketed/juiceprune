@@ -6,7 +6,7 @@ This diagram shows the command hierarchy and how different command types provide
 classDiagram
     class BaseCommand {
         <<abstract>>
-        +CommandDefinition definition
+        +ActionDefintion definition
         +Session session
         +StepExecutor step_executor
         +BuiltinSteps builtin_steps

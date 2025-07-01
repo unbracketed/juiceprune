@@ -17,7 +17,7 @@ This directory contains comprehensive Mermaid diagrams that visualize the PruneJ
 **Purpose**: Illustrates the core domain models and their relationships using a UML class diagram.
 
 **Key Entities**:
-- `CommandDefinition`: YAML-based command specifications
+- `ActionDefintion`: YAML-based command specifications
 - `Session`: Runtime execution context with state management
 - `ExecutionEvent`: Persistent database records for tracking
 - `CommandStep`: Individual execution units with type safety

@@ -65,7 +65,9 @@ class PrunejuiceApp(App):
         self.worktrees: List[Dict[str, Any]] = []  # Store worktree data for reference
         self.highlighted_index = -1  # Track currently highlighted worktree
         self.is_in_tmux = os.getenv("TMUX") is not None
-        self.current_tmux_session = self._get_current_tmux_session() if self.is_in_tmux else None
+        self.current_tmux_session = (
+            self._get_current_tmux_session() if self.is_in_tmux else None
+        )
 
     def compose(self) -> ComposeResult:
         """Create application layout."""
@@ -79,7 +81,10 @@ class PrunejuiceApp(App):
                 id="sidebar",
             ),
             Vertical(
-                Static("Welcome to PruneJuice TUI!\n\nSelect a worktree to see details and available actions.\n\nKey Bindings:\n  [s] Start new worktree\n  [c] Commit changes\n  [m] Merge to parent\n  [p] Create pull request\n  [d] Delete worktree\n  [r] Refresh list\n  [q] Quit", id="main-content"),
+                Static(
+                    "Welcome to PruneJuice TUI!\n\nSelect a worktree to see details and available actions.\n\nKey Bindings:\n  [s] Start new worktree\n  [c] Commit changes\n  [m] Merge to parent\n  [p] Create pull request\n  [d] Delete worktree\n  [r] Refresh list\n  [q] Quit",
+                    id="main-content",
+                ),
             ),
         )
         yield Footer()
@@ -181,10 +186,10 @@ class PrunejuiceApp(App):
                     worktree = self.worktrees[index]
                     path = worktree.get("path", "No path available")
                     branch = worktree.get("branch", "unknown")
-                    
+
                     # Get git status for this worktree
                     git_status = self._get_git_status(path)
-                    
+
                     # Update main content with worktree details and git status
                     main_content = self.query_one("#main-content", Static)
                     content = f"Branch: {branch}\nPath: {path}\n\nGit Status:\n{git_status}\n\n"
@@ -205,20 +210,20 @@ class PrunejuiceApp(App):
             worktree = self.worktrees[self.highlighted_index]
             worktree_path = worktree.get("path")
             branch = worktree.get("branch", "unknown")
-            
+
             if worktree_path:
                 try:
                     if self.is_in_tmux and self.current_tmux_session:
                         # We're in tmux, use switch-client for better UX
                         session_name = self.session_manager.create_session_for_worktree_with_tui_return(
-                            Path(worktree_path),
-                            self.current_tmux_session,
-                            branch
+                            Path(worktree_path), self.current_tmux_session, branch
                         )
-                        
+
                         if session_name:
                             # Switch to the worktree session
-                            success = self.session_manager.switch_to_session(session_name)
+                            success = self.session_manager.switch_to_session(
+                                session_name
+                            )
                             if not success:
                                 main_content = self.query_one("#main-content", Static)
                                 main_content.update("Failed to switch to tmux session")
@@ -228,21 +233,21 @@ class PrunejuiceApp(App):
                     else:
                         # Not in tmux, use the old approach
                         session_name = self.session_manager.create_session_for_worktree(
-                            Path(worktree_path), 
-                            branch,
-                            auto_attach=False
+                            Path(worktree_path), branch, auto_attach=False
                         )
-                        
+
                         if session_name:
                             # Exit the TUI app cleanly first
                             self.exit()
                             # Use os.execvp to replace the current process with tmux attach
-                            os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
+                            os.execvp(
+                                "tmux", ["tmux", "attach-session", "-t", session_name]
+                            )
                         else:
                             # Update main content to show error
                             main_content = self.query_one("#main-content", Static)
                             main_content.update("Failed to create tmux session")
-                        
+
                 except Exception as e:
                     # Update main content to show error
                     main_content = self.query_one("#main-content", Static)
@@ -254,68 +259,77 @@ class PrunejuiceApp(App):
 
     def action_start(self) -> None:
         """Show the start worktree screen."""
+
         def handle_result(result):
             """Handle the result from the start worktree screen."""
             if result:  # User didn't cancel
                 self.start_new_worktree(result["name"], result["base_branch"])
-        
+
         self.push_screen(StartWorkTreeScreen(), handle_result)
 
     def start_new_worktree(self, name: str, base_branch: str) -> None:
         """Create a new worktree and start a tmux session."""
         main_content = self.query_one("#main-content", Static)
-        
+
         try:
             # Update UI to show progress
             main_content.update(f"Creating worktree '{name}' from '{base_branch}'...")
-            
+
             # Create worktree
             worktree_path = self.git_manager.create_worktree(name, base_branch)
-            main_content.update(f"Worktree created at: {worktree_path}\n\nCreating tmux session...")
-            
+            main_content.update(
+                f"Worktree created at: {worktree_path}\n\nCreating tmux session..."
+            )
+
             # Create tmux session
             if self.is_in_tmux and self.current_tmux_session:
                 # We're in tmux, use the TUI return approach
-                session_name = self.session_manager.create_session_for_worktree_with_tui_return(
-                    worktree_path,
-                    self.current_tmux_session,
-                    name
+                session_name = (
+                    self.session_manager.create_session_for_worktree_with_tui_return(
+                        worktree_path, self.current_tmux_session, name
+                    )
                 )
-                
+
                 if session_name:
-                    main_content.update(f"Session '{session_name}' created!\n\nSwitching to session...")
+                    main_content.update(
+                        f"Session '{session_name}' created!\n\nSwitching to session..."
+                    )
                     # Switch to the new session
                     success = self.session_manager.switch_to_session(session_name)
                     if not success:
-                        main_content.update(f"Session created but failed to switch. Run: tmux attach -t {session_name}")
+                        main_content.update(
+                            f"Session created but failed to switch. Run: tmux attach -t {session_name}"
+                        )
                 else:
                     main_content.update("Failed to create tmux session")
             else:
                 # Not in tmux, use the standard approach
                 session_name = self.session_manager.create_session_for_worktree(
-                    worktree_path, 
-                    name,
-                    auto_attach=False
+                    worktree_path, name, auto_attach=False
                 )
-                
+
                 if session_name:
-                    main_content.update(f"Session '{session_name}' created!\n\nExiting TUI and attaching to session...")
+                    main_content.update(
+                        f"Session '{session_name}' created!\n\nExiting TUI and attaching to session..."
+                    )
                     # Exit the TUI app cleanly first
                     self.exit()
                     # Use os.execvp to replace the current process with tmux attach
                     os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
                 else:
                     main_content.update("Failed to create tmux session")
-            
+
             # Refresh the worktree list to include the new worktree
             self.load_worktrees()
-            
+
         except Exception as e:
             main_content.update(f"Error creating worktree: {str(e)}")
             # Try to clean up the worktree if it was created but session failed
             try:
                 self.git_manager.remove_worktree(Path(name))
-                main_content.update(f"Error creating worktree: {str(e)}\n\nCleaned up partial worktree.")
+                main_content.update(
+                    f"Error creating worktree: {str(e)}\n\nCleaned up partial worktree."
+                )
             except Exception:
                 # If cleanup also fails, just show the original error
                 pass
@@ -325,12 +339,14 @@ class PrunejuiceApp(App):
         if self.highlighted_index >= 0 and self.highlighted_index < len(self.worktrees):
             worktree = self.worktrees[self.highlighted_index]
             worktree_path = worktree.get("path", "")
-            
+
             if worktree_path:
                 # Update main content to show status
                 main_content = self.query_one("#main-content", Static)
-                main_content.update(f"Opening commit interface for: {worktree_path}\n\nNote: Full interactive commit UI coming soon!\nFor now, use: prj worktree commit {worktree_path}")
-                
+                main_content.update(
+                    f"Opening commit interface for: {worktree_path}\n\nNote: Full interactive commit UI coming soon!\nFor now, use: prj worktree commit {worktree_path}"
+                )
+
                 # TODO: Implement full interactive commit dialog
                 # For now, just show the command the user can run
             else:
@@ -346,11 +362,13 @@ class PrunejuiceApp(App):
             worktree = self.worktrees[self.highlighted_index]
             worktree_path = worktree.get("path", "")
             branch = worktree.get("branch", "unknown")
-            
+
             if worktree_path:
                 main_content = self.query_one("#main-content", Static)
-                main_content.update(f"Merge operation for branch '{branch}'\n\nRun: prj worktree merge {worktree_path}")
-                
+                main_content.update(
+                    f"Merge operation for branch '{branch}'\n\nRun: prj worktree merge {worktree_path}"
+                )
+
                 # TODO: Add confirmation dialog and execute merge
             else:
                 main_content = self.query_one("#main-content", Static)
@@ -365,11 +383,13 @@ class PrunejuiceApp(App):
             worktree = self.worktrees[self.highlighted_index]
             worktree_path = worktree.get("path", "")
             branch = worktree.get("branch", "unknown")
-            
+
             if worktree_path:
                 main_content = self.query_one("#main-content", Static)
-                main_content.update(f"Create PR for branch '{branch}'\n\nRun: prj worktree pull-request {worktree_path}")
-                
+                main_content.update(
+                    f"Create PR for branch '{branch}'\n\nRun: prj worktree pull-request {worktree_path}"
+                )
+
                 # TODO: Add PR creation dialog
             else:
                 main_content = self.query_one("#main-content", Static)
@@ -384,11 +404,13 @@ class PrunejuiceApp(App):
             worktree = self.worktrees[self.highlighted_index]
             worktree_path = worktree.get("path", "")
             branch = worktree.get("branch", "unknown")
-            
+
             if worktree_path:
                 main_content = self.query_one("#main-content", Static)
-                main_content.update(f"Delete worktree '{branch}'?\n\nRun: prj worktree delete {worktree_path}")
-                
+                main_content.update(
+                    f"Delete worktree '{branch}'?\n\nRun: prj worktree delete {worktree_path}"
+                )
+
                 # TODO: Add confirmation dialog and execute delete
             else:
                 main_content = self.query_one("#main-content", Static)

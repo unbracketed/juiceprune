@@ -8,7 +8,7 @@ import logging
 import os
 
 from .database import Database
-from .models import CommandDefinition, ExecutionResult, CommandStep, StepType
+from .models import ActionDefintion, ExecutionResult, CommandStep, StepType
 from .state import StateManager
 from .session import ActionContext
 from .builtin_steps import BuiltinSteps
@@ -164,7 +164,7 @@ class StepExecutor:
         # Check if the script contains uv commands by reading its content
         try:
             script_content = script_path.read_text()
-            if any(is_uv_command(line.strip()) for line in script_content.split('\n')):
+            if any(is_uv_command(line.strip()) for line in script_content.split("\n")):
                 env = prepare_clean_environment()
             else:
                 env = os.environ.copy()
@@ -339,7 +339,7 @@ class Executor:
             )
 
     def _validate_arguments(
-        self, command: CommandDefinition, args: Dict[str, Any]
+        self, command: ActionDefintion, args: Dict[str, Any]
     ) -> List[str]:
         """Validate command arguments."""
         errors = []
@@ -350,7 +350,9 @@ class Executor:
 
         return errors
 
-    def _dry_run(self, command: CommandDefinition, context: ActionContext) -> ExecutionResult:
+    def _dry_run(
+        self, command: ActionDefintion, context: ActionContext
+    ) -> ExecutionResult:
         """Perform a dry run showing what would be executed."""
         output = f"Dry run for command: {command.name}\n"
         output += f"Description: {command.description}\n"

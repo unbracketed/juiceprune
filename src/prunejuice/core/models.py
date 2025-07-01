@@ -77,7 +77,7 @@ class CommandStep(BaseModel):
             return cls(name=step_str, type=StepType.BUILTIN, action=step_str)
 
 
-class CommandDefinition(BaseModel):
+class ActionDefintion(BaseModel):
     """Complete command definition."""
 
     name: str

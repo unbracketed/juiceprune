@@ -10,7 +10,7 @@ import shutil
 from prunejuice.core.config import Settings
 from prunejuice.core.database import Database
 from prunejuice.core.executor import Executor
-from prunejuice.core.models import CommandDefinition, CommandArgument
+from prunejuice.core.models import ActionDefintion, CommandArgument
 
 
 @pytest.fixture(scope="session")
@@ -54,7 +54,7 @@ async def test_executor(test_settings):
 @pytest.fixture
 def sample_command():
     """Sample command definition for testing."""
-    return CommandDefinition(
+    return ActionDefintion(
         name="test-command",
         description="Test command for unit tests",
         arguments=[
