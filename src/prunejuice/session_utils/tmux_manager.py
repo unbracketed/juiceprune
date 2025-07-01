@@ -165,11 +165,12 @@ class TmuxManager:
             if not self.create_session(session_name, working_dir, auto_attach=False):
                 return False
 
-            # Add custom keybinding for returning to TUI (prefix + x) - session-specific
+            # Add custom keybinding for returning to TUI (prefix + x) by executing within session
             result = subprocess.run(
                 [
-                    "tmux", "bind-key", "-t", session_name, "-T", "prefix", "x",
-                    "switch-client", "-t", tui_session_name
+                    "tmux", "send-keys", "-t", session_name,
+                    f"tmux bind-key -T prefix x switch-client -t {tui_session_name}",
+                    "Enter"
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
