@@ -1,4 +1,4 @@
-"""Session management for PruneJuice commands."""
+"""Action context management for PruneJuice actions."""
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -11,8 +11,8 @@ from ..worktree_utils import GitWorktreeManager, FileManager
 from ..session_utils import TmuxManager, SessionLifecycleManager
 
 
-class SessionStatus(str, Enum):
-    """Status of a command session."""
+class ActionStatus(str, Enum):
+    """Status of an action context."""
 
     ACTIVE = "active"
     COMPLETED = "completed"
@@ -30,8 +30,8 @@ class StepExecution(BaseModel):
     error: Optional[str] = None
 
 
-class Session(BaseModel):
-    """Central session management for command execution."""
+class ActionContext(BaseModel):
+    """Central action context management for action execution."""
 
     id: str
     command_name: str
@@ -41,7 +41,7 @@ class Session(BaseModel):
     shared_data: Dict[str, Any] = Field(default_factory=dict)
     step_history: List[StepExecution] = Field(default_factory=list)
     artifact_dir: Path
-    status: SessionStatus = SessionStatus.ACTIVE
+    status: ActionStatus = ActionStatus.ACTIVE
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     def get_context(self) -> Dict[str, Any]:

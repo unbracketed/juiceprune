@@ -10,9 +10,9 @@ import os
 from .database import Database
 from .models import CommandDefinition, ExecutionResult, CommandStep, StepType
 from .state import StateManager
-from .session import Session
+from .session import ActionContext
 from .builtin_steps import BuiltinSteps
-from .commands import create_command
+from .commands import create_action
 from ..commands.loader import CommandLoader
 from ..utils.artifacts import ArtifactStore
 from ..worktree_utils import GitWorktreeManager
@@ -257,19 +257,19 @@ class Executor:
             project_path, session_id, command_name
         )
 
-        session = Session(
+        context = ActionContext(
             id=session_id,
             command_name=command_name,
             project_path=project_path,
             artifact_dir=artifact_dir,
         )
 
-        # Store command arguments in session shared data
-        session.set_shared_data("args", args)
-        session.set_shared_data("environment", {**os.environ, **command.environment})
+        # Store command arguments in context shared data
+        context.set_shared_data("args", args)
+        context.set_shared_data("environment", {**os.environ, **command.environment})
 
         if dry_run:
-            return self._dry_run(command, session)
+            return self._dry_run(command, context)
 
         # Detect current worktree context
         worktree_name = None
@@ -298,20 +298,20 @@ class Executor:
                 artifacts_path=str(artifact_dir),
                 worktree_name=worktree_name,
             )
-            session.set_shared_data("event_id", event_id)
+            context.set_shared_data("event_id", event_id)
         except Exception as e:
             logger.warning(f"Failed to start event tracking: {e}")
-            session.set_shared_data("event_id", None)
+            context.set_shared_data("event_id", None)
 
         # Create appropriate command type and execute
         try:
-            command_instance = create_command(
-                command, session, self.step_executor, self.builtin_steps
+            command_instance = create_action(
+                command, context, self.step_executor, self.builtin_steps
             )
             result = await command_instance.execute()
 
             # Mark success in event tracking
-            event_id = session.get_shared_data("event_id")
+            event_id = context.get_shared_data("event_id")
             if event_id:
                 try:
                     status = "completed" if result.success else "failed"
@@ -327,7 +327,7 @@ class Executor:
             logger.error(f"Command execution failed: {e}")
 
             # Mark failure in event tracking
-            event_id = session.get_shared_data("event_id")
+            event_id = context.get_shared_data("event_id")
             if event_id:
                 try:
                     await self.db.end_event(event_id, "failed", 1, str(e))
@@ -335,7 +335,7 @@ class Executor:
                     logger.warning(f"Failed to mark event as failed: {db_e}")
 
             return ExecutionResult(
-                success=False, error=str(e), artifacts_path=str(session.artifact_dir)
+                success=False, error=str(e), artifacts_path=str(context.artifact_dir)
             )
 
     def _validate_arguments(
@@ -350,12 +350,12 @@ class Executor:
 
         return errors
 
-    def _dry_run(self, command: CommandDefinition, session: Session) -> ExecutionResult:
+    def _dry_run(self, command: CommandDefinition, context: ActionContext) -> ExecutionResult:
         """Perform a dry run showing what would be executed."""
         output = f"Dry run for command: {command.name}\n"
         output += f"Description: {command.description}\n"
-        output += f"Project path: {session.project_path}\n"
-        output += f"Arguments: {session.get_shared_data('args')}\n\n"
+        output += f"Project path: {context.project_path}\n"
+        output += f"Arguments: {context.get_shared_data('args')}\n\n"
 
         all_steps = command.get_all_steps()
         output += f"Steps to execute ({len(all_steps)}):\n"

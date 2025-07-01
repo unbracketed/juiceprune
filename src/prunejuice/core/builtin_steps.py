@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 import logging
 
-from .session import Session
+from .session import ActionContext
 from ..worktree_utils import GitWorktreeManager
 
 logger = logging.getLogger(__name__)
@@ -19,20 +19,20 @@ class BuiltinSteps:
         self.db = db
         self.artifacts = artifacts
 
-    async def setup_environment(self, session: Session) -> str:
+    async def setup_environment(self, context: ActionContext) -> str:
         """Setup execution environment."""
-        artifact_dir = session.artifact_dir
+        artifact_dir = context.artifact_dir
         artifact_dir.mkdir(parents=True, exist_ok=True)
         (artifact_dir / "logs").mkdir(exist_ok=True)
         (artifact_dir / "outputs").mkdir(exist_ok=True)
         return "Environment setup complete"
 
-    async def validate_prerequisites(self, session: Session) -> str:
+    async def validate_prerequisites(self, context: ActionContext) -> str:
         """Validate prerequisites for command execution."""
         issues = []
 
         # Check if we're in a git repository
-        project_path = session.project_path
+        project_path = context.project_path
         if project_path:
             try:
                 manager = GitWorktreeManager(project_path)
@@ -48,26 +48,26 @@ class BuiltinSteps:
 
         return "Prerequisites validated"
 
-    async def create_worktree(self, session: Session) -> str:
+    async def create_worktree(self, context: ActionContext) -> str:
         """Create worktree using native implementation."""
-        branch_name = session.get_shared_data(
+        branch_name = context.get_shared_data(
             "branch_name",
-            f"pj-{session.command_name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
+            f"pj-{context.command_name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
         )
 
-        worktree_path = await session.create_worktree(branch_name)
-        session.set_shared_data("branch_name", branch_name)
+        worktree_path = await context.create_worktree(branch_name)
+        context.set_shared_data("branch_name", branch_name)
 
         return f"Created worktree at {worktree_path}"
 
-    async def start_session(self, session: Session) -> str:
+    async def start_session(self, context: ActionContext) -> str:
         """Start tmux session using native implementation."""
-        session_name = await session.create_tmux_session()
+        session_name = await context.create_tmux_session()
         return f"Started tmux session: {session_name}"
 
-    async def gather_context(self, session: Session) -> str:
+    async def gather_context(self, context: ActionContext) -> str:
         """Gather context information for the command."""
-        project_path = session.project_path
+        project_path = context.project_path
 
         context_info = {
             "project_name": project_path.name,
@@ -84,38 +84,38 @@ class BuiltinSteps:
 
         # Store context as artifact
         self.artifacts.store_content(
-            session.artifact_dir,
+            context.artifact_dir,
             json.dumps(context_info, indent=2),
             "context.json",
             "specs",
         )
 
-        session.set_shared_data("context_info", context_info)
+        context.set_shared_data("context_info", context_info)
         return f"Context gathered for {context_info['project_name']}"
 
-    async def store_artifacts(self, session: Session) -> str:
-        """Store artifacts for the session."""
+    async def store_artifacts(self, context: ActionContext) -> str:
+        """Store artifacts for the action context."""
         # Mark artifacts in database
-        event_id = session.get_shared_data("event_id")
+        event_id = context.get_shared_data("event_id")
         if event_id:
             try:
                 await self.db.store_artifact(
-                    event_id, "session", str(session.artifact_dir), 0
+                    event_id, "session", str(context.artifact_dir), 0
                 )
             except Exception as e:
                 logger.warning(f"Failed to store artifact info: {e}")
 
-        return f"Artifacts stored in {session.artifact_dir}"
+        return f"Artifacts stored in {context.artifact_dir}"
 
-    async def cleanup(self, session: Session) -> str:
-        """Cleanup session resources."""
+    async def cleanup(self, context: ActionContext) -> str:
+        """Cleanup action context resources."""
         # This would be implemented based on state manager requirements
         return "Cleanup completed"
 
-    async def start_worktree_session(self, session: Session) -> str:
+    async def start_worktree_session(self, context: ActionContext) -> str:
         """Create a worktree and start a tmux session in it, optionally attaching."""
         # Get arguments
-        args = session.get_shared_data("args", {})
+        args = context.get_shared_data("args", {})
         name = args.get("name")
         base_branch = args.get("base_branch", "main")
         no_attach = args.get("no_attach", False)
@@ -125,13 +125,13 @@ class BuiltinSteps:
 
         # Create worktree with the specified name
         logger.info(f"Creating worktree '{name}' from base branch '{base_branch}'")
-        worktree_path = await session.create_worktree(name, base_branch)
-        session.set_shared_data("branch_name", name)
+        worktree_path = await context.create_worktree(name, base_branch)
+        context.set_shared_data("branch_name", name)
         logger.info(f"Created worktree at {worktree_path}")
 
         # Create tmux session in the worktree
         logger.info(f"Creating tmux session for worktree '{name}'")
-        session_name = await session.create_tmux_session()
+        session_name = await context.create_tmux_session()
         logger.info(f"Created tmux session: {session_name}")
 
         # Attach to the session if requested
@@ -164,13 +164,13 @@ class BuiltinSteps:
             ),
         }
 
-    def _wrap_session_method(self, session_method):
-        """Wrap a session method to work with StepExecutor's context dict."""
+    def _wrap_session_method(self, context_method):
+        """Wrap an action context method to work with StepExecutor's context dict."""
 
         async def wrapper(context: Dict[str, Any]) -> str:
-            # For now, we need to create a minimal Session from context
+            # For now, we need to create a minimal ActionContext from context
             # This is a transitional approach until we fully migrate StepExecutor
-            from .session import Session, SessionStatus
+            from .session import ActionContext, ActionStatus
 
             # Handle potential None values in context
             project_path = context.get("project_path")
@@ -185,37 +185,37 @@ class BuiltinSteps:
             elif not isinstance(artifact_dir, Path):
                 artifact_dir = Path(artifact_dir)
 
-            session = Session(
+            action_context = ActionContext(
                 id=context.get("session_id", "unknown"),
                 command_name=context.get("command_name", "unknown"),
                 project_path=project_path,
                 artifact_dir=artifact_dir,
-                status=SessionStatus.ACTIVE,
+                status=ActionStatus.ACTIVE,
             )
 
-            # Copy context data to session
+            # Copy context data to action context
             if "shared_data" in context:
-                session.shared_data = context["shared_data"]
+                action_context.shared_data = context["shared_data"]
             if "args" in context:
-                session.set_shared_data("args", context["args"])
+                action_context.set_shared_data("args", context["args"])
             if "environment" in context:
-                session.set_shared_data("environment", context["environment"])
+                action_context.set_shared_data("environment", context["environment"])
             if "event_id" in context:
-                session.set_shared_data("event_id", context["event_id"])
+                action_context.set_shared_data("event_id", context["event_id"])
             if "worktree_path" in context and context["worktree_path"] is not None:
-                session.worktree_path = Path(context["worktree_path"])
+                action_context.worktree_path = Path(context["worktree_path"])
             if "tmux_session" in context and context["tmux_session"] is not None:
-                session.tmux_session_name = context["tmux_session"]
+                action_context.tmux_session_name = context["tmux_session"]
 
-            # Call the session method
-            result = await session_method(session)
+            # Call the action context method
+            result = await context_method(action_context)
 
-            # Update context with any changes from session
-            if session.worktree_path:
-                context["worktree_path"] = session.worktree_path
-            if session.tmux_session_name:
-                context["tmux_session"] = session.tmux_session_name
-            context["shared_data"] = session.shared_data
+            # Update context with any changes from action context
+            if action_context.worktree_path:
+                context["worktree_path"] = action_context.worktree_path
+            if action_context.tmux_session_name:
+                context["tmux_session"] = action_context.tmux_session_name
+            context["shared_data"] = action_context.shared_data
 
             return result
 
