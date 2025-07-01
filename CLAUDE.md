@@ -45,7 +45,7 @@ Prunejuice is a Python-based parallel agentic coding workflow orchestrator with 
 
 ### Data Models
 - **ActionDefintion**: YAML-based command specifications with steps, arguments, and environment
-- **CommandStep**: Individual execution units with support for builtin, shell, and script types
+- **ActionStep**: Individual execution units with support for builtin, shell, and script types
 - **ExecutionResult**: Tracking of command execution status and outputs
 - **Session**: Persistent execution context with artifact management
 

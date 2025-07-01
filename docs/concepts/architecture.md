@@ -71,7 +71,7 @@ class ActionDefintion(BaseModel):
     category: str = "workflow"
     arguments: List[CommandArgument] = []
     environment: Dict[str, str] = {}
-    steps: List[Union[str, CommandStep]] = []
+    steps: List[Union[str, ActionStep]] = []
     working_directory: Optional[str] = None
     timeout: int = 1800
 
@@ -88,7 +88,7 @@ class ExecutionEvent(BaseModel):
     end_time: Optional[datetime] = None
 
 # Command Step Model
-class CommandStep(BaseModel):
+class ActionStep(BaseModel):
     name: str
     type: StepType = StepType.BUILTIN
     action: str
@@ -151,7 +151,7 @@ class CommandExecutor:
     
     async def execute_step(
         self,
-        step: CommandStep,
+        step: ActionStep,
         context: ExecutionContext
     ) -> StepResult
 ```
@@ -310,7 +310,7 @@ Native Python implementations for common operations:
 
 ```python
 # Example builtin step
-async def execute_builtin_step(step: CommandStep, context: ExecutionContext):
+async def execute_builtin_step(step: ActionStep, context: ExecutionContext):
     if step.action == "echo":
         message = step.args.get("message", "Hello")
         print(message)
@@ -323,7 +323,7 @@ External script execution with environment management:
 
 ```python
 # Script step execution
-async def execute_script_step(step: CommandStep, context: ExecutionContext):
+async def execute_script_step(step: ActionStep, context: ExecutionContext):
     script_path = resolve_script_path(step.action)
     process = await asyncio.create_subprocess_exec(
         str(script_path),
@@ -345,7 +345,7 @@ Direct shell command execution:
 
 ```python
 # Shell step execution
-async def execute_shell_step(step: CommandStep, context: ExecutionContext):
+async def execute_shell_step(step: ActionStep, context: ExecutionContext):
     process = await asyncio.create_subprocess_shell(
         step.action,
         stdout=asyncio.subprocess.PIPE,
@@ -472,7 +472,7 @@ Extend the system with custom step implementations:
 from prunejuice.core.executor import register_step_executor
 
 @register_step_executor("custom")
-async def execute_custom_step(step: CommandStep, context: ExecutionContext):
+async def execute_custom_step(step: ActionStep, context: ExecutionContext):
     # Custom implementation
     return StepResult(success=True)
 ```

@@ -13,7 +13,7 @@ This document outlines the implementation plan for three new features in PruneJu
 ### Strengths
 - Good modular design with separate concerns (models, execution, integrations)
 - Existing tmux and worktree utilities are well-implemented (`TmuxManager`, `GitWorktreeManager`)
-- Strong foundation with `ActionDefintion`, `CommandStep` models
+- Strong foundation with `ActionDefintion`, `ActionStep` models
 - Database integration for execution tracking
 - Artifact management system
 
@@ -38,10 +38,10 @@ class ActionDefintion(BaseModel):
     category: str = "workflow"
     arguments: List[CommandArgument] = Field(default_factory=list)
     environment: Dict[str, str] = Field(default_factory=dict)
-    pre_steps: List[Union[str, CommandStep]] = Field(default_factory=list)
-    steps: List[Union[str, CommandStep]] = Field(default_factory=list)
-    post_steps: List[Union[str, CommandStep]] = Field(default_factory=list)
-    cleanup_on_failure: List[Union[str, CommandStep]] = Field(default_factory=list)
+    pre_steps: List[Union[str, ActionStep]] = Field(default_factory=list)
+    steps: List[Union[str, ActionStep]] = Field(default_factory=list)
+    post_steps: List[Union[str, ActionStep]] = Field(default_factory=list)
+    cleanup_on_failure: List[Union[str, ActionStep]] = Field(default_factory=list)
     working_directory: Optional[str] = None
     timeout: int = 1800
 ```

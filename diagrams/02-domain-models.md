@@ -11,22 +11,22 @@ classDiagram
         +String category
         +List~CommandArgument~ arguments
         +Dict environment
-        +List~CommandStep~ pre_steps
-        +List~CommandStep~ steps
-        +List~CommandStep~ post_steps
-        +List~CommandStep~ cleanup_on_failure
+        +List~ActionStep~ pre_steps
+        +List~ActionStep~ steps
+        +List~ActionStep~ post_steps
+        +List~ActionStep~ cleanup_on_failure
         +int timeout
-        +get_all_steps() List~CommandStep~
+        +get_all_steps() List~ActionStep~
     }
     
-    class CommandStep {
+    class ActionStep {
         +String name
         +StepType type
         +String action
         +Dict args
         +String script
         +int timeout
-        +from_string(str) CommandStep
+        +from_string(str) ActionStep
     }
     
     class StepType {
@@ -109,9 +109,9 @@ classDiagram
     }
     
     %% Relationships
-    ActionDefintion ||--o{ CommandStep : contains
+    ActionDefintion ||--o{ ActionStep : contains
     ActionDefintion ||--o{ CommandArgument : has
-    CommandStep ||--|| StepType : typed_as
+    ActionStep ||--|| StepType : typed_as
     Session ||--o{ StepExecution : tracks
     Session ||--|| SessionStatus : has_status
     StepExecution ||--|| StepStatus : has_status
@@ -121,7 +121,7 @@ classDiagram
 ## Key Model Relationships
 
 - **ActionDefintion**: The central configuration model loaded from YAML files, containing all steps and metadata
-- **CommandStep**: Individual execution units that can be builtin functions, shell commands, or external scripts
+- **ActionStep**: Individual execution units that can be builtin functions, shell commands, or external scripts
 - **Session**: Runtime execution context that tracks state, shared data, and step history
 - **ExecutionEvent**: Persistent database record of command execution for history and tracking
 - **StepExecution**: Individual step execution records within a session

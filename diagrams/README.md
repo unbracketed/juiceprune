@@ -20,7 +20,7 @@ This directory contains comprehensive Mermaid diagrams that visualize the PruneJ
 - `ActionDefintion`: YAML-based command specifications
 - `Session`: Runtime execution context with state management
 - `ExecutionEvent`: Persistent database records for tracking
-- `CommandStep`: Individual execution units with type safety
+- `ActionStep`: Individual execution units with type safety
 
 ### 3. [Execution Flow](03-execution-flow.md)
 **Purpose**: Demonstrates the complete command execution sequence from CLI invocation to completion.

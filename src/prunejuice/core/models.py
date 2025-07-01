@@ -34,7 +34,7 @@ class StepType(str, Enum):
     SHELL = "shell"
 
 
-class CommandStep(BaseModel):
+class ActionStep(BaseModel):
     """Individual step in a command."""
 
     name: str
@@ -64,8 +64,8 @@ class CommandStep(BaseModel):
         return data
 
     @classmethod
-    def from_string(cls, step_str: str) -> "CommandStep":
-        """Create a CommandStep from a string (for backward compatibility)."""
+    def from_string(cls, step_str: str) -> "ActionStep":
+        """Create a ActionStep from a string (for backward compatibility)."""
         # Auto-detect step type based on content
         if " " in step_str or any(
             op in step_str for op in ["|", "&&", ";", ">", "<", "$"]
@@ -87,10 +87,10 @@ class ActionDefintion(BaseModel):
     category: str = "workflow"
     arguments: List[CommandArgument] = Field(default_factory=list)
     environment: Dict[str, str] = Field(default_factory=dict)
-    pre_steps: List[Union[str, CommandStep]] = Field(default_factory=list)
-    steps: List[Union[str, CommandStep]] = Field(default_factory=list)
-    post_steps: List[Union[str, CommandStep]] = Field(default_factory=list)
-    cleanup_on_failure: List[Union[str, CommandStep]] = Field(default_factory=list)
+    pre_steps: List[Union[str, ActionStep]] = Field(default_factory=list)
+    steps: List[Union[str, ActionStep]] = Field(default_factory=list)
+    post_steps: List[Union[str, ActionStep]] = Field(default_factory=list)
+    cleanup_on_failure: List[Union[str, ActionStep]] = Field(default_factory=list)
     working_directory: Optional[str] = None
     timeout: int = 1800
 
@@ -99,10 +99,10 @@ class ActionDefintion(BaseModel):
     )
     @classmethod
     def convert_string_steps(cls, v):
-        """Convert string steps to CommandStep objects for backward compatibility."""
+        """Convert string steps to ActionStep objects for backward compatibility."""
         if isinstance(v, list):
             return [
-                CommandStep.from_string(step) if isinstance(step, str) else step
+                ActionStep.from_string(step) if isinstance(step, str) else step
                 for step in v
             ]
         return v
@@ -124,13 +124,13 @@ class ActionDefintion(BaseModel):
 
         return data
 
-    def get_all_steps(self) -> List[CommandStep]:
-        """Get all steps as CommandStep objects."""
+    def get_all_steps(self) -> List[ActionStep]:
+        """Get all steps as ActionStep objects."""
         all_steps = []
         for step_list in [self.pre_steps, self.steps, self.post_steps]:
             for step in step_list:
                 if isinstance(step, str):
-                    all_steps.append(CommandStep.from_string(step))
+                    all_steps.append(ActionStep.from_string(step))
                 else:
                     all_steps.append(step)
         return all_steps

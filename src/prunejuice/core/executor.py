@@ -8,7 +8,7 @@ import logging
 import os
 
 from .database import Database
-from .models import ActionDefintion, ExecutionResult, CommandStep, StepType
+from .models import ActionDefintion, ExecutionResult, ActionStep, StepType
 from .state import StateManager
 from .session import ActionContext
 from .builtin_steps import BuiltinSteps
@@ -29,7 +29,7 @@ class StepExecutor:
         self.builtin_steps = builtin_steps
 
     async def execute(
-        self, step: CommandStep, context: Dict[str, Any], timeout: int = 300
+        self, step: ActionStep, context: Dict[str, Any], timeout: int = 300
     ) -> Tuple[bool, str]:
         """Execute a step and return (success, output)."""
         # Use the minimum of command timeout and step timeout (favor more restrictive)
@@ -45,7 +45,7 @@ class StepExecutor:
             return False, f"Unknown step type: {step.type}"
 
     async def _execute_builtin(
-        self, step: CommandStep, context: Dict[str, Any], timeout: int
+        self, step: ActionStep, context: Dict[str, Any], timeout: int
     ) -> Tuple[bool, str]:
         """Execute a built-in step."""
         if step.action in self.builtin_steps:
@@ -99,7 +99,7 @@ class StepExecutor:
             return False, f"Step '{step.name}' not found"
 
     async def _execute_script_step(
-        self, step: CommandStep, context: Dict[str, Any], timeout: int
+        self, step: ActionStep, context: Dict[str, Any], timeout: int
     ) -> Tuple[bool, str]:
         """Execute a script step."""
         script_path = Path(step.action)
@@ -113,7 +113,7 @@ class StepExecutor:
             return False, f"Script not found: {step.action}"
 
     async def _execute_shell_command(
-        self, step: CommandStep, context: Dict[str, Any], timeout: int
+        self, step: ActionStep, context: Dict[str, Any], timeout: int
     ) -> Tuple[bool, str]:
         """Execute a shell command directly."""
         # Use clean environment for uv commands, regular environment otherwise
@@ -368,7 +368,7 @@ class Executor:
             output += "\nCleanup steps on failure:\n"
             for step_item in command.cleanup_on_failure:
                 if isinstance(step_item, str):
-                    step = CommandStep.from_string(step_item)
+                    step = ActionStep.from_string(step_item)
                 else:
                     step = step_item
                 output += f"  - {step.name} ({step.type.value}): {step.action}\n"
