@@ -46,9 +46,9 @@ nav:
   - Quickstart:
     - New Project: quickstart/new-project.md
     - Existing Project: quickstart/existing-project.md
-    - First Command: quickstart/first-command.md
+    - First Action: quickstart/first-action.md
   - Guides:
-    - Command Definition: guides/command-definition.md
+    - Action Definition: guides/action-definition.md
     - Step Creation: guides/step-creation.md
     - Project Setup: guides/project-setup.md
     - Workflows: guides/workflows.md
@@ -57,7 +57,7 @@ nav:
     - Sessions: concepts/sessions.md
     - Architecture: concepts/architecture.md
   - Reference:
-    - Commands: reference/commands.md
+    - Action: reference/action.md
     - Configuration: reference/config.md
     - YAML Schema: reference/yaml-schema.md
   - Advanced:

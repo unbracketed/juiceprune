@@ -10,9 +10,9 @@ class TestWorkflows:
     """Test complete user workflows end-to-end."""
 
     @pytest.mark.asyncio
-    async def test_multi_step_command_execution(self, test_project, test_settings):
-        """Test execution of multi-step commands."""
-        # Create multi-step command
+    async def test_multi_step_action_execution(self, test_project, test_settings):
+        """Test execution of multi-step actions."""
+        # Create multi-step action
         cmd_yaml = """
 name: multi-step
 description: Multi-step test
@@ -25,13 +25,13 @@ steps:
 post_steps:
   - cleanup
 """
-        cmd_file = test_project / ".prj" / "commands" / "multi-step.yaml"
+        cmd_file = test_project / ".prj" / "actions" / "multi-step.yaml"
         cmd_file.parent.mkdir(parents=True, exist_ok=True)
         cmd_file.write_text(cmd_yaml)
 
-        # Execute command
+        # Execute action
         executor = Executor(test_settings)
-        result = await executor.execute_command("multi-step", test_project, {})
+        result = await executor.execute_action("multi-step", test_project, {})
 
         assert result.success
         assert Path(result.artifacts_path).exists()
@@ -39,7 +39,7 @@ post_steps:
     @pytest.mark.asyncio
     async def test_error_recovery(self, test_project, test_settings):
         """Test error recovery in workflows."""
-        # Create command that fails mid-execution
+        # Create action that fails mid-execution
         cmd_yaml = """
 name: fail-recover
 description: Failure recovery test
@@ -50,38 +50,38 @@ steps:
 cleanup_on_failure:
   - cleanup
 """
-        cmd_file = test_project / ".prj" / "commands" / "fail.yaml"
+        cmd_file = test_project / ".prj" / "actions" / "fail.yaml"
         cmd_file.parent.mkdir(parents=True, exist_ok=True)
         cmd_file.write_text(cmd_yaml)
 
         executor = Executor(test_settings)
-        result = await executor.execute_command("fail-recover", test_project, {})
+        result = await executor.execute_action("fail-recover", test_project, {})
 
         assert not result.success
         assert "not found" in result.error
         # Cleanup should have run
 
     @pytest.mark.asyncio
-    async def test_concurrent_commands(self, test_project, test_settings):
-        """Test concurrent command execution."""
-        # Create simple command
+    async def test_concurrent_actions(self, test_project, test_settings):
+        """Test concurrent action execution."""
+        # Create simple action
         cmd_yaml = """
 name: concurrent-test
 description: Concurrent execution test
 steps:
   - echo "Running concurrent test"
 """
-        cmd_file = test_project / ".prj" / "commands" / "concurrent-test.yaml"
+        cmd_file = test_project / ".prj" / "actions" / "concurrent-test.yaml"
         cmd_file.parent.mkdir(parents=True, exist_ok=True)
         cmd_file.write_text(cmd_yaml)
 
         executor = Executor(test_settings)
 
-        # Run multiple commands concurrently
+        # Run multiple actions concurrently
         import asyncio
 
         tasks = [
-            executor.execute_command("concurrent-test", test_project, {"id": str(i)})
+            executor.execute_action("concurrent-test", test_project, {"id": str(i)})
             for i in range(3)
         ]
 

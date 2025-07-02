@@ -1,10 +1,10 @@
 -- PruneJuice Event Tracking Database Schema
--- This schema tracks SDLC command execution and session management
+-- This schema tracks SDLC action execution and session management
 
--- Main events table for tracking command execution
+-- Main events table for tracking action execution
 CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    command TEXT NOT NULL,
+    action TEXT NOT NULL,
     project_path TEXT NOT NULL,
     worktree_name TEXT,
     session_id TEXT,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS events (
     artifacts_path TEXT,
     exit_code INTEGER,
     error_message TEXT,
-    metadata TEXT -- JSON blob for additional command-specific data
+    metadata TEXT -- JSON blob for additional action-specific data
 );
 
 -- Index for common queries
@@ -24,8 +24,8 @@ CREATE INDEX IF NOT EXISTS idx_events_start_time ON events(start_time);
 CREATE INDEX IF NOT EXISTS idx_events_worktree ON events(worktree_name);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
 
--- Command definitions table for storing YAML command metadata
-CREATE TABLE IF NOT EXISTS command_definitions (
+-- action definitions table for storing YAML action metadata
+CREATE TABLE IF NOT EXISTS action_definitions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL,
     description TEXT,
@@ -79,11 +79,11 @@ LIMIT 50;
 CREATE VIEW IF NOT EXISTS event_summary AS
 SELECT 
     project_path,
-    command,
+    action,
     COUNT(*) as execution_count,
     AVG(CASE WHEN end_time IS NOT NULL THEN 
         (julianday(end_time) - julianday(start_time)) * 24 * 60 * 60 
         ELSE NULL END) as avg_duration_seconds,
     MAX(start_time) as last_execution
 FROM events 
-GROUP BY project_path, command;
+GROUP BY project_path, action;

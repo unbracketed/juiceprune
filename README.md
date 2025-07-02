@@ -7,7 +7,7 @@ A unified Python implementation of a parallel agentic coding workflow orchestrat
 - **Native Python Implementation**: Fully integrated worktree and session management without shell script dependencies
 - **Git Worktree Integration**: Create, manage, and remove git worktrees seamlessly
 - **Tmux Session Management**: Automatic session creation and lifecycle management for development environments
-- **Command-Based Workflow**: Define and execute complex development workflows through YAML configurations
+- **Action-Based Workflow**: Define and execute complex development workflows through YAML configurations
 - **Modern Python Stack**: Built with asyncio, Pydantic, Typer, and GitPython
 
 ## Installation
@@ -33,7 +33,7 @@ prunejuice init
 ```
 
 This creates a `.prj/` directory with:
-- `commands/` - YAML command definitions
+- `actions/` - YAML action definitions
 - `steps/` - Reusable step implementations
 - `configs/` - Project configuration files
 
@@ -45,20 +45,20 @@ prj status
 
 Shows:
 - Current project configuration
-- Available commands
+- Available actions
 - Git worktree status
 - Active tmux sessions
 
-### 3. List Available Commands
+### 3. List Available Actions
 
 ```bash
-prj list-commands
+prj list-actions
 ```
 
-### 4. Run Commands
+### 4. Run Actions
 
 ```bash
-# Run a command by name
+# Run a action by name
 prj run setup-dev
 
 # Run with arguments
@@ -71,16 +71,16 @@ prj run deploy --dry-run
 prj run tests --cwd /path/to/directory
 ```
 
-## Core Commands
+## PruneJuice Commands
 
 ### Project Management
 
 ```bash
 prj init                    # Initialize new project
 prj status                  # Show project status
-prj list-commands           # List available commands
-prj run <command>           # Execute a command
-prj run <command> --dry-run # Preview command execution
+prj list-actions           # List available actions
+prj run <action>           # Execute a action
+prj run <action> --dry-run # Preview action execution
 ```
 
 ### Worktree Operations
@@ -105,7 +105,7 @@ prj status
 Automatic tmux session integration:
 
 ```bash
-# Sessions are created automatically when commands
+# Sessions are created automatically when actions
 # specify session requirements
 
 # List active sessions
@@ -115,17 +115,17 @@ prj status
 # project-worktree-task
 ```
 
-## Command Definition
+## Action Definition
 
-Commands are defined in YAML files in `.prj/commands/`:
+Action are defined in YAML files in `.prj/actions/`:
 
 ```yaml
-# .prj/commands/setup-dev.yaml
+# .prj/actions/setup-dev.yaml
 name: setup-dev
 description: Set up development environment
 category: development
 
-# Optional: Create a worktree for this command
+# Optional: Create a worktree for this actions
 worktree:
   branch: "dev-{{task_id}}"
   base_branch: "main"
@@ -147,7 +147,7 @@ environment:
   NODE_ENV: development
   DEBUG: "true"
 
-# Optional: Command arguments
+# Optional: Action arguments
 arguments:
   - name: skip_tests
     description: Skip running initial tests
@@ -302,7 +302,7 @@ make check               # Run all quality checks
 # Project commands
 make init                # Initialize new project
 make status              # Show project status
-make list-commands       # List available commands
+make list-actions       # List available actions
 
 # Utilities
 make clean               # Clean build artifacts
@@ -315,7 +315,7 @@ Prunejuice is built with a modular architecture:
 
 - **CLI Layer** (`prunejuice.cli`): Typer-based command interface
 - **Core Models** (`prunejuice.core`): Pydantic models for configuration and commands
-- **Command System** (`prunejuice.commands`): YAML-based command loading and execution
+- **Action System** (`prunejuice.actions`): YAML-based command loading and execution
 - **Worktree Utils** (`prunejuice.worktree_utils`): Native Git worktree management
 - **Session Utils** (`prunejuice.session_utils`): Native tmux session management
 - **Integrations** (`prunejuice.integrations`): High-level integration interfaces

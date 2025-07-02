@@ -16,7 +16,7 @@ class StepStatus(str, Enum):
     SKIPPED = "skipped"
 
 
-class CommandArgument(BaseModel):
+class ActionArgument(BaseModel):
     """Definition of a command argument."""
 
     name: str
@@ -85,7 +85,7 @@ class ActionDefintion(BaseModel):
     prompt_file: Optional[str] = None
     extends: Optional[str] = None
     category: str = "workflow"
-    arguments: List[CommandArgument] = Field(default_factory=list)
+    arguments: List[ActionArgument] = Field(default_factory=list)
     environment: Dict[str, str] = Field(default_factory=dict)
     pre_steps: List[Union[str, ActionStep]] = Field(default_factory=list)
     steps: List[Union[str, ActionStep]] = Field(default_factory=list)

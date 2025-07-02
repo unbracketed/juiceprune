@@ -455,10 +455,10 @@ class MCPServerIntegration:
     
     async def start_server(self, port: int = 8000):
         """Start MCP server to expose commands as tools."""
-        from prunejuice.commands.loader import CommandLoader
+        from prunejuice.commands.loader import ActionLoader
         
         # Load available commands
-        loader = CommandLoader(self.project_path)
+        loader = ActionLoader(self.project_path)
         self.available_commands = await loader.load_all_commands()
         
         # Start MCP server (implementation depends on MCP framework)

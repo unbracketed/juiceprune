@@ -18,7 +18,7 @@ async def test_sql_injection_protection(test_database):
     for malicious_input in malicious_inputs:
         # Try injecting via event creation
         event_id = await test_database.start_event(
-            command=malicious_input,
+            action=malicious_input,
             project_path="/tmp",
             session_id="test",
             artifacts_path="/tmp",
@@ -33,7 +33,7 @@ async def test_sql_injection_protection(test_database):
 
             # Verify the malicious input was stored as data, not executed
             cursor = await conn.execute(
-                "SELECT command FROM events WHERE id = ?", (event_id,)
+                "SELECT action FROM events WHERE id = ?", (event_id,)
             )
             result = await cursor.fetchone()
             assert result[0] == malicious_input
@@ -46,7 +46,7 @@ async def test_parameter_binding(test_database):
     special_chars = "'; SELECT * FROM events; /*"
 
     await test_database.start_event(
-        command="test-command",
+        action="test-action",
         project_path=special_chars,
         session_id="test-session",
         artifacts_path="/tmp",
@@ -65,7 +65,7 @@ async def test_event_lifecycle(test_database):
     """Test complete event lifecycle."""
     # Start event
     event_id = await test_database.start_event(
-        command="test-command",
+        action="test-action",
         project_path="/test/project",
         session_id="test-session-123",
         artifacts_path="/test/artifacts",
@@ -83,7 +83,7 @@ async def test_event_lifecycle(test_database):
 
     event = events[0]
     assert event.id == event_id
-    assert event.command == "test-command"
+    assert event.action == "test-action"
     assert event.status == "completed"
     assert event.exit_code == 0
     assert event.metadata["test"] == "data"
@@ -94,7 +94,7 @@ async def test_artifact_storage(test_database):
     """Test artifact storage with parameter binding."""
     # Create an event first
     event_id = await test_database.start_event(
-        command="test", project_path="/test", session_id="test", artifacts_path="/test"
+        action="test", project_path="/test", session_id="test", artifacts_path="/test"
     )
 
     # Store artifact with potential injection
@@ -134,7 +134,7 @@ async def test_json_metadata_handling(test_database):
     }
 
     await test_database.start_event(
-        command="test",
+        action="test",
         project_path="/test",
         session_id="test",
         artifacts_path="/test",
@@ -160,7 +160,7 @@ async def test_concurrent_operations(test_database):
 
     async def create_event(i):
         return await test_database.start_event(
-            command=f"command-{i}",
+            action=f"action-{i}",
             project_path=f"/project-{i}",
             session_id=f"session-{i}",
             artifacts_path=f"/artifacts-{i}",

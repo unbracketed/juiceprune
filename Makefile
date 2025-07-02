@@ -58,8 +58,8 @@ init: ## Initialize a new prunejuice project
 status: ## Show project status
 	uv run prj status
 
-list-commands: ## List available commands
-	uv run prj list-commands
+list-actions: ## List available actions
+	uv run prj list-actions
 
 # Development utilities
 clean: ## Clean build artifacts and cache
@@ -140,8 +140,8 @@ example-init: ## Example: Initialize project in current directory
 
 example-status: ## Example: Show detailed project status
 	uv run prj status
-	@echo "Use 'make list-commands' to see available commands."
+	@echo "Use 'make list-actions' to see available actions."
 
-example-run: ## Example: Run a command (requires CMD=<command-name>)
-	@if [ -z "$(CMD)" ]; then echo "Usage: make example-run CMD=<command-name>"; exit 1; fi
+example-run: ## Example: Run an action (requires ACTION=<action-name>)
+	@if [ -z "$(ACTION)" ]; then echo "Usage: make example-run ACTION=<action-name>"; exit 1; fi
 	uv run prj run $(CMD)

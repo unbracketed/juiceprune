@@ -15,13 +15,13 @@ Pydantic Graph Integration Assessment
     - Current: SQLite events table for tracking
     - With Graph: Built-in state snapshots that integrate with existing schema
   4. Human-in-the-Loop Workflows
-    - Current: Limited support for interactive commands
+    - Current: Limited support for interactive actions
     - With Graph: Native pause/resume for user input, approval steps
 
   🎯 Immediate Modernization Opportunities
 
   Priority 1 (High Impact, Low Risk):
-  - Rename session.Session → CommandSession (eliminates tmux confusion)
+  - Rename session.Session → ActionContext (eliminates tmux confusion)
   - Implement BaseStatePersistence for existing database
   - Create BaseNode implementations for common steps
 

@@ -16,7 +16,7 @@ graph TB
     - Async Execution
     - Error Handling`"]
     
-    LOADER["`**CommandLoader**
+    LOADER["`**ActionLoader**
     - YAML Parsing
     - Command Discovery
     - Inheritance Support`"]

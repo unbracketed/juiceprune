@@ -31,7 +31,7 @@ MCP Server
 The MCP server integrates directly with Prunejuice's command system:
 
 ```python
-from prunejuice.commands.loader import CommandLoader
+from prunejuice.commands.loader import ActionLoader
 from prunejuice.core.executor import CommandExecutor
 from prunejuice.core.database import EventDatabase
 ```
@@ -99,7 +99,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 
-from prunejuice.commands.loader import CommandLoader
+from prunejuice.commands.loader import ActionLoader
 from prunejuice.core.executor import CommandExecutor
 from prunejuice.core.config import Settings
 
@@ -111,7 +111,7 @@ class PrunejuiceMCPServer:
     def __init__(self, project_path: Path, settings: Settings):
         self.project_path = project_path
         self.settings = settings
-        self.command_loader = CommandLoader(project_path)
+        self.command_loader = ActionLoader(project_path)
         self.command_executor = CommandExecutor(project_path, settings)
         self.available_tools = {}
         self.connected_clients = set()

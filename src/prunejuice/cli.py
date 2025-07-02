@@ -15,10 +15,10 @@ import subprocess
 
 from .core.config import Settings
 from .core.database import Database
-from .commands.loader import CommandLoader
+from .actions.loader import ActionLoader
 from .utils.logging import setup_logging
-from .commands.worktree import worktree_app
-from .commands.session import session_app
+from .actions.worktree import worktree_app
+from .actions.session import session_app
 from .worktree_utils import GitWorktreeManager
 from .session_utils import TmuxManager, SessionLifecycleManager
 from .utils.path_resolver import ProjectPathResolver
@@ -95,16 +95,16 @@ def init(
     # Create project structure
     prj_dir = path / ".prj"
     prj_dir.mkdir(exist_ok=True)
-    (prj_dir / "commands").mkdir(exist_ok=True)
+    (prj_dir / "actions").mkdir(exist_ok=True)
     (prj_dir / "steps").mkdir(exist_ok=True)
     (prj_dir / "configs").mkdir(exist_ok=True)
     (prj_dir / "artifacts").mkdir(exist_ok=True)
 
-    # Copy template commands (optional - project can work without them)
+    # Copy template actions (optional - project can work without them)
     try:
         from importlib import resources
 
-        templates = resources.files("prunejuice.template_commands")
+        templates = resources.files("prunejuice.template_actions")
         template_names = [
             "analyze-issue.yaml",
             "code-review.yaml",
@@ -121,7 +121,7 @@ def init(
                 try:
                     template_path = templates / template_name
                     if template_path.is_file():
-                        (prj_dir / "commands" / template_name).write_text(
+                        (prj_dir / "actions" / template_name).write_text(
                             template_path.read_text()
                         )
                         console.print(f"Copied template: {template_name}", style="dim")
@@ -132,11 +132,11 @@ def init(
                     )
         else:
             console.print(
-                "Templates not found - project initialized without example commands",
+                "Templates not found - project initialized without example actions",
                 style="dim",
             )
     except Exception as e:
-        console.print(f"Note: Template commands not available: {e}", style="dim")
+        console.print(f"Note: Template actions not available: {e}", style="dim")
 
     # Copy template steps (optional - project can work without them)
     try:
@@ -189,7 +189,7 @@ def init(
 @app.command()
 def list(
     what: Optional[str] = typer.Argument(
-        "events", help="What to list: 'events' (default) or 'commands'"
+        "events", help="What to list: 'events' (default) or 'actions'"
     ),
     limit: int = typer.Option(
         10, "--limit", "-n", help="Number of events to show (events only)"
@@ -199,38 +199,38 @@ def list(
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed info"),
 ):
-    """List recent events (default) or available commands."""
-    if what == "commands":
-        _list_commands(verbose)
+    """List recent events (default) or available actions."""
+    if what == "actions":
+        _list_actions(verbose)
     elif what == "events":
         _list_events(limit, status, verbose)
     else:
         console.print(
-            f"❌ Unknown list type: {what}. Use 'events' or 'commands'.",
+            f"❌ Unknown list type: {what}. Use 'events' or 'actions'.",
             style="bold red",
         )
         raise typer.Exit(code=1)
 
 
-def _list_commands(verbose: bool = False):
-    """List available SDLC commands."""
+def _list_actions(verbose: bool = False):
+    """List available SDLC actions."""
     try:
-        loader = CommandLoader()
-        commands = loader.discover_commands(Path.cwd())
+        loader = ActionLoader()
+        actions = loader.discover_actions(Path.cwd())
 
-        if not commands:
-            console.print("No commands found. Run 'prj init' first.", style="yellow")
+        if not actions:
+            console.print("No actions found. Run 'prj init' first.", style="yellow")
             return
 
-        table = Table(title="Available Commands")
-        table.add_column("Command", style="cyan", no_wrap=True)
+        table = Table(title="Available Actions")
+        table.add_column("Action", style="cyan", no_wrap=True)
         table.add_column("Category", style="yellow")
         table.add_column("Description", style="green")
 
         if verbose:
             table.add_column("Steps", style="blue")
 
-        for cmd in commands:
+        for cmd in actions:
             row = [cmd.name, cmd.category, cmd.description]
             if verbose:
                 steps = cmd.pre_steps + cmd.steps + cmd.post_steps
@@ -240,12 +240,12 @@ def _list_commands(verbose: bool = False):
         console.print(table)
 
     except Exception as e:
-        console.print(f"❌ Error listing commands: {e}", style="bold red")
+        console.print(f"❌ Error listing actions: {e}", style="bold red")
         raise typer.Exit(code=1)
 
 
 def _list_events(limit: int = 10, status: Optional[str] = None, verbose: bool = False):
-    """List recent command events."""
+    """List recent action events."""
     try:
         # Get project root for consistent database access
         project_root = ProjectPathResolver.get_project_root()
@@ -265,7 +265,7 @@ def _list_events(limit: int = 10, status: Optional[str] = None, verbose: bool = 
 
         table = Table(title="Recent Events")
         table.add_column("ID", style="dim", width=4)
-        table.add_column("Command", style="cyan")
+        table.add_column("Action", style="cyan")
         table.add_column("Status", style="yellow")
         table.add_column("Started", style="green")
         table.add_column("Duration", style="blue")
@@ -279,7 +279,7 @@ def _list_events(limit: int = 10, status: Optional[str] = None, verbose: bool = 
 
             row = [
                 str(event.id),
-                event.command,
+                event.action,
                 f"[{status_style}]{event.status}[/{status_style}]",
                 event.start_time.strftime("%m/%d %H:%M"),
                 duration_str,
@@ -297,36 +297,24 @@ def _list_events(limit: int = 10, status: Optional[str] = None, verbose: bool = 
         raise typer.Exit(code=1)
 
 
-# Keep backwards compatibility
-@app.command()
-def list_commands(
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed info"),
-):
-    """List available SDLC commands (deprecated: use 'list commands')."""
-    console.print(
-        "Note: 'list-commands' is deprecated. Use 'list commands' instead.", style="dim"
-    )
-    _list_commands(verbose)
-
-
 @app.command()
 def run(
-    command: str = typer.Argument(help="Command name to execute"),
+    action: str = typer.Argument(help="Action name to execute"),
     args: Optional[List[str]] = typer.Argument(
-        None, help="Command arguments in key=value format"
+        None, help="Action arguments in key=value format"
     ),
     dry_run: bool = typer.Option(
         False, "--dry-run", help="Show what would be executed"
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
 ):
-    """Run an SDLC command."""
+    """Run an SDLC action."""
     try:
         # Set up logging
         log_level = "DEBUG" if verbose else "INFO"
         setup_logging(level=log_level)
 
-        console.print(f"🚀 Executing command: [bold cyan]{command}[/bold cyan]")
+        console.print(f"🚀 Executing action: [bold cyan]{action}[/bold cyan]")
 
         # Import executor here to avoid circular imports
         from .core.executor import Executor
@@ -349,9 +337,9 @@ def run(
                 )
                 raise typer.Exit(code=1)
 
-        # Run command
+        # Run action
         result = asyncio.run(
-            executor.execute_command(command, Path.cwd(), parsed_args, dry_run)
+            executor.execute_action(action, Path.cwd(), parsed_args, dry_run)
         )
 
         # Handle dry run output specially
@@ -360,13 +348,13 @@ def run(
             return
 
         if result.success:
-            console.print("✅ Command completed successfully!", style="bold green")
+            console.print("✅ Action completed successfully!", style="bold green")
             if result.artifacts_path:
                 console.print(
                     f"Artifacts stored in: {result.artifacts_path}", style="dim"
                 )
         else:
-            console.print(f"❌ Command failed: {result.error}", style="bold red")
+            console.print(f"❌ Action failed: {result.error}", style="bold red")
             raise typer.Exit(code=1)
 
     except Exception as e:
@@ -489,7 +477,7 @@ def status(
 
             if events:
                 table = Table(title="Recent Events")
-                table.add_column("Command", style="cyan")
+                table.add_column("Action", style="cyan")
                 table.add_column("Status", style="yellow")
                 table.add_column("Start Time", style="green")
                 table.add_column("Duration", style="blue")
@@ -503,7 +491,7 @@ def status(
                     worktree_display = event.worktree_name or "main"
 
                     table.add_row(
-                        event.command,
+                        event.action,
                         f"[{status_style}]{event.status}[/{status_style}]",
                         event.start_time.strftime("%Y-%m-%d %H:%M:%S"),
                         duration_str,
@@ -521,7 +509,7 @@ def status(
                     f"\n🔄 Active Events: {len(active_events)}", style="bold yellow"
                 )
                 for event in active_events:
-                    console.print(f"  - {event.command} (session: {event.session_id})")
+                    console.print(f"  - {event.action} (session: {event.session_id})")
 
         # Show worktree information (always show, regardless of init status)
         console.print("\n🌳 Worktree Status", style="bold")
@@ -870,7 +858,7 @@ def resume():
                 return
 
     except Exception as e:
-        console.print(f"❌ Error in resume command: {e}", style="bold red")
+        console.print(f"❌ Error in resume action: {e}", style="bold red")
         raise typer.Exit(code=1)
 
 
@@ -1002,8 +990,8 @@ def history(
     status: Optional[str] = typer.Option(
         None, "--status", help="Filter by status (completed, failed, running)"
     ),
-    command: Optional[str] = typer.Option(
-        None, "--command", help="Filter by command name"
+    action: Optional[str] = typer.Option(
+        None, "--action", help="Filter by action name"
     ),
     worktree: Optional[str] = typer.Option(
         None, "--worktree", help="Filter by worktree name"
@@ -1018,7 +1006,7 @@ def history(
         help="Show events from all worktrees (default: current worktree only when in worktree)",
     ),
 ):
-    """Show command execution history with filtering options."""
+    """Show action execution history with filtering options."""
     try:
         # Get project and worktree context
         context = _get_project_context()
@@ -1043,7 +1031,7 @@ def history(
             db.get_events(
                 limit=limit,
                 status=status,
-                command=command,
+                action=action,
                 worktree=worktree_filter,
                 project_path=project_filter,
             )
@@ -1053,9 +1041,9 @@ def history(
             console.print("No history found matching criteria.", style="yellow")
             return
 
-        table = Table(title="Command History")
+        table = Table(title="Action History")
         table.add_column("ID", style="dim", width=4)
-        table.add_column("Command", style="cyan")
+        table.add_column("Action", style="cyan")
         table.add_column("Status", style="yellow")
         table.add_column("Start Time", style="green")
         table.add_column("Duration", style="blue")
@@ -1074,7 +1062,7 @@ def history(
 
             table.add_row(
                 str(event.id),
-                event.command,
+                event.action,
                 f"[{status_style}]{event.status}[/{status_style}]",
                 event.start_time.strftime("%m/%d %H:%M"),
                 duration_str,
@@ -1245,8 +1233,8 @@ def show(event_id: int = typer.Argument(..., help="The ID of the event to show")
 
         # Create a formatted panel
         text = Text()
-        text.append("Command: ", style="bold yellow")
-        text.append(f"{event.command}\n")
+        text.append("Action: ", style="bold yellow")
+        text.append(f"{event.action}\n")
         text.append("Status: ", style="bold yellow")
         status_style = _get_status_style(event.status)
         text.append(f"{event.status}\n", style=status_style)

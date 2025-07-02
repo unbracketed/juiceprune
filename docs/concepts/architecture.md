@@ -69,7 +69,7 @@ class ActionDefintion(BaseModel):
     name: str
     description: str
     category: str = "workflow"
-    arguments: List[CommandArgument] = []
+    arguments: List[ActionArgument] = []
     environment: Dict[str, str] = {}
     steps: List[Union[str, ActionStep]] = []
     working_directory: Optional[str] = None
@@ -109,9 +109,9 @@ YAML-based command definition and loading system:
 #### Command Loader (`commands.loader`)
 
 ```python
-class CommandLoader:
-    def load_commands(self, commands_dir: Path) -> Dict[str, ActionDefintion]
-    def load_command(self, yaml_path: Path) -> ActionDefintion
+class ActionLoader:
+    def load_actions(self, commands_dir: Path) -> Dict[str, ActionDefintion]
+    def load_action(self, yaml_path: Path) -> ActionDefintion
     def validate_command(self, command: ActionDefintion) -> bool
 ```
 

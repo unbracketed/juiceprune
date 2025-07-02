@@ -6,7 +6,7 @@ This sequence diagram shows the complete flow of command execution from CLI invo
 sequenceDiagram
     participant CLI
     participant Executor
-    participant CommandLoader
+    participant ActionLoader
     participant CommandFactory as Command Factory
     participant Command
     participant StepExecutor
@@ -16,8 +16,8 @@ sequenceDiagram
     
     CLI->>Executor: execute_command(name, path, args)
     Executor->>Database: initialize()
-    Executor->>CommandLoader: load_command(name, path)
-    CommandLoader-->>Executor: ActionDefintion
+    Executor->>ActionLoader: load_action(name, path)
+    ActionLoader-->>Executor: ActionDefintion
     
     Executor->>Executor: validate_arguments()
     Executor->>Session: create(id, command_name, path)

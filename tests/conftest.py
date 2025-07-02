@@ -10,7 +10,7 @@ import shutil
 from prunejuice.core.config import Settings
 from prunejuice.core.database import Database
 from prunejuice.core.executor import Executor
-from prunejuice.core.models import ActionDefintion, CommandArgument
+from prunejuice.core.models import ActionDefintion, ActionArgument
 
 
 @pytest.fixture(scope="session")
@@ -58,8 +58,8 @@ def sample_command():
         name="test-command",
         description="Test command for unit tests",
         arguments=[
-            CommandArgument(name="input", required=True),
-            CommandArgument(name="optional", required=False, default="default_value"),
+            ActionArgument(name="input", required=True),
+            ActionArgument(name="optional", required=False, default="default_value"),
         ],
         steps=["validate-prerequisites", "store-artifacts"],
     )
@@ -97,7 +97,7 @@ def test_project(temp_dir):
     # Create .prj structure
     prj_dir = project_path / ".prj"
     prj_dir.mkdir()
-    (prj_dir / "commands").mkdir()
+    (prj_dir / "actions").mkdir()
     (prj_dir / "steps").mkdir()
 
     return project_path

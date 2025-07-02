@@ -11,7 +11,7 @@ from prunejuice.core.models import ActionDefintion
 runner = CliRunner()
 
 
-def test_init_command(temp_dir):
+def test_init_action(temp_dir):
     """Test project initialization."""
     # Change to temp directory
     original_cwd = Path.cwd()
@@ -26,7 +26,7 @@ def test_init_command(temp_dir):
 
         # Verify project structure
         assert (temp_dir / ".prj").exists()
-        assert (temp_dir / ".prj" / "commands").exists()
+        assert (temp_dir / ".prj" / "actions").exists()
         assert (temp_dir / ".prj" / "steps").exists()
         assert (temp_dir / ".prj" / "configs").exists()
 
@@ -34,37 +34,34 @@ def test_init_command(temp_dir):
         os.chdir(original_cwd)
 
 
-def test_list_commands_empty(temp_dir):
-    """Test listing commands in empty project."""
+def test_list_actions_empty(temp_dir):
+    """Test listing actions in empty project."""
     original_cwd = Path.cwd()
     import os
 
     os.chdir(temp_dir)
 
     try:
-        result = runner.invoke(app, ["list-commands"])
+        result = runner.invoke(app, ["list actions"])
         assert result.exit_code == 0
-        # Should show deprecation notice and template commands
-        assert "list-commands' is deprecated" in result.stdout
-        assert "Available Commands" in result.stdout
-
+        assert "Available actions" in result.stdout
     finally:
         os.chdir(original_cwd)
 
 
-def test_list_commands_with_commands(test_project):
-    """Test listing commands when commands exist."""
-    # Create a test command
-    sample_command = ActionDefintion(
+def test_list_actions_with_actions(test_project):
+    """Test listing actions when actions exist."""
+    # Create a test action
+    sample_action = ActionDefintion(
         name="test-cmd",
-        description="Test command",
+        description="Test action",
         category="test",
         steps=["setup-environment"],
     )
 
-    cmd_file = test_project / ".prj" / "commands" / "test-cmd.yaml"
+    cmd_file = test_project / ".prj" / "actions" / "test-cmd.yaml"
     with open(cmd_file, "w") as f:
-        yaml.dump(sample_command.model_dump(), f)
+        yaml.dump(sample_action.model_dump(), f)
 
     original_cwd = Path.cwd()
     import os
@@ -72,28 +69,28 @@ def test_list_commands_with_commands(test_project):
     os.chdir(test_project)
 
     try:
-        result = runner.invoke(app, ["list-commands"])
+        result = runner.invoke(app, ["list-actions"])
         assert result.exit_code == 0
         assert "test-cmd" in result.stdout
-        assert "Test command" in result.stdout
+        assert "Test action" in result.stdout
 
     finally:
         os.chdir(original_cwd)
 
 
-def test_run_command_missing_args(test_project):
-    """Test running command with missing arguments."""
-    # Create a command that requires arguments
-    sample_command = ActionDefintion(
+def test_run_action_missing_args(test_project):
+    """Test running action with missing arguments."""
+    # Create a action that requires arguments
+    sample_action = ActionDefintion(
         name="arg-cmd",
-        description="Command with args",
+        description="action with args",
         arguments=[{"name": "required_arg", "required": True}],
         steps=["setup-environment"],
     )
 
-    cmd_file = test_project / ".prj" / "commands" / "arg-cmd.yaml"
+    cmd_file = test_project / ".prj" / "actions" / "arg-cmd.yaml"
     with open(cmd_file, "w") as f:
-        yaml.dump(sample_command.model_dump(), f)
+        yaml.dump(sample_action.model_dump(), f)
 
     original_cwd = Path.cwd()
     import os
@@ -109,8 +106,8 @@ def test_run_command_missing_args(test_project):
         os.chdir(original_cwd)
 
 
-def test_run_nonexistent_command(test_project):
-    """Test running non-existent command."""
+def test_run_nonexistent_action(test_project):
+    """Test running non-existent action."""
     original_cwd = Path.cwd()
     import os
 
@@ -127,13 +124,13 @@ def test_run_nonexistent_command(test_project):
 
 def test_dry_run(test_project):
     """Test dry run functionality."""
-    sample_command = ActionDefintion(
+    sample_action = ActionDefintion(
         name="dry-test", description="Dry run test", steps=["setup-environment"]
     )
 
-    cmd_file = test_project / ".prj" / "commands" / "dry-test.yaml"
+    cmd_file = test_project / ".prj" / "actions" / "dry-test.yaml"
     with open(cmd_file, "w") as f:
-        yaml.dump(sample_command.model_dump(), f)
+        yaml.dump(sample_action.model_dump(), f)
 
     original_cwd = Path.cwd()
     import os
@@ -143,14 +140,14 @@ def test_dry_run(test_project):
     try:
         result = runner.invoke(app, ["run", "dry-test", "--dry-run"])
         assert result.exit_code == 0
-        assert "Dry run for command" in result.stdout
+        assert "Dry run for action" in result.stdout
 
     finally:
         os.chdir(original_cwd)
 
 
-def test_status_command(test_project):
-    """Test status command."""
+def test_status_action(test_project):
+    """Test status action."""
     original_cwd = Path.cwd()
     import os
 
@@ -171,13 +168,13 @@ def test_status_command(test_project):
 
 def test_invalid_argument_format(test_project):
     """Test handling of invalid argument format."""
-    sample_command = ActionDefintion(
+    sample_action = ActionDefintion(
         name="arg-test", description="Test args", steps=["setup-environment"]
     )
 
-    cmd_file = test_project / ".prj" / "commands" / "arg-test.yaml"
+    cmd_file = test_project / ".prj" / "actions" / "arg-test.yaml"
     with open(cmd_file, "w") as f:
-        yaml.dump(sample_command.model_dump(), f)
+        yaml.dump(sample_action.model_dump(), f)
 
     original_cwd = Path.cwd()
     import os
@@ -195,7 +192,7 @@ def test_invalid_argument_format(test_project):
 
 
 def test_status_worktree_column(test_project):
-    """Test status command shows worktree column in Recent Events."""
+    """Test status action shows worktree column in Recent Events."""
     import asyncio
     from prunejuice.core.database import Database
 
@@ -214,7 +211,7 @@ def test_status_worktree_column(test_project):
 
         async def add_test_event():
             event_id = await db.start_event(
-                command="test-command",
+                action="test-action",
                 project_path=str(test_project),
                 session_id="test-session",
                 artifacts_path="test-artifacts",
@@ -235,7 +232,7 @@ def test_status_worktree_column(test_project):
 
 
 def test_status_worktree_filtering(test_project):
-    """Test status command filters events by worktree when in worktree context."""
+    """Test status action filters events by worktree when in worktree context."""
     import asyncio
     from prunejuice.core.database import Database
     from unittest.mock import patch
@@ -256,7 +253,7 @@ def test_status_worktree_filtering(test_project):
         async def add_test_events():
             # Main branch event
             event1_id = await db.start_event(
-                command="main-command",
+                action="main-action",
                 project_path=str(test_project),
                 session_id="main-session",
                 artifacts_path="main-artifacts",
@@ -266,7 +263,7 @@ def test_status_worktree_filtering(test_project):
 
             # Feature branch event
             event2_id = await db.start_event(
-                command="feature-command",
+                action="feature-action",
                 project_path=str(test_project),
                 session_id="feature-session",
                 artifacts_path="feature-artifacts",
@@ -292,21 +289,21 @@ def test_status_worktree_filtering(test_project):
             # Status without --all should only show feature-branch events
             result = runner.invoke(app, ["status"])
             assert result.exit_code == 0
-            assert "feature-command" in result.stdout
-            assert "main-command" not in result.stdout
+            assert "feature-action" in result.stdout
+            assert "main-action" not in result.stdout
 
             # Status with --all should show all events
             result = runner.invoke(app, ["status", "--all"])
             assert result.exit_code == 0
-            assert "feature-command" in result.stdout
-            assert "main-command" in result.stdout
+            assert "feature-action" in result.stdout
+            assert "main-action" in result.stdout
 
     finally:
         os.chdir(original_cwd)
 
 
 def test_history_worktree_display(test_project):
-    """Test history command shows worktree information in project column."""
+    """Test history action shows worktree information in project column."""
     import asyncio
     from prunejuice.core.database import Database
 
@@ -326,7 +323,7 @@ def test_history_worktree_display(test_project):
         async def add_test_events():
             # Main branch event
             event1_id = await db.start_event(
-                command="main-command",
+                action="main-action",
                 project_path=str(test_project),
                 session_id="main-session",
                 artifacts_path="main-artifacts",
@@ -336,7 +333,7 @@ def test_history_worktree_display(test_project):
 
             # Feature branch event
             event2_id = await db.start_event(
-                command="feature-command",
+                action="feature-action",
                 project_path=str(test_project),
                 session_id="feature-session",
                 artifacts_path="feature-artifacts",
@@ -350,9 +347,9 @@ def test_history_worktree_display(test_project):
         result = runner.invoke(app, ["history"])
         assert result.exit_code == 0
 
-        # Verify the commands are displayed
-        assert "main-command" in result.stdout
-        assert "feature-command" in result.stdout
+        # Verify the actions are displayed
+        assert "main-action" in result.stdout
+        assert "feature-action" in result.stdout
 
         # The actual formatting logic creates project-worktree display
         # Even if truncated in Rich table, the logic is correct
@@ -362,7 +359,7 @@ def test_history_worktree_display(test_project):
 
 
 def test_history_worktree_filtering(test_project):
-    """Test history command filters events by worktree when in worktree context."""
+    """Test history action filters events by worktree when in worktree context."""
     import asyncio
     from prunejuice.core.database import Database
     from unittest.mock import patch
@@ -383,7 +380,7 @@ def test_history_worktree_filtering(test_project):
         async def add_test_events():
             # Main branch event
             event1_id = await db.start_event(
-                command="main-command",
+                action="main-action",
                 project_path=str(test_project),
                 session_id="main-session",
                 artifacts_path="main-artifacts",
@@ -393,7 +390,7 @@ def test_history_worktree_filtering(test_project):
 
             # Feature branch event
             event2_id = await db.start_event(
-                command="feature-command",
+                action="feature-action",
                 project_path=str(test_project),
                 session_id="feature-session",
                 artifacts_path="feature-artifacts",
@@ -419,21 +416,21 @@ def test_history_worktree_filtering(test_project):
             # History without --all should only show feature-branch events
             result = runner.invoke(app, ["history"])
             assert result.exit_code == 0
-            assert "feature-command" in result.stdout
-            assert "main-command" not in result.stdout
+            assert "feature-action" in result.stdout
+            assert "main-action" not in result.stdout
 
             # History with --all should show all events
             result = runner.invoke(app, ["history", "--all"])
             assert result.exit_code == 0
-            assert "feature-command" in result.stdout
-            assert "main-command" in result.stdout
+            assert "feature-action" in result.stdout
+            assert "main-action" in result.stdout
 
     finally:
         os.chdir(original_cwd)
 
 
-def test_tui_command(test_project):
-    """Test that the tui command can be invoked."""
+def test_tui_action(test_project):
+    """Test that the tui action can be invoked."""
     from unittest.mock import patch, Mock
 
     original_cwd = Path.cwd()
@@ -452,7 +449,7 @@ def test_tui_command(test_project):
         with patch("prunejuice.tui.PrunejuiceApp", mock_app_class):
             result = runner.invoke(app, ["tui"])
 
-            # Check that the command ran without errors
+            # Check that the action ran without errors
             assert result.exit_code == 0
 
             # Verify the TUI app was created with the correct project path

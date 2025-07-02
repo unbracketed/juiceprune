@@ -1,4 +1,4 @@
-"""YAML command loader for PruneJuice."""
+"""YAML action loader for PruneJuice."""
 
 import yaml
 from pathlib import Path
@@ -6,62 +6,62 @@ from typing import List, Optional, Dict, Any
 import hashlib
 import logging
 
-from ..core.models import ActionDefintion, CommandArgument
+from ..core.models import ActionDefintion, ActionArgument
 
 logger = logging.getLogger(__name__)
 
 
-class CommandLoader:
-    """Loads and manages YAML command definitions."""
+class ActionLoader:
+    """Loads and manages YAML action definitions."""
 
     def __init__(self):
-        """Initialize command loader."""
-        self._command_cache: Dict[str, ActionDefintion] = {}
+        """Initialize action loader."""
+        self._action_cache: Dict[str, ActionDefintion] = {}
 
-    def discover_commands(self, project_path: Path) -> List[ActionDefintion]:
-        """Discover all available commands in project and templates."""
-        commands_by_name = {}
+    def discover_actions(self, project_path: Path) -> List[ActionDefintion]:
+        """Discover all available actions in project and templates."""
+        actions_by_name = {}
 
-        # Project-specific commands (higher priority)
-        project_cmd_dir = project_path / ".prj" / "commands"
+        # Project-specific actions (higher priority)
+        project_cmd_dir = project_path / ".prj" / "actions"
         if project_cmd_dir.exists():
-            project_commands = self._load_commands_from_dir(project_cmd_dir)
-            for cmd in project_commands:
-                commands_by_name[cmd.name] = cmd
+            project_actions = self._load_actions_from_dir(project_cmd_dir)
+            for cmd in project_actions:
+                actions_by_name[cmd.name] = cmd
 
-        # Built-in template commands (lower priority)
+        # Built-in template actions (lower priority)
         try:
             from importlib import resources
 
-            template_files = resources.files("prunejuice.template_commands")
+            template_files = resources.files("prunejuice.template_actions")
             for template_file in template_files.iterdir():
                 if template_file.name.endswith(".yaml"):
                     try:
                         content = template_file.read_text()
-                        cmd = self._parse_command_yaml(content, str(template_file))
-                        if cmd and cmd.name not in commands_by_name:
-                            commands_by_name[cmd.name] = cmd
+                        cmd = self._parse_action_yaml(content, str(template_file))
+                        if cmd and cmd.name not in actions_by_name:
+                            actions_by_name[cmd.name] = cmd
                     except Exception as e:
                         logger.warning(
                             f"Failed to load template {template_file.name}: {e}"
                         )
         except Exception as e:
-            logger.warning(f"Failed to load template commands: {e}")
+            logger.warning(f"Failed to load template actions: {e}")
 
-        return list(commands_by_name.values())
+        return list(actions_by_name.values())
 
-    def load_command(
-        self, command_name: str, project_path: Path
+    def load_action(
+        self, action_name: str, project_path: Path
     ) -> Optional[ActionDefintion]:
-        """Load a specific command by name."""
+        """Load a specific action by name."""
         # Check cache first
-        if command_name in self._command_cache:
-            return self._command_cache[command_name]
+        if action_name in self._action_cache:
+            return self._action_cache[action_name]
 
-        # Look for command file
+        # Look for action file
         search_paths = [
-            project_path / ".prj" / "commands" / f"{command_name}.yaml",
-            project_path / ".prj" / "commands" / f"{command_name}.yml",
+            project_path / ".prj" / "actions" / f"{action_name}.yaml",
+            project_path / ".prj" / "actions" / f"{action_name}.yml",
         ]
 
         for cmd_path in search_paths:
@@ -70,49 +70,49 @@ class CommandLoader:
                     with open(cmd_path, "r") as f:
                         content = f.read()
 
-                    cmd = self._parse_command_yaml(content, str(cmd_path))
+                    cmd = self._parse_action_yaml(content, str(cmd_path))
                     if cmd:
-                        self._command_cache[command_name] = cmd
+                        self._action_cache[action_name] = cmd
                         return cmd
                 except Exception as e:
-                    logger.error(f"Failed to load command {command_name}: {e}")
+                    logger.error(f"Failed to load action {action_name}: {e}")
 
         # Try built-in templates
         try:
             from importlib import resources
 
-            template_files = resources.files("prunejuice.template_commands")
-            template_path = template_files / f"{command_name}.yaml"
+            template_files = resources.files("prunejuice.template_actions")
+            template_path = template_files / f"{action_name}.yaml"
             if template_path.is_file():
                 content = template_path.read_text()
-                cmd = self._parse_command_yaml(content, str(template_path))
+                cmd = self._parse_action_yaml(content, str(template_path))
                 if cmd:
-                    self._command_cache[command_name] = cmd
+                    self._action_cache[action_name] = cmd
                     return cmd
         except Exception as e:
-            logger.warning(f"Failed to load template command {command_name}: {e}")
+            logger.warning(f"Failed to load template action {action_name}: {e}")
 
         return None
 
-    def _load_commands_from_dir(self, cmd_dir: Path) -> List[ActionDefintion]:
-        """Load all commands from a directory."""
-        commands = []
+    def _load_actions_from_dir(self, cmd_dir: Path) -> List[ActionDefintion]:
+        """Load all actions from a directory."""
+        actions = []
 
         for cmd_file in cmd_dir.glob("*.yaml"):
             try:
                 with open(cmd_file, "r") as f:
                     content = f.read()
 
-                cmd = self._parse_command_yaml(content, str(cmd_file))
+                cmd = self._parse_action_yaml(content, str(cmd_file))
                 if cmd:
-                    commands.append(cmd)
-                    self._command_cache[cmd.name] = cmd
+                    actions.append(cmd)
+                    self._action_cache[cmd.name] = cmd
             except Exception as e:
-                logger.error(f"Failed to load command from {cmd_file}: {e}")
+                logger.error(f"Failed to load action from {cmd_file}: {e}")
 
-        return commands
+        return actions
 
-    def _parse_command_yaml(
+    def _parse_action_yaml(
         self, content: str, file_path: str
     ) -> Optional[ActionDefintion]:
         """Parse YAML content into ActionDefintion."""
@@ -121,22 +121,22 @@ class CommandLoader:
             if not data:
                 return None
 
-            # Handle command inheritance
+            # Handle action inheritance
             if data.get("extends"):
-                base_data = self._resolve_base_command(data["extends"], file_path)
+                base_data = self._resolve_base_action(data["extends"], file_path)
                 if base_data:
-                    # Merge base command data with current data
-                    data = self._merge_command_data(base_data, data)
+                    # Merge base action data with current data
+                    data = self._merge_action_data(base_data, data)
 
             # Parse arguments
             arguments = []
             for arg_data in data.get("arguments", []):
                 if isinstance(arg_data, dict):
-                    arguments.append(CommandArgument(**arg_data))
+                    arguments.append(ActionArgument(**arg_data))
                 elif isinstance(arg_data, str):
-                    arguments.append(CommandArgument(name=arg_data))
+                    arguments.append(ActionArgument(name=arg_data))
 
-            # Create command definition
+            # Create action definition
             cmd = ActionDefintion(
                 name=data["name"],
                 description=data.get("description", ""),
@@ -158,15 +158,15 @@ class CommandLoader:
             logger.error(f"YAML parsing error in {file_path}: {e}")
             return None
         except Exception as e:
-            logger.error(f"Error parsing command from {file_path}: {e}")
+            logger.error(f"Error parsing action from {file_path}: {e}")
             return None
 
-    def _resolve_base_command(
+    def _resolve_base_action(
         self, base_name: str, current_file: str
     ) -> Optional[Dict[str, Any]]:
-        """Resolve base command data for inheritance."""
+        """Resolve base action data for inheritance."""
         try:
-            # Look for base command in same directory as current file
+            # Look for base action in same directory as current file
             current_dir = Path(current_file).parent
             base_file = current_dir / f"{base_name}.yaml"
 
@@ -174,14 +174,14 @@ class CommandLoader:
                 with open(base_file, "r") as f:
                     return yaml.safe_load(f.read())
         except Exception as e:
-            logger.warning(f"Could not resolve base command '{base_name}': {e}")
+            logger.warning(f"Could not resolve base action '{base_name}': {e}")
 
         return None
 
-    def _merge_command_data(
+    def _merge_action_data(
         self, base_data: Dict[str, Any], derived_data: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Merge base command data with derived command data."""
+        """Merge base action data with derived action data."""
         merged = base_data.copy()
 
         # Override simple fields
@@ -195,7 +195,7 @@ class CommandLoader:
             derived_env = derived_data["environment"]
             merged["environment"] = {**base_env, **derived_env}
 
-        # Merge lists (derived command extends base command)
+        # Merge lists (derived action extends base action)
         for list_key in [
             "pre_steps",
             "steps",

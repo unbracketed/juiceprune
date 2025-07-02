@@ -38,7 +38,7 @@ class Database:
 
     async def start_event(
         self,
-        command: str,
+        action: str,
         project_path: str,
         session_id: str,
         artifacts_path: str,
@@ -50,12 +50,12 @@ class Database:
             cursor = await db.execute(
                 """
                 INSERT INTO events 
-                (command, project_path, worktree_name, session_id, 
+                (action, project_path, worktree_name, session_id, 
                  artifacts_path, metadata)
                 VALUES (?, ?, ?, ?, ?, json(?))
                 """,
                 (
-                    command,
+                    action,
                     project_path,
                     worktree_name,
                     session_id,
@@ -91,7 +91,7 @@ class Database:
         async with self.connection() as db:
             cursor = await db.execute(
                 """
-                SELECT id, command, project_path, worktree_name, session_id,
+                SELECT id, action, project_path, worktree_name, session_id,
                        start_time, end_time, status, artifacts_path, exit_code,
                        error_message, metadata
                 FROM events 
@@ -112,7 +112,7 @@ class Database:
 
                 event = ExecutionEvent(
                     id=row[0],
-                    command=row[1],
+                    action=row[1],
                     project_path=row[2],
                     worktree_name=row[3],
                     session_id=row[4],
@@ -135,7 +135,7 @@ class Database:
         async with self.connection() as db:
             cursor = await db.execute(
                 """
-                SELECT id, command, project_path, worktree_name, session_id,
+                SELECT id, action, project_path, worktree_name, session_id,
                        start_time, end_time, status, artifacts_path, exit_code,
                        error_message, metadata
                 FROM events 
@@ -154,7 +154,7 @@ class Database:
 
                 event = ExecutionEvent(
                     id=row[0],
-                    command=row[1],
+                    action=row[1],
                     project_path=row[2],
                     worktree_name=row[3],
                     session_id=row[4],
@@ -190,7 +190,7 @@ class Database:
             )
             await db.commit()
 
-    async def store_command_definition(
+    async def store_action_definition(
         self, name: str, description: str, yaml_path: str, yaml_hash: str
     ):
         """Store or update command definition with secure binding."""

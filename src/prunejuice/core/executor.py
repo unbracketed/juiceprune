@@ -1,4 +1,4 @@
-"""Command execution engine for PruneJuice."""
+"""Action execution engine for PruneJuice."""
 
 import asyncio
 from pathlib import Path
@@ -12,8 +12,8 @@ from .models import ActionDefintion, ExecutionResult, ActionStep, StepType
 from .state import StateManager
 from .session import ActionContext
 from .builtin_steps import BuiltinSteps
-from .commands import create_action
-from ..commands.loader import CommandLoader
+from .actions import create_action
+from ..actions.loader import ActionLoader
 from ..utils.artifacts import ArtifactStore
 from ..worktree_utils import GitWorktreeManager
 from ..env_utils import prepare_clean_environment, is_uv_command
@@ -32,7 +32,7 @@ class StepExecutor:
         self, step: ActionStep, context: Dict[str, Any], timeout: int = 300
     ) -> Tuple[bool, str]:
         """Execute a step and return (success, output)."""
-        # Use the minimum of command timeout and step timeout (favor more restrictive)
+        # Use the minimum of action timeout and step timeout (favor more restrictive)
         step_timeout = min(timeout, step.timeout) if step.timeout > 0 else timeout
 
         if step.type == StepType.BUILTIN:
@@ -206,13 +206,13 @@ class StepExecutor:
 
 
 class Executor:
-    """Main command orchestration engine - simple sequential execution."""
+    """Main Action orchestration engine - simple sequential execution."""
 
     def __init__(self, settings):
         """Initialize executor with settings."""
         self.settings = settings
         self.db = Database(settings.db_path)
-        self.loader = CommandLoader()
+        self.loader = ActionLoader()
         self.state = StateManager(self.db)
         self.artifacts = ArtifactStore(settings.artifacts_dir)
 
@@ -222,29 +222,29 @@ class Executor:
         # Register built-in steps with step executor
         self.step_executor = StepExecutor(self.builtin_steps.get_step_registry())
 
-    async def execute_command(
+    async def execute_action(
         self,
-        command_name: str,
+        action_name: str,
         project_path: Path,
         args: Dict[str, Any],
         dry_run: bool = False,
     ) -> ExecutionResult:
-        """Execute a command with full lifecycle management."""
+        """Execute a action with full lifecycle management."""
         # Initialize database if needed
         try:
             await self.db.initialize()
         except Exception as e:
             logger.warning(f"Database initialization failed: {e}")
 
-        # Load command definition
-        command = self.loader.load_command(command_name, project_path)
-        if not command:
+        # Load action definition
+        action = self.loader.load_action(action_name, project_path)
+        if not action:
             return ExecutionResult(
-                success=False, error=f"Command '{command_name}' not found"
+                success=False, error=f"Action '{action_name}' not found"
             )
 
         # Validate arguments
-        validation_errors = self._validate_arguments(command, args)
+        validation_errors = self._validate_arguments(action, args)
         if validation_errors:
             return ExecutionResult(
                 success=False,
@@ -254,22 +254,22 @@ class Executor:
         # Create session
         session_id = f"{project_path.name}-{int(datetime.now().timestamp())}"
         artifact_dir = self.artifacts.create_session_dir(
-            project_path, session_id, command_name
+            project_path, session_id, action_name
         )
 
         context = ActionContext(
             id=session_id,
-            command_name=command_name,
+            action_name=action_name,
             project_path=project_path,
             artifact_dir=artifact_dir,
         )
 
-        # Store command arguments in context shared data
+        # Store action arguments in context shared data
         context.set_shared_data("args", args)
-        context.set_shared_data("environment", {**os.environ, **command.environment})
+        context.set_shared_data("environment", {**os.environ, **action.environment})
 
         if dry_run:
-            return self._dry_run(command, context)
+            return self._dry_run(action, context)
 
         # Detect current worktree context
         worktree_name = None
@@ -292,7 +292,7 @@ class Executor:
         # Start event tracking
         try:
             event_id = await self.db.start_event(
-                command=command_name,
+                action=action_name,
                 project_path=str(project_path),
                 session_id=session_id,
                 artifacts_path=str(artifact_dir),
@@ -303,12 +303,12 @@ class Executor:
             logger.warning(f"Failed to start event tracking: {e}")
             context.set_shared_data("event_id", None)
 
-        # Create appropriate command type and execute
+        # Create appropriate action type and execute
         try:
-            command_instance = create_action(
-                command, context, self.step_executor, self.builtin_steps
+            action_instance = create_action(
+                action, context, self.step_executor, self.builtin_steps
             )
-            result = await command_instance.execute()
+            result = await action_instance.execute()
 
             # Mark success in event tracking
             event_id = context.get_shared_data("event_id")
@@ -324,7 +324,7 @@ class Executor:
             return result
 
         except Exception as e:
-            logger.error(f"Command execution failed: {e}")
+            logger.error(f"Action execution failed: {e}")
 
             # Mark failure in event tracking
             event_id = context.get_shared_data("event_id")
@@ -339,34 +339,34 @@ class Executor:
             )
 
     def _validate_arguments(
-        self, command: ActionDefintion, args: Dict[str, Any]
+        self, action: ActionDefintion, args: Dict[str, Any]
     ) -> List[str]:
-        """Validate command arguments."""
+        """Validate action arguments."""
         errors = []
 
-        for arg_def in command.arguments:
+        for arg_def in action.arguments:
             if arg_def.required and arg_def.name not in args:
                 errors.append(f"Required argument '{arg_def.name}' missing")
 
         return errors
 
     def _dry_run(
-        self, command: ActionDefintion, context: ActionContext
+        self, action: ActionDefintion, context: ActionContext
     ) -> ExecutionResult:
         """Perform a dry run showing what would be executed."""
-        output = f"Dry run for command: {command.name}\n"
-        output += f"Description: {command.description}\n"
+        output = f"Dry run for action: {action.name}\n"
+        output += f"Description: {action.description}\n"
         output += f"Project path: {context.project_path}\n"
         output += f"Arguments: {context.get_shared_data('args')}\n\n"
 
-        all_steps = command.get_all_steps()
+        all_steps = action.get_all_steps()
         output += f"Steps to execute ({len(all_steps)}):\n"
         for i, step in enumerate(all_steps, 1):
             output += f"  {i}. {step.name} ({step.type.value}): {step.action}\n"
 
-        if command.cleanup_on_failure:
+        if action.cleanup_on_failure:
             output += "\nCleanup steps on failure:\n"
-            for step_item in command.cleanup_on_failure:
+            for step_item in action.cleanup_on_failure:
                 if isinstance(step_item, str):
                     step = ActionStep.from_string(step_item)
                 else:

@@ -19,8 +19,8 @@ class TestSmoke:
             assert result.exit_code == 0
             assert Path(".prj").exists()
 
-            # List commands
-            result = runner.invoke(app, ["list-commands"])
+            # List actions
+            result = runner.invoke(app, ["list-actions"])
             assert result.exit_code == 0
             assert "echo-hello" in result.stdout
 
@@ -30,11 +30,11 @@ class TestSmoke:
             assert "Command completed successfully" in result.stdout
 
     def test_help_available(self):
-        """Ensure help is available for all commands."""
+        """Ensure help is available for all actions."""
         runner = CliRunner()
-        commands = ["init", "list-commands", "run", "status"]
+        actions = ["init", "list-actions", "run", "status"]
 
-        for cmd in commands:
-            result = runner.invoke(app, [cmd, "--help"])
+        for action in actions:
+            result = runner.invoke(app, [action, "--help"])
             assert result.exit_code == 0
             assert "help" in result.stdout.lower()

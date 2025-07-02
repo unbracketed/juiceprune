@@ -9,7 +9,7 @@ classDiagram
         +String name
         +String description
         +String category
-        +List~CommandArgument~ arguments
+        +List~ActionArgument~ arguments
         +Dict environment
         +List~ActionStep~ pre_steps
         +List~ActionStep~ steps
@@ -36,7 +36,7 @@ classDiagram
         SHELL
     }
     
-    class CommandArgument {
+    class ActionArgument {
         +String name
         +bool required
         +String type
@@ -110,7 +110,7 @@ classDiagram
     
     %% Relationships
     ActionDefintion ||--o{ ActionStep : contains
-    ActionDefintion ||--o{ CommandArgument : has
+    ActionDefintion ||--o{ ActionArgument : has
     ActionStep ||--|| StepType : typed_as
     Session ||--o{ StepExecution : tracks
     Session ||--|| SessionStatus : has_status
