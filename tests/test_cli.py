@@ -42,9 +42,9 @@ def test_list_actions_empty(temp_dir):
     os.chdir(temp_dir)
 
     try:
-        result = runner.invoke(app, ["list actions"])
+        result = runner.invoke(app, ["list", "actions"])
         assert result.exit_code == 0
-        assert "Available actions" in result.stdout
+        assert "Available Actions" in result.stdout
     finally:
         os.chdir(original_cwd)
 
@@ -69,7 +69,7 @@ def test_list_actions_with_actions(test_project):
     os.chdir(test_project)
 
     try:
-        result = runner.invoke(app, ["list-actions"])
+        result = runner.invoke(app, ["list", "actions"])
         assert result.exit_code == 0
         assert "test-cmd" in result.stdout
         assert "Test action" in result.stdout

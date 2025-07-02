@@ -240,7 +240,7 @@ class Executor:
         action = self.loader.load_action(action_name, project_path)
         if not action:
             return ExecutionResult(
-                success=False, error=f"Action '{action_name}' not found"
+                success=False, error=f"action '{action_name}' not found"
             )
 
         # Validate arguments

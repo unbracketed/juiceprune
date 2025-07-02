@@ -66,6 +66,20 @@ def sample_command():
 
 
 @pytest.fixture
+def sample_action():
+    """Sample action definition for testing."""
+    return ActionDefintion(
+        name="test-action",
+        description="Test action for unit tests",
+        arguments=[
+            ActionArgument(name="input", required=True),
+            ActionArgument(name="optional", required=False, default="default_value"),
+        ],
+        steps=["validate-prerequisites", "store-artifacts"],
+    )
+
+
+@pytest.fixture
 def test_project(temp_dir):
     """Create a test project structure."""
     project_path = temp_dir / "test-project"

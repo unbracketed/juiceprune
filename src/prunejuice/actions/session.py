@@ -13,7 +13,7 @@ console = Console()
 # Create session subcommand app
 session_app = typer.Typer(
     name="session",
-    help="Manage tmux sessions using pots integration",
+    help="Manage tmux sessions",
     rich_markup_mode="rich",
 )
 

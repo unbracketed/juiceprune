@@ -137,10 +137,10 @@ class ActionDefintion(BaseModel):
 
 
 class ExecutionEvent(BaseModel):
-    """Event tracking for command execution."""
+    """Event tracking for action execution."""
 
     id: Optional[int] = None
-    command: str
+    action: str
     project_path: str
     worktree_name: Optional[str] = None
     session_id: str

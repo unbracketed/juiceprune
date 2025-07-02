@@ -20,21 +20,25 @@ class TestSmoke:
             assert Path(".prj").exists()
 
             # List actions
-            result = runner.invoke(app, ["list-actions"])
+            result = runner.invoke(app, ["list", "actions"])
             assert result.exit_code == 0
             assert "echo-hello" in result.stdout
 
             # Run simple command
             result = runner.invoke(app, ["run", "echo-hello"])
             assert result.exit_code == 0
-            assert "Command completed successfully" in result.stdout
+            assert "Action completed successfully" in result.stdout
 
     def test_help_available(self):
         """Ensure help is available for all actions."""
         runner = CliRunner()
-        actions = ["init", "list-actions", "run", "status"]
+        actions = ["init", ["list", "actions"], "run", "status"]
 
         for action in actions:
-            result = runner.invoke(app, [action, "--help"])
+            if isinstance(action, list):
+                cmd = action + ["--help"]
+            else:
+                cmd = [action, "--help"]
+            result = runner.invoke(app, cmd)
             assert result.exit_code == 0
             assert "help" in result.stdout.lower()

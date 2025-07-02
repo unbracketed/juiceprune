@@ -209,13 +209,13 @@ class Database:
         self,
         limit: int = 20,
         status: Optional[str] = None,
-        command: Optional[str] = None,
+        action: Optional[str] = None,
         worktree: Optional[str] = None,
         project_path: Optional[str] = None,
     ) -> List[ExecutionEvent]:
         """Get events with optional filters and secure parameter binding."""
         query_parts = [
-            "SELECT id, command, project_path, worktree_name, session_id,",
+            "SELECT id, action, project_path, worktree_name, session_id,",
             "start_time, end_time, status, artifacts_path, exit_code,",
             "error_message, metadata FROM events",
         ]
@@ -225,9 +225,9 @@ class Database:
         if status:
             conditions.append("status = ?")
             params.append(status)
-        if command:
-            conditions.append("command LIKE ?")
-            params.append(f"%{command}%")
+        if action:
+            conditions.append("action LIKE ?")
+            params.append(f"%{action}%")
         if worktree:
             conditions.append("worktree_name LIKE ?")
             params.append(f"%{worktree}%")
@@ -257,7 +257,7 @@ class Database:
 
                 event = ExecutionEvent(
                     id=row[0],
-                    command=row[1],
+                    action=row[1],
                     project_path=row[2],
                     worktree_name=row[3],
                     session_id=row[4],
@@ -280,7 +280,7 @@ class Database:
         async with self.connection() as db:
             cursor = await db.execute(
                 """
-                SELECT id, command, project_path, worktree_name, session_id,
+                SELECT id, action, project_path, worktree_name, session_id,
                        start_time, end_time, status, artifacts_path, exit_code,
                        error_message, metadata
                 FROM events 
@@ -301,7 +301,7 @@ class Database:
 
             return ExecutionEvent(
                 id=row[0],
-                command=row[1],
+                action=row[1],
                 project_path=row[2],
                 worktree_name=row[3],
                 session_id=row[4],

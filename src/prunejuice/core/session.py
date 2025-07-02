@@ -34,7 +34,7 @@ class ActionContext(BaseModel):
     """Central action context management for action execution."""
 
     id: str
-    command_name: str
+    action_name: str
     project_path: Path
     worktree_path: Optional[Path] = None
     tmux_session_name: Optional[str] = None
@@ -48,7 +48,7 @@ class ActionContext(BaseModel):
         """Get execution context for steps - replaces manual context building."""
         context = {
             "session_id": self.id,
-            "command_name": self.command_name,
+            "action_name": self.action_name,
             "project_path": self.project_path,
             "worktree_path": self.worktree_path,
             "tmux_session": self.tmux_session_name,
@@ -97,13 +97,13 @@ class ActionContext(BaseModel):
 
         session_name = session_manager.create_session_for_worktree(
             self.worktree_path or self.project_path,
-            self.command_name,
+            self.action_name,
             auto_attach=False,
         )
 
         if not session_name:
             # Fallback session name if creation failed
-            session_name = f"prunejuice-{self.command_name}"
+            session_name = f"prunejuice-{self.action_name}"
 
         self.tmux_session_name = session_name
         return session_name

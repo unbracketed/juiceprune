@@ -187,7 +187,7 @@ class BuiltinSteps:
 
             action_context = ActionContext(
                 id=context.get("session_id", "unknown"),
-                command_name=context.get("command_name", "unknown"),
+                action_name=context.get("action_name", "unknown"),
                 project_path=project_path,
                 artifact_dir=artifact_dir,
                 status=ActionStatus.ACTIVE,
